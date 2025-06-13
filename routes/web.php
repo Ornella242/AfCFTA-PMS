@@ -7,6 +7,7 @@ Route::get('/', function () {
 });
 Route::view('/login', 'auth.login');
 Route::view('/dashboard', 'dashboard');
+Route::view('/addnewproject', 'newproject');
 Route::view('/allprojects', 'allprojects');
 Route::view('/adminprojects', 'adminprojects');
 Route::view('/hrmprojects', 'hrmprojects');

@@ -16,7 +16,7 @@
                         <div class="col pr-0">
                           <p class="h5 text-bold text-white mb-0">12 Completed</p>
                           {{-- <span class="h3 mb-0 text-white">12</span> --}}
-                          <span class="small text-muted">in the last 7days</span>
+                          <span class="small text-white">in the last 7days</span>
                         </div>
                       </div>
                     </div>
@@ -34,7 +34,7 @@
                         <div class="col pr-0">
                           <p class="h5 text-white mb-0">34 Updated</p>
                           {{-- <span class="h3 mb-0">2</span> --}}
-                          <span class="small text-muted">in the last 7 days</span>
+                          <span class="small text-white">in the last 7 days</span>
                         </div>
                       </div>
                     </div>
@@ -72,7 +72,7 @@
                           </span>
                         </div>
                         <div class="col">
-                          <p class="h5 text-white mb-0">1 due soon</p>
+                          <p class="h5 text-white mb-0">1 non started</p>
                               <span class="small text-white">in the next 7 days</span>                          
                         </div>
                       </div>
@@ -83,7 +83,7 @@
             
               <!-- info small box -->
               <div class="row">               
-                <div class="col-md-6">
+                <div class="col-md-12">
                   <div class="card shadow mb-4">
                     <div class="card-body">
                       <div class="card-title">
@@ -91,11 +91,15 @@
                         <a class="float-right small text-muted" href="{{ url('/allprojects') }}">View all</a>
                       </div>
                       <div class="row">
-                        <div class="col-md-12">
+                        {{-- <div class="col-md-12">
                           <div id="chart-box">
                             <div id="donutChartWidget"></div>
                           </div>
+                        </div> --}}
+                        <div class="col-md-12">
+                          <div id="phaseProgressChartVertical"></div>
                         </div>
+
                         <div class="col-md-12">
                           <div class="row align-items-center my-3">
                             <div class="col">
@@ -154,7 +158,7 @@
                     </div> <!-- .card-body -->
                   </div> <!-- .card -->
                 </div> <!-- .col-md -->
-                <div class="col-md-6">
+                {{-- <div class="col-md-6">
                   
                   <div class="card timeline shadow">
                     <div class="card-header">
@@ -196,7 +200,7 @@
                   </div> <!-- / .card-body -->
                   </div> <!-- / .card -->
                 
-                </div> <!-- .col -->
+                </div> <!-- .col --> --}}
               </div> <!-- / .row -->
               <div class="row">
                 <!-- Recent projects -->
@@ -355,5 +359,75 @@
        
         @include('partials.footer')
 </main> <!-- main -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var options = {
+    chart: {
+      type: 'bar',
+      height: 400
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '50%',
+        endingShape: 'rounded'
+      }
+    },
+    dataLabels: {
+      enabled: false  // Désactivation de l'affichage sur les barres
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent']
+    },
+    series: [
+      {
+        name: 'ToR',
+        data: [80, 100, 60]
+      },
+      {
+        name: 'Procurement',
+        data: [0, 90, 0]
+      },
+      {
+        name: 'Implementation',
+        data: [0, 70, 0]
+      }
+    ],
+    xaxis: {
+      categories: ['AHRM Communication', 'AfCFTA Library', 'AfCFTA DEAI Strategy'],
+      title: {
+        text: 'Projets'
+      }
+    },
+    yaxis: {
+      max: 100,
+      title: {
+        text: 'Pourcentage'
+      }
+    },
+    fill: {
+      opacity: 1
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return val + "%";
+        }
+      }
+    },
+    legend: {
+      position: 'top'
+    }
+  };
+
+  var chart = new ApexCharts(document.querySelector("#phaseProgressChartVertical"), options);
+  chart.render();
+});
+
+</script>
+
+
 
  

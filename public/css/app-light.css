@@ -7193,12 +7193,12 @@ a.text-dark:hover, a.text-dark:focus {
   color: #EBEAE5; }
 /* End Text Colors */
 
-/* .main-content {
+ /* .bg-main {
     background-image: url('/images/bg.jpg'); 
     background-size: cover; 
     background-repeat: no-repeat; 
     background-position: center;
-} */
+}  */
 /* .main-content {
     background-color:#EBEAE5 ;
 } */
@@ -7485,6 +7485,7 @@ button:focus {
 
 .brand-md {
   width: 4rem; }
+
 
 [data-mode="dark"] .fe::before {
   content: "\e9e3"; }

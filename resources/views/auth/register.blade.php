@@ -80,7 +80,7 @@
               </ul>
             </div>
           </div>
-          <button class="btn btn-lg btn-primary btn-block" type="submit">
+          <button class="btn btn-lg bg-green btn-block" type="submit">
             <a href="{{ url('/login') }}" class="text-white no-underline"> Sign up</a>
           </button>
           <p class="mt-5 mb-3 text-muted text-center">© <span class="text-maroon">AHRMD 2025</span></p>

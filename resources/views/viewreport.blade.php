@@ -8,7 +8,7 @@
                   <h2 class="h3 page-title text-black"><small class="h3 text-maroon text-uppercase">Report</small><br />#0001</h2>
                 </div>
                 <div class="col-auto">
-                  <button type="button" class="btn bg-yellow text-white"><i class="fe fe-file fe-16"></i> Print</button>
+                  <button type="button" class="btn bg-yellow text-white"><i class="fe fe-printer fe-16"></i> Print</button>
                 </div>
               </div>
               <div class="card shadow">

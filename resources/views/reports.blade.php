@@ -28,6 +28,13 @@
                                         <option value="Project 2">Project 2</option>
                                     </select>
                                 </div>
+                                 <div class="form-row mt-2">
+                                    <label for="priority">Type of report</label>
+                                    <select class="form-control" id="project_name" name="project_name">
+                                        <option value="Project 1">Project report</option>
+                                        <option value="Project 2">Financial project report</option>
+                                    </select>
+                                </div>
                                 <div class="form-row mt-2">
                                     <div class="form-group col-md-6">
                                     <label for="priority">Season</label>
