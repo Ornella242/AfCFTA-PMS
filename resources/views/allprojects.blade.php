@@ -8,116 +8,6 @@
                          <h2 class="h3 mb-0 page-title">All Projects</h2>
                         </div>
                         <div class="col-auto">
-                          {{-- <button type="button" class="btn mb-2 bg-maroon  text-white" data-toggle="modal" data-target="#varyModal" data-whatever="@mdo"><i class="fe fe-plus mx-1"></i>Add new </button>
-                          <div class="modal fade" id="varyModal" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="varyModalLabel">New project</h5>
-                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <form action="" method="POST">
-                                    @csrf
-                                    <!-- Title -->
-                                    <div class="form-group">
-                                      <label for="title">Title</label>
-                                      <input type="text" class="form-control" id="title" name="title" placeholder="Enter project title" required>
-                                    </div>
-                                    <!-- Description -->
-                                    <div class="form-group">
-                                      <label for="description">Description</label>
-                                      <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter project description"></textarea>
-                                    </div>
-                                    <!-- Start Date & End Date -->
-                                    <div class="form-row">
-                                      <div class="form-group col-md-6">
-                                        <label for="start_date">Start Date</label>
-                                        <input type="date" class="form-control" id="start_date" name="start_date" required>
-                                      </div>
-                                      <div class="form-group col-md-6">
-                                        <label for="end_date">End Date</label>
-                                        <input type="date" class="form-control" id="end_date" name="end_date" required>
-                                      </div>
-                                    </div>
-                                    <!-- Priority & Status -->
-                                    <div class="form-row">
-                                      <div class="form-group col-md-6">
-                                        <label for="priority">Priority</label>
-                                        <select class="form-control" id="priority" name="priority">
-                                          <option value="high">High</option>
-                                          <option value="medium">Medium</option>
-                                          <option value="low">Low</option>
-                                        </select>
-                                      </div>
-                                      <div class="form-group col-md-6">
-                                        <label for="status">Status</label>
-                                        <select class="form-control" id="status" name="status">
-                                          <option value="pending" class="text-maroon">Pending</option>
-                                          <option value="processing" class="text-yellow">Processing</option>
-                                          <option value="completed" class="text-green">Completed</option>
-                                        </select>
-                                      </div>
-                                    </div>
-                                    <!-- Partner & Unit -->
-                                    <div class="form-row">
-                                      <div class="form-group col-md-6">
-                                        <label for="unit">Unit</label>
-                                        <select class="form-control" id="unit" name="unit">
-                                          <option value="HR">HR</option>
-                                          <option value="Facilities">Facilities</option>
-                                          <option value="IT">IT</option>
-                                          <option value="Procurement">Procurement</option>
-                                          <option value="Travel">Travel</option>
-                                          <option value="Transport">Transport</option>
-                                        </select>
-                                      </div>
-                                       <div class="form-group col-md-6">
-                                        <label for="partner">Project Manager</label>
-                                        <select class="form-control" id="partner" name="partner">
-                                           <option value="Director">Director</option>
-                                           <option value="Head">Head of Division</option>
-                                        </select>
-                                      </div>
-                                    </div>
-                                    <!-- Type of project & Partner -->
-                                    <div class="form-row">
-                                      <div class="form-group col-md-6">
-                                        <label for="unit">Type of project</label>
-                                        <select class="form-control" id="unit" name="unit">
-                                          <option value="HRM">HRM</option>
-                                          <option value="Admin">Admin</option>
-                                        </select>
-                                      </div>
-                                      <div class="form-group col-md-6">
-                                        <label for="partner">Partner</label>
-                                        <select class="form-control" id="partner" name="partner">
-                                          <option value="AfDB">AfDB</option>
-                                          <option value="AUC">AUC</option>
-                                          <option value="MS-1">MS-1</option>
-                                        </select>
-                                      </div>
-                                    </div>
-                                    
-                                    <!-- Budget -->
-                                    <div class="form-group">
-                                      <label for="budget">Budget (USD)</label>
-                                      <input type="number" step="0.01" class="form-control" id="budget" name="budget" placeholder="Enter budget amount">
-                                    </div>
-
-                                  </div>
-
-                                  <!-- Footer -->
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save Project</button>
-                                  </div>
-                                  </form>
-                                </div>
-                            </div>
-                          </div> --}}
                           <button type="button" class="btn mb-2 bg-maroon text-white" data-toggle="modal" data-target="#projectModal">
                         <i class="fe fe-plus mx-1"></i>Add new
                       </button>
@@ -418,16 +308,24 @@
                           </div>
                         </td>
                         
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ url('/projectdetail') }}">Edit</a>
-                            <a class="dropdown-item" href="{{ url('/projectdetail') }}">View</a>
-                            <a class="dropdown-item" href="#">Remove</a>
-                            <a class="dropdown-item" href="#">Assign</a>
-                          </div>
-                        </td>
+                          <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                       </tr>
                       <tr>
                         <td class="text-muted small">0002</td>
@@ -442,16 +340,24 @@
                             <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                           </div>
                         </td>
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="text-muted sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Edit</a>
-                            <a class="dropdown-item" href="#">View</a>
-                            <a class="dropdown-item" href="#">Remove</a>
-                            <a class="dropdown-item" href="#">Assign</a>
-                          </div>
-                        </td>
+                        <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                       </tr>
                         <tr>
                         <td class="text-muted small">0003</td>
@@ -467,16 +373,24 @@
                           </div>
                         </td>
                         
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="text-muted sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Edit</a>
-                            <a class="dropdown-item" href="#">View</a>
-                            <a class="dropdown-item" href="#">Remove</a>
-                            <a class="dropdown-item" href="#">Assign</a>
-                          </div>
-                        </td>
+                         <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                       </tr>
                       <tr>
                         <td class="text-muted medium">0004</td>
@@ -491,16 +405,24 @@
                             <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
                           </div>
                         </td>
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="text-muted sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Edit</a>
-                            <a class="dropdown-item" href="#">View</a>
-                            <a class="dropdown-item" href="#">Remove</a>
-                            <a class="dropdown-item" href="#">Assign</a>
-                          </div>
-                        </td>
+                         <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                       </tr>
                         <tr>
                         <td class="text-muted small">0005</td>
@@ -516,16 +438,24 @@
                           </div>
                         </td>
                         
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="text-muted sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Edit</a>
-                            <a class="dropdown-item" href="#">View</a>
-                            <a class="dropdown-item" href="#">Remove</a>
-                            <a class="dropdown-item" href="#">Assign</a>
-                          </div>
-                        </td>
+                         <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                       </tr>
                       <tr>
                         <td class="text-muted small">0006</td>
@@ -540,19 +470,26 @@
                             <div class="progress-bar bg-primary" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                           </div>
                         </td>
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="text-muted sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Edit</a>
-                            <a class="dropdown-item" href="#">View</a>
-                            <a class="dropdown-item" href="#">Remove</a>
-                            <a class="dropdown-item" href="#">Assign</a>
-                          </div>
-                        </td>
+                        <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                       </tr>
                     
-
                       <tr>
                         <td class="text-muted small">0001</td>
                         <td class="text-center"><span class="dot dot-lg bg-secondary mr-2"></span></td>
@@ -567,16 +504,24 @@
                           </div>
                         </td>
                         
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="text-muted sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Edit</a>
-                            <a class="dropdown-item" href="#">View</a>
-                            <a class="dropdown-item" href="#">Remove</a>
-                            <a class="dropdown-item" href="#">Assign</a>
-                          </div>
-                        </td>
+                        <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                       </tr>
                       <tr>
                         <td class="text-muted small">0002</td>
@@ -591,16 +536,24 @@
                             <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                           </div>
                         </td>
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="text-muted sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="#">Edit</a>
-                            <a class="dropdown-item" href="#">View</a>
-                            <a class="dropdown-item" href="#">Remove</a>
-                            <a class="dropdown-item" href="#">Assign</a>
-                          </div>
-                        </td>
+                        <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                       </tr>
                      
                       <tr>
@@ -616,15 +569,23 @@
                               <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                           </td>
-                          <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <span class="text-muted sr-only">Action</span>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="#">Edit</a>
-                              <a class="dropdown-item" href="#">View</a>
-                              <a class="dropdown-item" href="#">Remove</a>
-                              <a class="dropdown-item" href="#">Assign</a>
-                            </div>
+                          <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
                           </td>
                       </tr>
 
@@ -641,15 +602,23 @@
                               <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                           </td>
-                          <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <span class="text-muted sr-only">Action</span>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="#">Edit</a>
-                              <a class="dropdown-item" href="#">View</a>
-                              <a class="dropdown-item" href="#">Remove</a>
-                              <a class="dropdown-item" href="#">Assign</a>
-                            </div>
+                          <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
                           </td>
                       </tr>
 
@@ -666,15 +635,23 @@
                               <div class="progress-bar bg-warning" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                           </td>
-                          <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <span class="text-muted sr-only">Action</span>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="#">Edit</a>
-                              <a class="dropdown-item" href="#">View</a>
-                              <a class="dropdown-item" href="#">Remove</a>
-                              <a class="dropdown-item" href="#">Assign</a>
-                            </div>
+                          <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
                           </td>
                       </tr>
 
@@ -691,18 +668,25 @@
                               <div class="progress-bar bg-success" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                           </td>
-                          <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <span class="text-muted sr-only">Action</span>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="#">Edit</a>
-                              <a class="dropdown-item" href="#">View</a>
-                              <a class="dropdown-item" href="#">Remove</a>
-                              <a class="dropdown-item" href="#">Assign</a>
-                            </div>
+                          <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
                           </td>
                       </tr>
-
                     </tbody>
                   </table>
                  

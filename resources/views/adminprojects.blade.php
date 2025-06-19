@@ -128,17 +128,24 @@
                           <div class="progress-bar bg-success" style="width: 100%"></div>
                         </div>
                       </td>
-                      <td>
-                        <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">View</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </td>
+                      <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                     </tr>
                     <tr class="collapse" id="detailsRow1">
                       <td colspan="8" class="bg-light">
@@ -165,17 +172,24 @@
                           <div class="progress-bar bg-success" style="width: 50%"></div>
                         </div>
                       </td>
-                      <td>
-                        <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">View</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </td>
+                      <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                     </tr>
                     <tr class="collapse" id="detailsRow2">
                       <td colspan="8" class="bg-light">
@@ -202,17 +216,24 @@
                           <div class="progress-bar bg-success" style="width: 50%"></div>
                         </div>
                       </td>
-                      <td>
-                        <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">View</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </td>
+                      <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                     </tr>
                     <tr class="collapse" id="detailsRow3">
                       <td colspan="8" class="bg-light">
@@ -239,17 +260,24 @@
                           <div class="progress-bar bg-success" style="width: 50%"></div>
                         </div>
                       </td>
-                      <td>
-                        <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">View</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </td>
+                    <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                     </tr>
                     <tr class="collapse" id="detailsRow4">
                       <td colspan="8" class="bg-light">
@@ -276,17 +304,24 @@
                           <div class="progress-bar bg-warning" style="width: 50%"></div>
                         </div>
                       </td>
-                      <td>
-                        <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">View</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </td>
+                      <td class="text-center">
+                            <!-- Edit -->
+                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
+                              <i class="fe fe-edit-2"></i>
+                            </a>
+                            <!-- View -->
+                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
+                              <i class="fe fe-eye"></i>
+                            </a>
+                            <!-- Remove -->
+                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
+                              <i class="fe fe-trash-2"></i>
+                            </a>
+                            <!-- Assign -->
+                            <a href="#" class="text-warning text-decoration-none" title="Assign">
+                              <i class="fe fe-user-plus"></i>
+                            </a>
+                          </td>
                     </tr>
                     <tr class="collapse" id="detailsRow5">
                       <td colspan="8" class="bg-light">

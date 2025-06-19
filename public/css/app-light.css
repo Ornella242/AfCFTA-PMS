@@ -7170,7 +7170,23 @@ a.text-dark:hover, a.text-dark:focus {
 .bg-grey {
   background: #EBEAE5; }
 /* End background colors */
+  .section-title {
+    padding: 8px;
+    font-weight: bold;
+    color: white;
+  }
 
+  .step-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    border-bottom: 1px solid #dee2e6;
+  }
+  .step-row:nth-child(even) { background-color: #f8f9fa; }
+  .status-select {
+    width: 160px;
+  }
 /* Start Text colors */
 .text-maroon {
   color: #9E2140; }

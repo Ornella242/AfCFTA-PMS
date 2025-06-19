@@ -52,9 +52,7 @@
                         </div>
                         <div class="row align-items-center my-4">
                             <div class="col-md-6">
-                            <div id="chart-box">
-                                <div id="donutChartWidget"></div>
-                            </div>
+                                <div id="phaseProgressChartVertical"></div>
                             </div>
                             <div class="col-md-6">
                             <div class="row align-items-center my-2">
@@ -151,178 +149,212 @@
                         </div> <!-- .card -->
                          
                         <div class="card shadow mb-4">
-                           <div class="card-header d-flex justify-content-between align-items-center">
-                                <strong class="card-title h5 mb-0">Associated Tasks</strong>
-                                <div class="d-flex align-items-center">
-                                    <span class="mr-3 d-flex align-items-center">
-                                    <i class="fe fe-layers mr-1"></i>3
-                                    </span>
-                                    <button type="button" class="btn bg-maroon text-white" data-toggle="modal" data-target="#createtask">
-                                    Create task
-                                    </button>
-                                       <!-- Modal -->
-                                    <div class="modal fade" id="createtask" tabindex="-1" role="dialog" aria-labelledby="createtask" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h5 class="modal-title" id="defaultModalLabel">Create task</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                            </div>
-                                        <div class="modal-body">
-                                                <form action="" method="POST">
-                                                    @csrf
-                                                    {{-- Project name --}}
-                                                    <div class="form-group">
-                                                        <label for="project_name">Project name</label>
-                                                        <select class="form-control" id="unit" name="unit">
-                                                            <option value="">Administration Data</option>
-                                                            <option value="">Administration Data</option>
-                                                            <option value="">Administration Data</option>
-                                                            <!-- Tu peux ajouter d'autres unités -->
-                                                        </select>
-                                                    </div>
-                                                   
-                                                    <!-- Title -->
-                                                    <div class="form-group">
-                                                    <label for="title">Title</label>
-                                                    <input type="text" class="form-control" id="title" name="title" placeholder="Enter task title" required>
-                                                    </div>
-                                                    <!-- Description -->
-                                                    <div class="form-group">
-                                                    <label for="description">Description</label>
-                                                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter task description"></textarea>
-                                                    </div>
-                                                    <!-- Start Date & End Date -->
-                                                    <div class="form-row">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="start_date">Start Date</label>
-                                                        <input type="date" class="form-control" id="start_date" name="start_date" required>
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="end_date">End Date</label>
-                                                        <input type="date" class="form-control" id="end_date" name="end_date" required>
-                                                    </div>
-                                                    </div>
-                                                    <!-- Priority & Status -->
-                                                    <div class="form-row">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="priority">Priority</label>
-                                                        <select class="form-control" id="priority" name="priority">
-                                                        <option value="high">High</option>
-                                                        <option value="medium">Medium</option>
-                                                        <option value="low">Low</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="status">Status</label>
-                                                        <select class="form-control" id="status" name="status">
-                                                        <option value="pending" class="text-maroon">Pending</option>
-                                                        <option value="processing" class="text-yellow">Processing</option>
-                                                        <option value="completed" class="text-green">Completed</option>
-                                                        </select>
-                                                    </div>
-                                                    </div>
-                                                 
-                                                </div>
-
-                                                <!-- Footer -->
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn bg-maroon text-white">Add task</button>
-                                                </div>
-                                                </form>
-                                        </div>                                              
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <div class="card-body p-0">
-                                <table class="table mb-0 table-hover">
-                                <thead class="thead-light">
-                                    <tr>
-                                    <th>Title</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Status</th>
-                                    <th class="text-right">Progress</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr data-toggle="modal" data-target=".modal-right">
-                                    <td>Design and Implement Database Schema for Administrative Data</td>
-                                    <td>05/06/2025</td>
-                                    <td>05/06/2025</td>
-                                    <td><span class="badge badge-success pt-1">Completed</span></td>
-                                    <td class="text-right text-green-600">
-                                        100%  
-                                    </td>
-                                    </tr>
-                                    <tr data-toggle="modal" data-target=".modal-right">
-                                    <td>Develop Admin Dashboard Interface</td>
-                                    <td>05/06/2025</td>
-                                    <td>05/06/2025</td>
-                                    <td><span class="badge badge-warning pt-1">In Progress</span></td>
-                                    <td class="text-right">
-                                        60%
-                                    </td>
-                                    </tr>
-                                    <tr data-toggle="modal" data-target=".modal-right">
-                                            <td>Implement Role-Based Access Control </td>
-                                            <td>05/06/2025</td>
-                                            <td>05/06/2025</td>
-                                            <td><span class="badge badge-secondary pt-1">Pending</span></td>
-                                            <td class="text-right">
-                                                0%
-                                            </td>
-                                        
-                                            <div class="modal fade modal-right modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog modal-sm" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                        <h5 class="modal-title" id="defaultModalLabel">Subtasks</h5>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                        </div>
-                                                        <div class="modal-body"> 
-                                                            <div class="list-group">
-                                                                <!-- Subtask 1 -->
-                                                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                                    <div>
-                                                                    <h6 class="mb-1">Design login page</h6>
-                                                                    <span class="badge badge-success pt-2 pb-2 text-md">Completed</span>
-                                                                    </div>                                                                  
-                                                                </div>
-
-                                                                <!-- Subtask 2 -->
-                                                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                                    <div>
-                                                                    <h6 class="mb-1">Set up database</h6>
-                                                                    <span class="badge badge-warning pt-2 pb-2">In Progress</span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Subtask 3 -->
-                                                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                                    <div>
-                                                                    <h6 class="mb-1">Write documentation</h6>
-                                                                    <span class="badge badge-secondary pb-2 pt-2">Pending</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                        <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                    </tr>
-                                </tbody>
-                                </table>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <strong class="card-title h5 mb-0">Associated Phases</strong>
                             </div>
+                          
+
+                            <!-- TERMS OF REFERENCES -->
+                            <div class="section-title bg-maroon">TERMS OF REFERENCES</div>
+                                <div class="step-row">
+                                    <span>Preparation</span>
+                                    <select class="form-control form-control-sm status-select">
+                                        <option selected>Not started</option>
+                                        <option>In Progress</option>
+                                        <option>Completed</option>
+                                        <option>Cancelled</option>
+                                        <option>Waiting for approval</option>
+                                        <option>Delayed</option>
+                                        <option>Under review</option>
+                                    </select>
+                                      <input type="text" class="form-control form-control-sm reason-input d-none" placeholder="Enter reason" style="width: 200px;" />
+                                </div>
+                                <div class="step-row">
+                                    <span>Availability of Funds</span>
+                                    <select class="form-control form-control-sm status-select">
+                                        <option selected>Not started</option>
+                                        <option>In Progress</option>
+                                        <option>Completed</option>
+                                        <option>Cancelled</option>
+                                        <option>Waiting for approval</option>
+                                        <option>Delayed</option>
+                                        <option>Under review</option>
+                                    </select>
+                                </div>
+                                  <div class="step-row">
+                                    <span>Validation</span>
+                                    <select class="form-control form-control-sm status-select">
+                                        <option selected>Not started</option>
+                                        <option>In Progress</option>
+                                        <option>Completed</option>
+                                        <option>Cancelled</option>
+                                        <option>Waiting for approval</option>
+                                        <option>Delayed</option>
+                                        <option>Under review</option>
+                                    </select>
+                                </div>
+                                <div class="step-row">
+                                <span>SG Approval</span>
+                                <select class="form-control form-control-sm status-select">
+                                        <option selected>Not started</option>
+                                        <option>In Progress</option>
+                                        <option>Completed</option>
+                                        <option>Cancelled</option>
+                                        <option>Waiting for approval</option>
+                                        <option>Delayed</option>
+                                        <option>Under review</option>
+                                    </select>
+                                </div>
+                                <div class="step-row">
+                                <span>Proc. Request</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+
+                            <!-- PROCUREMENT -->
+                            <div class="section-title bg-yellow">PROCUREMENT</div>
+                                <div class="step-row">
+                                <span>Tender Doc</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                <div class="step-row">
+                                <span>Advert.</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                <div class="step-row">
+                                <span>Evaluation and negotiation</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                <div class="step-row">
+                                <span>Award</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                  <div class="step-row">
+                                    <span>Contracting</span>
+                                    <select class="form-control form-control-sm status-select">
+                                        <option selected>Not started</option>
+                                        <option>In Progress</option>
+                                        <option>Completed</option>
+                                        <option>Cancelled</option>
+                                        <option>Waiting for approval</option>
+                                        <option>Delayed</option>
+                                        <option>Under review</option>
+                                    </select>
+                                </div>
+
+                            <!-- IMPLEMENTATION -->
+                            <div class="section-title bg-green">IMPLEMENTATION</div>
+                                <div class="step-row">
+                                <span>Team Set</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                <div class="step-row">
+                                <span>WorkPlan</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                <div class="step-row">
+                                <span>Development</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                <div class="step-row">
+                                <span>Control and validation</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                <div class="step-row">
+                                <span>Training</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
+                                <div class="step-row">
+                                <span>In service</span>
+                                <select class="form-control form-control-sm status-select">
+                                    <option selected>Not started</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                    <option>Cancelled</option>
+                                    <option>Waiting for approval</option>
+                                    <option>Delayed</option>
+                                    <option>Under review</option>
+                                </select>
+                                </div>
                         </div>
 
                     </div> <!-- .col-md -->
@@ -334,4 +366,92 @@
         </div> <!-- .container-fluid -->
      
         @include('partials.footer')
+        <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var options = {
+          chart: {
+            type: 'bar',
+            height: 400
+          },
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '50%',
+              endingShape: 'rounded'
+            }
+          },
+          dataLabels: {
+            enabled: false  // Désactivation de l'affichage sur les barres
+          },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent']
+          },
+          series: [
+            {
+              name: 'ToR',
+              data: [80, 100, 60]
+            },
+            {
+              name: 'Procurement',
+              data: [0, 90, 0]
+            },
+            {
+              name: 'Implementation',
+              data: [0, 70, 0]
+            }
+          ],
+          xaxis: {
+            categories: ['AHRM Communication', 'AfCFTA Library', 'AfCFTA DEAI Strategy'],
+            title: {
+              text: 'Projets'
+            }
+          },
+          yaxis: {
+            max: 100,
+            title: {
+              text: 'Pourcentage'
+            }
+          },
+          fill: {
+            opacity: 1
+          },
+          tooltip: {
+            y: {
+              formatter: function (val) {
+                return val + "%";
+              }
+            }
+          },
+          legend: {
+            position: 'top'
+          }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#phaseProgressChartVertical"), options);
+        chart.render();
+      });
+
+    </script> 
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const selects = document.querySelectorAll('.status-select');
+
+    selects.forEach(select => {
+      select.addEventListener('change', function () {
+        const parent = this.closest('.step-row');
+        const reasonInput = parent.querySelector('.reason-input');
+
+        if (['Cancelled', 'Delayed', 'Pending'].includes(this.value)) {
+          reasonInput.classList.remove('d-none');
+        } else {
+          reasonInput.classList.add('d-none');
+        }
+      });
+    });
+  });
+</script>
+
 </main> <!-- main -->

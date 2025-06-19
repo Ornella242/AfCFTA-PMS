@@ -9,6 +9,23 @@
                     </div>
                     <div class="col-auto">
                       <button type="button" class="btn mb-2 bg-green  text-white" data-toggle="modal" data-target="#varyModalUser" data-whatever="@mdo"><i class="fe fe-user-plus mx-1"></i>Add new user</button>
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
                         <div class="modal fade" id="varyModalUser" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                             <div class="modal-content">
@@ -19,7 +36,7 @@
                                 </button>
                                 </div>
                                 <div class="modal-body">
-                                <form action="" method="POST">
+                                <form action="{{ route('users.store') }}" method="POST">
                                     @csrf
                                     <!-- Firstname -->
                                     <div class="form-group">
@@ -38,29 +55,27 @@
                                     <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="unit">Unit</label>
-                                        <select class="form-control" id="unit" name="unit">
-                                        <option value="HR">HR</option>
-                                        <option value="Facilities">Facilities</option>
-                                        <option value="IT">IT</option>
-                                        <option value="Procurement">Procurement</option>
-                                        <option value="Travel">Travel</option>
-                                        <option value="Transport">Transport</option>
+                                         <select name="unit_id" id="unit" class="form-control">
+                                            @foreach($units as $unit)
+                                                <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                         <div class="form-group col-md-6">
                                         <label for="role">Role</label>
-                                        <select class="form-control" id="partner" name="partner">
-                                            <option value="admin">Admin</option>
-                                            <option value="pm">Project Manager</option>
-                                            <option value="pma">PM Assistant</option>
+                                        <select id="role" class="form-control" name='role_id'>
+                                                @foreach($roles as $role)
+                                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                @endforeach
                                         </select>
                                     </div>
                                     </div>
-                                <!-- Footer -->
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn bg-green text-white">Add user</button>
-                                </div>
+                                    <!-- Footer -->
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn bg-green text-white">
+                                            <i class="fe fe-user-plus mx-1"></i>Add
+                                        </button>
+                                    </div>
                                 </form>
                                 </div>
                             </div>
@@ -86,169 +101,129 @@
                           </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>0001</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>Facilities</td>
-                                <td><i class="fe fe-user text-maroon"></i> Project Manager</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0002</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>IT</td>
-                                <td><i class="fe fe-user text-maroon"></i> Project Manager</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0003</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>Procurement</td>
-                                <td><i class="fe fe-shield text-green"></i> Admin</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0004</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>HR</td>
-                                <td><i class="fe fe-user text-maroon"></i> Project Manager</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0005</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>HR</td>
-                                <td><i class="fe fe-shield text-green"></i> Admin</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0006</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>Facilities</td>
-                                <td><i class="fe fe-users text-yellow"></i> PM Assistant</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0007</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>Facilities</td>
-                                <td><i class="fe fe-user text-maroon"></i> Project Manager</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0008</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>Facilities</td>
-                                <td><i class="fe fe-users text-yellow"></i> PM Assistant</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0009</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>Facilities</td>
-                                <td><i class="fe fe-user text-maroon"></i> Project Manager</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td>0010</td>
-                                <td>Imani Lara</td>
-                                <td>imanilara@au-afcfta.org</td>
-                                <td>Facilities</td>
-                                <td><i class="fe fe-users text-yellow"></i> PM Assistant</td>
-                                <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="text-muted sr-only">Action</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#">Edit</a>
-                                    <a class="dropdown-item" href="#">Remove</a>
-                                    <a class="dropdown-item" href="#">Assign</a>
-                                </div>
-                                </td>
-                            </tr>
-                         
+                            @foreach($users as $index => $user)
+                                <tr>
+                                    <td>{{ str_pad($user->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                    <td>{{ $user->firstname }} {{ $user->lastname }}</td>
+                                    <td>{{ $user->email }}</td>
+                                    <td>{{ $user->unit->name ?? '—' }}</td>
+                                    @php
+                                        $icon = 'fe fe-user';
+                                        $color = 'text-muted'; // couleur par défaut
+
+                                        if ($user->role->name === 'Admin') {
+                                            $icon = 'fe fe-shield';
+                                            $color = 'text-danger';
+                                        } elseif ($user->role->name === 'Project Manager') {
+                                            $icon = 'fe fe-user-check';
+                                            $color = 'text-maroon';
+                                        } elseif ($user->role->name === 'Project Manager Assistant') {
+                                            $icon = 'fe fe-user';
+                                            $color = 'text-green';
+                                        } elseif ($user->role->name === 'Member') {
+                                            $icon = 'fe fe-users';
+                                            $color = 'text-gold';
+                                        }
+                                    @endphp
+
+                                    <td><i class="{{ $icon }} {{ $color }}"></i> {{ $user->role->name ?? '—' }}</td>
+                                    {{-- <td>{{ $user->role->name ?? '—' }}</td> --}}
+
+                                     <!-- Action column -->
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <!-- Edit -->
+                                            <a href="#" class="text-primary text-decoration-none"
+                                            data-toggle="modal"
+                                            data-target="#editUserModal"
+                                            data-id="{{ $user->id }}"
+                                            data-firstname="{{ $user->firstname }}"
+                                            data-lastname="{{ $user->lastname }}"
+                                            data-email="{{ $user->email }}"
+                                            data-unit_id="{{ $user->unit_id }}"
+                                            data-role_id="{{ $user->role_id }}"
+                                            title="Edit">
+                                                <i class="fe fe-edit-2"></i>
+                                            </a>
+                                          
+                                            <!-- Remove -->
+                                            <form method="POST" action="{{ route('users.destroy', $user->id) }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-link text-danger p-0 m-0 text-decoration-none" title="Remove" onclick="return confirm('Are you sure?')">
+                                                    <i class="fe fe-trash-2"></i>
+                                                </button>
+                                            </form>
+                                            <!-- Assign -->
+                                            {{-- <a href="{{ route('users.assign', $user->id) }}" class="text-warning text-decoration-none" title="Assign">
+                                                <i class="fe fe-user-plus"></i>
+                                            </a> --}}
+                                        </div>
+                                    </td>
+
+
+                                </tr>
+                            @endforeach
                         </tbody>
+
                       </table>
+                      <!-- Edit User Modal -->
+                        <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <form method="POST" action="" id="editUserForm">
+                                @csrf
+                                @method('PUT')
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title">Edit User</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="hidden" name="user_id" id="edit_user_id">
+
+                                        <div class="form-group">
+                                            <label for="firstname">Firstname</label>
+                                            <input type="text" name="firstname" id="edit_firstname" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="lastname">Lastname</label>
+                                            <input type="text" name="lastname" id="edit_lastname" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="email">Email</label>
+                                            <input type="email" name="email" id="edit_email" class="form-control" required>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="unit">Unit</label>
+                                                <select name="unit_id" id="edit_unit_id" class="form-control">
+                                                    @foreach($units as $unit)
+                                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="role">Role</label>
+                                                <select name="role_id" id="edit_role_id" class="form-control">
+                                                    @foreach($roles as $role)
+                                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="submit" class="btn bg-green text-white">
+                                        <i class="fe fe-save"></i> Save
+                                    </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        </div>
+
                     </div>
                   </div>
                 </div> <!-- simple table -->
@@ -306,3 +281,25 @@
     gtag('js', new Date());
     gtag('config', 'UA-56159088-1');
 </script>
+
+<script>
+    $('#editUserModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget)
+
+        var id = button.data('id');
+        var firstname = button.data('firstname');
+        var lastname = button.data('lastname');
+        var email = button.data('email');
+        var unit_id = button.data('unit_id');
+        var role_id = button.data('role_id');
+
+        var modal = $(this);
+        modal.find('#edit_firstname').val(firstname);
+        modal.find('#edit_lastname').val(lastname);
+        modal.find('#edit_email').val(email);
+        modal.find('#edit_unit_id').val(unit_id);
+        modal.find('#edit_role_id').val(role_id);
+        modal.find('#editUserForm').attr('action', '/users/' + id); // Route vers UserController@update
+    });
+</script>
+

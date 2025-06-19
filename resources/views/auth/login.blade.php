@@ -23,31 +23,52 @@
         <canvas id="backgroundCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
 
     <div class="wrapper vh-100">
+      @if(session('success'))
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  {{ session('success') }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+          @endif
+
+          @if(session('error'))
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  {{ session('error') }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+          @endif
       <div class="row align-items-center h-100">
-        <form class="col-lg-3 col-md-4 col-10 mx-auto text-center">
-          <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="./index.html">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="navbar-brand-img brand-md">
+        <form method="POST" action="{{ route('login') }}" class="col-lg-3 col-md-4 col-10 mx-auto text-center">
+          @csrf
+          <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="#">
+              <img src="{{ asset('images/logo.png') }}" alt="Logo" class="navbar-brand-img brand-md">
           </a>
           <h1 class="h3 mb-3 text-green">Sign in</h1>
+
           <div class="form-group">
-            <label for="inputEmail" class="sr-only">Email address</label>
-            <input type="email" id="inputEmail" class="form-control form-control-lg" placeholder="Email address" required="" autofocus="">
+              <input type="email" name="email" id="inputEmail" class="form-control form-control-lg" placeholder="Email address" required autofocus>
           </div>
+
           <div class="form-group">
-            <label for="inputPassword" class="sr-only">Password</label>
-            <input type="password" id="inputPassword" class="form-control form-control-lg" placeholder="Password" required="">
+              <input type="password" name="password" id="inputPassword" class="form-control form-control-lg" placeholder="Password" required>
           </div>
-          {{-- <div class="checkbox mb-3">
-            <label>
-              <input type="checkbox" value="remember-me"> Stay logged in </label>
-          </div> --}}
+
+          <div class="checkbox mb-3">
+              <label>
+                  <input type="checkbox" name="remember"> Stay logged in
+              </label>
+          </div>
+
           <button class="btn btn-lg bg-green text-white btn-block" type="submit">
-            <a href="{{ url('/dashboard') }}" class="text-white">
-                Let me in
-            </a>
+              Let me in
           </button>
+
           <p class="mt-5 mb-3 text-muted text-center">© <span class="text-maroon">AHRMD 2025</span></p>
-        </form>
+      </form>
+
       </div>
     </div>
     <script src="js/jquery.min.js"></script>

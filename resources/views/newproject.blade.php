@@ -11,7 +11,8 @@
             <button type="button" class="btn bg-maroon text-white">Add project</button>
           </div>
         </div>
-        <form>
+        <form action="{{ route('projects.store') }}" method="POST">
+          @csrf
           <hr class="my-4">
           <h5 class="mb-2 mt-4 text-maroon">Project details</h5>
           <div class="form-row">

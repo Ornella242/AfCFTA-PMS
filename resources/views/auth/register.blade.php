@@ -25,66 +25,64 @@
 
     <div class="wrapper vh-100">
       <div class="row align-items-center h-100">
-        <form class="col-lg-6 col-md-8 col-10 mx-auto">
-          <div class="mx-auto text-center my-4">
-            <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="./index.html">
-              <img src="{{ asset('images/logo.png') }}" alt="Logo" class="navbar-brand-img brand-md">
-            </a>
-            <h2 class="my-3 text-gold">Registration <span class="text-maroon">Form</span></h2>
-          </div>
-          <div class="form-group">
-            <label for="inputEmail4">Email</label>
-            <input type="email" class="form-control" id="inputEmail4">
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="firstname">Firstname</label>
-              <input type="text" id="firstname" class="form-control">
+          <form method="POST" action="{{ route('register.store') }}" class="col-lg-6 col-md-8 col-10 mx-auto">
+            @csrf
+            <div class="mx-auto text-center my-4">
+              <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="./index.html">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="navbar-brand-img brand-md">
+              </a>
+              <h2 class="my-3 text-gold">Registration <span class="text-maroon">Form</span></h2>
             </div>
-            <div class="form-group col-md-6">
-              <label for="lastname">Lastname</label>
-              <input type="text" id="lastname" class="form-control">
+            <div class="form-group">
+              <label for="inputEmail4">Email</label>
+              <input type="email" name="email" class="form-control" id="inputEmail4">
             </div>
-          </div>
-          <div class="form-row">
-              <label for="unit">Unit</label>
-                <select class="form-control" id="unit" name="unit">
-                    <option value="HR">HR</option>
-                    <option value="Facilities">Facilities</option>
-                    <option value="IT">IT</option>
-                    <option value="Procurement">Procurement</option>
-                    <option value="Travel">Travel</option>
-                    <option value="Transport">Transport</option>
-                </select>  
-          </div>
-          <hr class="my-4">
-          <div class="row mb-4">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="inputPassword5">New Password</label>
-                <input type="password" class="form-control" id="inputPassword5">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="firstname">Firstname</label>
+                <input type="text" id="firstname" name="firstname" class="form-control">
               </div>
-              <div class="form-group">
-                <label for="inputPassword6">Confirm Password</label>
-                <input type="password" class="form-control" id="inputPassword6">
+              <div class="form-group col-md-6">
+                <label for="lastname">Lastname</label>
+                <input type="text" id="lastname" name="lastname" class="form-control">
               </div>
             </div>
-            <div class="col-md-6">
-              <p class="mb-2">Password requirements</p>
-              <p class="small text-muted mb-2"> To create a new password, you have to meet all of the following requirements: </p>
-              <ul class="small text-muted pl-4 mb-0">
-                <li> Minimum 8 character </li>
-                <li>At least one special character</li>
-                <li>At least one number</li>
-                <li>Can’t be the same as a previous password </li>
-              </ul>
+            <div class="form-row">
+                <label for="unit">Unit</label>
+                  <select class="form-control" id="unit" name="unit_id">
+                        @foreach($units as $unit)
+                          <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                        @endforeach
+                  </select>  
             </div>
-          </div>
-          <button class="btn btn-lg bg-green btn-block" type="submit">
-            <a href="{{ url('/login') }}" class="text-white no-underline"> Sign up</a>
-          </button>
-          <p class="mt-5 mb-3 text-muted text-center">© <span class="text-maroon">AHRMD 2025</span></p>
-        </form>
+            <hr class="my-4">
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="inputPassword5">New Password</label>
+                  <input type="password" name="password" class="form-control" id="inputPassword5">
+                </div>
+                <div class="form-group">
+                  <label for="inputPassword6">Confirm Password</label>
+                  <input type="password" name="password_confirmation" class="form-control" id="inputPassword6">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <p class="mb-2">Password requirements</p>
+                <p class="small text-muted mb-2"> To create a new password, you have to meet all of the following requirements: </p>
+                <ul class="small text-muted pl-4 mb-0">
+                  <li> Minimum 8 character </li>
+                  <li>At least one special character</li>
+                  <li>At least one number</li>
+                  <li>Can’t be the same as a previous password </li>
+                </ul>
+              </div>
+            </div>
+            <button class="btn btn-lg bg-green btn-block text-white" type="submit">
+              Sign up
+            </button>
+            <p class="mt-5 mb-3 text-muted text-center">© <span class="text-maroon">AHRMD 2025</span></p>
+          </form>
       </div>
     </div>
     <script src="js/jquery.min.js"></script>
