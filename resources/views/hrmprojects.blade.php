@@ -5,337 +5,301 @@
             <div class="col-12">
               <div class="row align-items-center mb-4">
                 <div class="col">
-                    <h2 class="h3 mb-0 page-title">HRM Projects</h2>
+                    <h2 class="h3 mb-0 page-title text-maroon">Human Resources Managment Projects</h2>
                 </div>
               </div>
-              <div class="row align-items-center my-4">
-                <div class="col-md-6">
-                    <div id="phaseProgressChartVertical"></div>
-                </div>
-               <div class="col-md-6">
-                  <div class="row align-items-center my-2">
-                    <div class="col">
-                      <strong class="text-green">Completed</strong><br / />
-                      <span class="my-0 medium">85%</span>
-                    </div>
-                    <div class="col-auto">
-                      <strong class="my-0">1200</strong>
-                    </div>
-                    <div class="col-3">
-                      <div class="progress" style="height: 4px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+              <div class="row">
+                @foreach($highPriorityProjects as $project)
+                  @php
+                      $phases = collect([
+                          ['name' => 'tor', 'color' => 'bg-info'],
+                          ['name' => 'procurement', 'color' => 'bg-warning'],
+                          ['name' => 'implementation', 'color' => 'bg-success'],
+                      ]);
+
+                      $phaseBars = $phases->map(function ($phase) use ($project) {
+                          $p = $project->phases->firstWhere('name', $phase['name']);
+                          return $p ? [
+                              'percentage' => $p->pivot->percentage,
+                              'color' => $phase['color']
+                          ] : null;
+                      })->filter();
+                  @endphp
+
+                  {{-- <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                      <div class="card-body">
+                        <h6 class="text-black font-weight-bold mb-3">{{ $project->title }}</h6>
+                        <div class="progress" style="height: 20px;">
+                          @foreach($phaseBars as $bar)
+                            <div class="progress-bar progress-bar-striped {{ $bar['color'] }}" 
+                                role="progressbar"
+                                style="width: {{ $bar['percentage'] }}%"
+                                aria-valuenow="{{ $bar['percentage'] }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100">
+                              {{ $bar['percentage'] }}%
+                            </div>
+                          @endforeach
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="row align-items-center my-2">
-                    <div class="col">
-                      <strong class="text-yellow">Processing</strong><br / />
-                      <span class="my-0 medium">60%</span>
-                    </div>
-                    <div class="col-auto">
-                      <strong>80</strong>
-                    </div>
-                    <div class="col-3">
-                      <div class="progress" style="height: 4px;">
-                        <div class="progress-bar bg-yellow" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div> --}}
+
+                  <div class="col-md-6 col-lg-4 mb-4">
+                    <a href="{{ route('projects.show', $project->id) }}" class="text-decoration-none text-dark">
+                      <div class="d-flex h-100">
+                        <!-- Bande verticale avec dégradé -->
+                        <div style="width: 2px; border-top-left-radius: .25rem; border-bottom-left-radius: .25rem;
+                                    background: linear-gradient(to bottom, #28a745, #ffc107, #dc3545);">
+                        </div>
+
+                        <!-- Carte cliquable -->
+                        <div class="card h-100 flex-grow-1 border-0 shadow-sm">
+                          <div class="card-body">
+                            <h6 class="text-black font-weight-bold mb-3">{{ $project->title }}</h6>
+                            <div class="progress" style="height: 20px;">
+                              @foreach($phaseBars as $bar)
+                                <div class="progress-bar progress-bar-striped {{ $bar['color'] }}" 
+                                    role="progressbar"
+                                    style="width: {{ $bar['percentage'] }}%"
+                                    aria-valuenow="{{ $bar['percentage'] }}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                  {{ $bar['percentage'] }}%
+                                </div>
+                              @endforeach
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    </a>
                   </div>
-                  <div class="row align-items-center my-2">
-                    <div class="col">
-                      <strong class="text-gold">Assigned</strong>
-                      <div class="my-0 medium">2%</div>
-                    </div>
-                    <div class="col-auto">
-                      <strong>262</strong>
-                    </div>
-                    <div class="col-3">
-                      <div class="progress" style="height: 4px;">
-                        <div class="progress-bar bg-gold" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row align-items-center my-2">
-                    <div class="col">
-                      <strong class="text-maroon">Pending</strong>
-                      <div class="my-0 medium">6%</div>
-                    </div>
-                    <div class="col-auto">
-                      <strong>26</strong>
-                    </div>
-                    <div class="col-3">
-                      <div class="progress" style="height: 4px;">
-                        <div class="progress-bar bg-maroon" role="progressbar" style="width: 2%" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div> <!-- .col-md-12 -->
-              </div> <!-- .row -->
+
+
+
+                @endforeach
+              </div>
               <div class="row items-align-center my-4  d-none d-lg-flex">
-                <div class="col-md">
+               <div class="col-md">
                   <ul class="nav nav-pills justify-content-start">
                     <li class="nav-item">
-                      <a class="nav-link active bg-transparent pr-2 pl-0 text-primary" href="#">All <span class="badge badge-pill bg-gold text-white pb-2 pt-2 ml-2">06</span></a>
+                      <a class="nav-link {{ request('status') === null ? 'active text-white' : 'text-dark' }}"
+                        href="{{ route('projects.hrm') }}">
+                        All
+                        <span class="badge badge-pill bg-gold text-white pb-2 pt-2 ml-2">{{ $counts['all'] }}</span>
+                      </a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link text-muted px-2" href="#">Pending <span class="badge badge-pill bg-maroon border text-white pb-2 pt-2 ml-2">02</span></a>
+                      <a class="nav-link {{ request('status') === 'Not started' ? 'active text-maroon' : 'text-dark' }}"
+                        href="{{ route('projects.hrm', ['status' => 'Not started']) }}">
+                        Not Started
+                        <span class="badge badge-pill bg-maroon border text-white pb-2 pt-2 ml-2">{{ $counts['Not started'] }}</span>
+                      </a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link text-muted px-2" href="#">Processing <span class="badge badge-pill bg-yellow border text-white pb-2 pt-2 ml-2">01</span></a>
+                      <a class="nav-link {{ request('status') === 'In progress' ? 'active text-yellow' : 'text-dark' }}"
+                        href="{{ route('projects.hrm', ['status' => 'In progress']) }}">
+                        In Progress
+                        <span class="badge badge-pill bg-yellow border text-white pb-2 pt-2 ml-2">{{ $counts['In progress'] }}</span>
+                      </a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link text-muted px-2" href="#">Completed <span class="badge badge-pill bg-green border text-white pb-2 pt-2 ml-2">03</span></a>
+                      <a class="nav-link {{ request('status') === 'Completed' ? 'active text-green' : 'text-dark' }}"
+                        href="{{ route('projects.hrm', ['status' => 'Completed']) }}">
+                        Completed
+                        <span class="badge badge-pill bg-green border text-white pb-2 pt-2 ml-2">{{ $counts['Completed'] }}</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link {{ request('status') === 'Cancelled' ? 'active text-white' : 'text-dark' }}"
+                        href="{{ route('projects.hrm', ['status' => 'Cancelled']) }}">
+                        Cancelled
+                        <span class="badge badge-pill bg-danger border text-white pb-2 pt-2 ml-2">{{ $counts['Cancelled'] }}</span>
+                      </a>
                     </li>
                   </ul>
                 </div>
                 <div class="col-md-auto ml-auto text-right">
                   <span class="small bg-white border py-1 px-2 rounded mr-2">
-                    <a href="#" class="text-muted"><i class="fe fe-x mx-1"></i></a>
-                    <span class="text-muted">Status : <strong>Pending</strong></span>
+                    <span class="text-muted">Status : <strong>{{ $status ?? 'All' }}</strong></span>
                   </span>
-                  <button type="button" class="btn" data-toggle="modal" data-target=".modal-slide"><span class="fe fe-filter fe-16 text-muted"></span></button>
-                  <button type="button" class="btn"><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
                 </div>
+
               </div>
+        
               <div class="row">
                 <div class="col-md-12">
                   <!-- table -->
                 <table class="table table-borderless table-striped">
-                  <thead>
+                  <thead class="bg-maroon text-white">
                     <tr>
                       <th>ID</th>
                       <th></th>
                       <th>Title</th>
-                      <th>Create At</th>
-                      <th>Budget</th>
-                      <th>Budget</th>
-                      <th>Partner</th>
+                      <th>Project Manager</th>
+                      <th>TOR</th>
+                      <th>Procurement</th>
+                      <th>Implementation</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Ligne 1 -->
-                    <tr data-toggle="collapse" data-target="#detailsRow1" class="clickable">
-                      <td class="text-white small bg-yellow">0001</td>
-                      <td class="text-center"><span class="dot dot-lg bg-secondary mr-2"></span></td>
-                      <th scope="col">AfCFTA Career Development Plan</th>
-                      <td class="medium">Jun 02, 2025</td>
-                      <td class="medium">0$</td>
-                      <td class="medium">No Partner</td>
-                      <td>
-                        <span class="medium">Completed</span>
-                        <div class="progress mt-2" style="height: 3px;">
-                          <div class="progress-bar bg-success" style="width: 100%"></div>
-                        </div>
-                      </td>
-                      <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                    </tr>
-                    <tr class="collapse" id="detailsRow1">
-                      <td colspan="8" class="bg-light">
-                        <table class="table table-sm mt-2">
-                          <thead><tr><th class="text-maroon">Sub Phase</th><th class="text-maroon">Reason</th></tr></thead>
-                          <tbody>
-                            <tr><td class="text-md">None</td><td>All tasks completed</td></tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
+                   
 
-                    <!-- Ligne 2 -->
-                    <tr data-toggle="collapse" data-target="#detailsRow2" class="clickable">
-                      <td class="text-muted small">0002</td>
-                      <td class="text-center"><span class="dot dot-lg bg-danger mr-2"></span></td>
-                      <th scope="col">AfCFTA DEAI Strategy</th>
-                      <td class="medium">May 4, 2025</td>
-                      <td class="medium">15,000$</td>
-                      <td class="medium">MS-3</td>
-                      <td>
-                        <span class="medium">Completed</span>
-                        <div class="progress mt-2" style="height: 3px;">
-                          <div class="progress-bar bg-success" style="width: 50%"></div>
-                        </div>
-                      </td>
-                      <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                    </tr>
-                    <tr class="collapse" id="detailsRow2">
-                      <td colspan="8" class="bg-light">
-                        <table class="table table-sm mt-2">
-                          <thead><tr><th class="text-maroon">Sub Phase</th><th class="text-maroon">Reason</th></tr></thead>
-                          <tbody>
-                            <tr><td class="text-md">None</td><td>All tasks completed</td></tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
+                    @forelse($projects as $project)
+                      @php
 
-                    <!-- Ligne 3 -->
-                    <tr data-toggle="collapse" data-target="#detailsRow3" class="clickable">
-                      <td class="text-white small bg-green">0003</td>
-                      <td class="text-center"><span class="dot dot-lg bg-success mr-2"></span></td>
-                      <th scope="col">AfCFTA Organizational Culture</th>
-                      <td class="medium">May 4, 2025</td>
-                      <td class="medium">15,000$</td>
-                      <td class="medium">MS-3</td>
-                      <td>
-                        <span class="medium">Completed</span>
-                        <div class="progress mt-2" style="height: 3px;">
-                          <div class="progress-bar bg-success" style="width: 50%"></div>
-                        </div>
-                      </td>
-                      <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                    </tr>
-                    <tr class="collapse" id="detailsRow3">
-                      <td colspan="8" class="bg-light">
-                        <table class="table table-sm mt-2">
-                          <thead><tr><th class="text-maroon">Sub Phase</th><th class="text-maroon">Reason</th></tr></thead>
-                          <tbody>
-                            <tr><td class="text-md">None</td><td>All tasks completed</td></tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
+                        $status = $project->status ?? 'Pending';
 
-                    <!-- Ligne 4 -->
-                    <tr data-toggle="collapse" data-target="#detailsRow4" class="clickable">
-                      <td class="text-muted small">0004</td>
-                      <td class="text-center"><span class="dot dot-lg bg-success mr-2"></span></td>
-                      <th scope="col">AfCFTA Recruitment</th>
-                      <td class="medium">May 4, 2025</td>
-                      <td class="medium">15,000$</td>
-                      <td class="medium">MS-3</td>
-                      <td>
-                        <span class="medium">Completed</span>
-                        <div class="progress mt-2" style="height: 3px;">
-                          <div class="progress-bar bg-success" style="width: 50%"></div>
-                        </div>
-                      </td>
-                    <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                    </tr>
-                    <tr class="collapse" id="detailsRow4">
-                      <td colspan="8" class="bg-light">
-                        <table class="table table-sm mt-2">
-                          <thead><tr><th class="text-maroon">Sub Phase</th><th class="text-maroon">Reason</th></tr></thead>
-                          <tbody>
-                            <tr><td class="text-md">None</td><td>All tasks completed</td></tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
+                        $bgClass = match($status) {
+                            'Not started'        => 'bg-secondary text-white',
+                            'In progress'        => 'bg-warning text-dark',
+                            'Completed'          => 'bg-success text-white',
+                            'Cancelled'          => 'bg-danger text-white',
+                            'Delayed'            => 'bg-danger text-white',
+                            'Waiting Approval'   => 'bg-info text-white',
+                            'Under review'       => 'bg-primary text-white',
+                            default              => 'bg-light text-dark',
+                        };
 
-                    <!-- Ligne 5 -->
-                    <tr data-toggle="collapse" data-target="#detailsRow5" class="clickable bg-maroon">
-                      <td class="text-white bg-maroon small">0005</td>
-                      <td class="text-center"><span class="dot dot-lg bg-warning mr-2"></span></td>
-                      <th scope="col">AfCFTA Staff Survey</th>
-                      <td class="medium">May 4, 2025</td>
-                      <td class="medium">15,000$</td>
-                      <td class="medium">MS-3</td>
-                      <td>
-                        <span class="medium">Pending</span>
-                        <div class="progress mt-2" style="height: 3px;">
-                          <div class="progress-bar bg-warning" style="width: 50%"></div>
-                        </div>
-                      </td>
-                      <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                    </tr>
-                    <tr class="collapse" id="detailsRow5">
-                      <td colspan="8" class="bg-light">
-                        <table class="table table-sm mt-2">
-                          <thead><tr><th class="text-maroon">Sub Phase</th><th class="text-maroon">Reason</th></tr></thead>
-                          <tbody>
-                            <tr><td class="text-md">None</td><td>All tasks completed</td></tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
+                       $hasImportantIssue = false;
+                        if ($status === 'In progress') {
+                            $hasImportantIssue = $project->subphases->contains(function ($sub) {
+                                return in_array($sub->pivot->status, ['Cancelled', 'Delayed']);
+                            });
 
+                            // Vérifie aussi les developmentDetails
+                            if (!$hasImportantIssue && $project->developmentDetails->isNotEmpty()) {
+                                $hasImportantIssue = $project->developmentDetails->contains(function ($detail) {
+                                    return in_array($detail->status, ['Cancelled', 'Delayed']);
+                                });
+                            }
+                        }
+
+                        $getPhasePercentage = function($project, $phaseName) {
+                            $phase = $project->phases->firstWhere('name', $phaseName);
+                            return $phase ? $phase->pivot->percentage : null;
+                        };
+
+                        $tor = $getPhasePercentage($project, 'tor');
+                        $proc = $getPhasePercentage($project, 'procurement');
+                        $impl = $getPhasePercentage($project, 'implementation');
+                      @endphp
+
+
+                        <tr @if($hasImportantIssue) data-toggle="collapse" data-target="#detailsRow{{ $project->id }}" class="clickable" @endif>
+                        <td class="small {{ $bgClass }}">{{ str_pad($project->id, 4, '0', STR_PAD_LEFT) }}</td>
+                        <td class="text-center"><span class="dot dot-lg {{ $bgClass }} mr-2"></span></td>
+                        <th>{{ $project->title }}</th>
+                        <td class="medium">
+                          {{ $project->projectManager ? $project->projectManager->firstname . ' ' . $project->projectManager->lastname : 'N/A' }}
+                        </td>
+
+                    {{-- TOR --}}
+                    <td class="medium">
+                      @if($tor !== null)
+                        {{ $tor }}%
+                        <div class="progress mt-1" style="height: 4px;">
+                          <div class="progress-bar bg-info" style="width: {{ $tor }}%"></div>
+                        </div>
+                      @else
+                        —
+                      @endif
+                    </td>
+
+                    {{-- Procurement --}}
+                   <td class="medium">
+                      @if($proc !== null)
+                        {{ $proc }}%
+                        <div class="progress mt-1" style="height: 4px;">
+                          <div class="progress-bar bg-warning" style="width: {{ $proc }}%"></div>
+                        </div>
+                      @else
+                        —
+                      @endif
+                    </td>
+
+                    {{-- Implementation --}}
+                   <td class="medium">
+                      @if($impl !== null)
+                        {{ $impl }}%
+                        <div class="progress mt-1" style="height: 4px;">
+                          <div class="progress-bar bg-success" style="width: {{ $impl }}%"></div>
+                        </div>
+                      @else
+                        —
+                      @endif
+                    </td>
+
+                        <td class="text-center">
+                          <div class="d-flex justify-content-center gap-2 align-items-center">
+                            <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none"><i class="fe fe-edit-2"></i></a>
+                            <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
+                            <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm text-danger" title="Delete">
+                                    <i class="fe fe-trash-2"></i>
+                                </button>
+                            </form>
+                          </div>
+                        </td>
+                      </tr>
+
+                    @if($hasImportantIssue)
+                      <tr class="collapse" id="detailsRow{{ $project->id }}">
+                          <td colspan="8" class="bg-light">
+                             <table class="table table-sm mt-2">
+                                <thead>
+                                    <tr class="bg-light">
+                                        <th class="text-maroon">Sub Phase / Development Detail</th>
+                                        <th class="text-maroon">Status</th>
+                                        <th class="text-maroon">Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{-- Sous-phases problématiques --}}
+                                    @foreach($project->subphases as $sub)
+                                        @if(in_array($sub->pivot->status, ['Cancelled', 'Delayed']))
+                                            @php
+                                                $rowClass = $sub->pivot->status === 'Cancelled' ? 'bg-danger text-white' : 'bg-warning text-dark';
+                                            @endphp
+                                            <tr class="{{ $rowClass }}">
+                                                <td><strong>{{ $sub->label ?? $sub->name }}</strong></td>
+                                                <td>{{ $sub->pivot->status }}</td>
+                                                <td>{{ !empty(trim($sub->pivot->reason)) ? $sub->pivot->reason : '—' }}</td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+
+                                    {{-- Development Details problématiques --}}
+                                    @foreach($project->developmentDetails as $detail)
+                                        @if(in_array($detail->status, ['Cancelled', 'Delayed']))
+                                            @php
+                                                $rowClass = $detail->status === 'Cancelled' ? 'bg-danger text-white' : 'bg-warning text-dark';
+                                            @endphp
+                                            <tr class="{{ $rowClass }}">
+                                                <td>{{ $detail->title }}</td>
+                                                <td>{{ $detail->status }}</td>
+                                                <td>{{ !empty(trim($detail->reason)) ? $detail->reason : '—' }}</td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                          </td>
+                      </tr>
+                    @endif
+
+
+                    @empty
+                        <tr><td colspan="8" class="text-center text-muted">No projects found.</td></tr>
+                    @endforelse
                   </tbody>
                 </table>
+
   
                 </div> <!-- .col -->
               </div> <!-- .row -->
@@ -343,72 +307,73 @@
           </div> <!-- .row -->
         </div> <!-- .container-fluid -->
      @include('partials.footer')  
-     <script>
-document.addEventListener("DOMContentLoaded", function () {
-  var options = {
-    chart: {
-      type: 'bar',
-      height: 400
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: '50%',
-        endingShape: 'rounded'
-      }
-    },
-    dataLabels: {
-      enabled: false  // Désactivation de l'affichage sur les barres
-    },
-    stroke: {
-      show: true,
-      width: 2,
-      colors: ['transparent']
-    },
-    series: [
-      {
-        name: 'ToR',
-        data: [80, 100, 60]
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var options = {
+      chart: {
+        type: 'bar',
+        height: 400
       },
-      {
-        name: 'Procurement',
-        data: [0, 90, 0]
-      },
-      {
-        name: 'Implementation',
-        data: [0, 70, 0]
-      }
-    ],
-    xaxis: {
-      categories: ['AHRM Communication', 'AfCFTA Library', 'AfCFTA DEAI Strategy'],
-      title: {
-        text: 'Projets'
-      }
-    },
-    yaxis: {
-      max: 100,
-      title: {
-        text: 'Pourcentage'
-      }
-    },
-    fill: {
-      opacity: 1
-    },
-    tooltip: {
-      y: {
-        formatter: function (val) {
-          return val + "%";
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '50%',
+          endingShape: 'rounded'
         }
+      },
+      dataLabels: {
+        enabled: false  // Désactivation de l'affichage sur les barres
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ['transparent']
+      },
+      series: [
+        {
+          name: 'ToR',
+          data: [80, 100, 60]
+        },
+        {
+          name: 'Procurement',
+          data: [0, 90, 0]
+        },
+        {
+          name: 'Implementation',
+          data: [0, 70, 0]
+        }
+      ],
+      xaxis: {
+        categories: ['AHRM Communication', 'AfCFTA Library', 'AfCFTA DEAI Strategy'],
+        title: {
+          text: 'Projets'
+        }
+      },
+      yaxis: {
+        max: 100,
+        title: {
+          text: 'Pourcentage'
+        }
+      },
+      fill: {
+        opacity: 1
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return val + "%";
+          }
+        }
+      },
+      legend: {
+        position: 'top'
       }
-    },
-    legend: {
-      position: 'top'
-    }
-  };
+    };
 
-  var chart = new ApexCharts(document.querySelector("#phaseProgressChartVertical"), options);
-  chart.render();
-});
+    var chart = new ApexCharts(document.querySelector("#phaseProgressChartVertical"), options);
+    chart.render();
+  });
 
 </script> 
+
 </main>

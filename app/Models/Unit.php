@@ -16,4 +16,10 @@ class Unit extends Model
     {
         return $this->hasMany(User::class);
     }
+    // Une unité peut avoir plusieurs projets
+    // Un projet appartient à une unité
+     public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
 }

@@ -5,7 +5,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Auth;
+use  App\Http\Controllers\DevelopmentDetailController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -30,7 +32,7 @@ Route::get('/', function () {
 });
 Route::view('/login', 'auth.login');
 Route::view('/dashboard', 'dashboard');
-Route::view('/addnewproject', 'newproject');
+Route::view('/newproject', 'newproject');
 Route::view('/allprojects', 'allprojects');
 Route::view('/adminprojects', 'adminprojects');
 Route::view('/hrmprojects', 'hrmprojects');
@@ -67,4 +69,28 @@ Route::post('/assign-role', [UserController::class, 'assignRole'])->name('assign
 // Route::post('/projects/store', [ProjectController::class, 'store'])->name('projects.store');
 
 
+Route::post('/change-password', [AuthController::class, 'showChangePasswordForm'])->name('password.update');
+Route::get('/change-password', [AuthController::class, 'changePassword'])->name('password.change');
 
+Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+
+Route::get('/allprojects', [ProjectController::class, 'index'])->name('allprojects');
+Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+
+Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+Route::patch('/projects/{project}/update-field', [ProjectController::class, 'updateField'])->name('projects.updateField');
+
+Route::get('/projects/{project}/edit/{field}', [ProjectController::class, 'editField'])->name('projects.editField');
+Route::put('/projects/{project}/update/{field}', [ProjectController::class, 'updateField'])->name('projects.updateField');
+
+Route::post('/projects/{id}/update-field', [ProjectController::class, 'updateField'])->name('projects.updateField');
+Route::patch('/projects/{project}/subphases/{subphase}/status', [ProjectController::class, 'updateSubphaseStatus'])->name('projects.updateSubphaseStatus');
+Route::post('/projects/{id}/add-procurement', [ProjectController::class, 'addProcurementPhase'])
+    ->name('projects.addProcurementPhase');
+Route::patch('/development-activity/{id}/update-status', [DevelopmentDetailController::class, 'updateStatus'])->name('developmentDetails.updateStatus');
+Route::patch('/development-details/{id}/update-status', [DevelopmentDetailController::class, 'updateStatus'])->name('developmentDetails.updateStatus');
+Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+Route::get('/hrmprojects', [ProjectController::class, 'hrmProjects'])->name('projects.hrm');
+Route::get('/adminprojects', [ProjectController::class, 'adminProjects'])->name('projects.admin');

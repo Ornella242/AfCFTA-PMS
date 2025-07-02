@@ -1,693 +1,181 @@
+@php
+function statusColorClass($status) {
+    return match($status) {
+        'Not started' => 'bg-secondary text-white',
+        'In progress' => 'bg-yellow text-dark',
+        'Completed' => 'bg-success text-white',
+        'Cancelled' => 'bg-danger text-white',
+        'Waiting Approval' => 'bg-info text-white',
+        'Delayed' => 'bg-orange text-white',
+        'Under review' => 'bg-primary text-white',
+        default => 'bg-light text-dark',
+    };
+}
+@endphp
 @include('partials.navbar')
-<main role="main" class="main-content">
+<div id="loading-spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
+  <div class="spinner-grow mr-3 text-success" role="status" style="width: 5rem; height: 5rem;">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-12">
-               <div class="row align-items-center mb-4">
-                        <div class="col">
-                         <h2 class="h3 mb-0 page-title">All Projects</h2>
-                        </div>
-                        <div class="col-auto">
-                          <button type="button" class="btn mb-2 bg-maroon text-white" data-toggle="modal" data-target="#projectModal">
-                        <i class="fe fe-plus mx-1"></i>Add new
-                      </button>
-
-                      <!-- Large Modal -->
-                      <div class="modal fade bd-example-modal-lg" id="projectModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg" role="document">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title">New project</h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <form action="" method="POST">
-                              @csrf
-                              <div class="modal-body">
-                                <!-- Title -->
-                                <div class="form-group">
-                                  <label for="title">Title</label>
-                                  <input type="text" class="form-control" id="title" name="title" placeholder="Enter project title" required>
-                                </div>
-                                <!-- Description -->
-                                <div class="form-group">
-                                  <label for="description">Description</label>
-                                  <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter project description"></textarea>
-                                </div>
-                                <!-- Dates -->
-                                <div class="form-row">
-                                  <div class="form-group col-md-6">
-                                    <label for="start_date">Start Date</label>
-                                    <input type="date" class="form-control" id="start_date" name="start_date" required>
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                    <label for="end_date">End Date</label>
-                                    <input type="date" class="form-control" id="end_date" name="end_date" required>
-                                  </div>
-                                </div>
-                                <!-- Priority & Status -->
-                                <div class="form-row">
-                                  <div class="form-group col-md-6">
-                                    <label for="priority">Priority</label>
-                                    <select class="form-control" id="priority" name="priority">
-                                      <option value="high">High</option>
-                                      <option value="medium">Medium</option>
-                                      <option value="low">Low</option>
-                                    </select>
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                    <label for="status">Status</label>
-                                    <select class="form-control" id="status" name="status">
-                                      <option value="pending">Pending</option>
-                                      <option value="processing">Processing</option>
-                                      <option value="completed">Completed</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <!-- Unit & Project Manager -->
-                                <div class="form-row">
-                                  <div class="form-group col-md-6">
-                                    <label for="unit">Unit</label>
-                                    <select class="form-control" id="unit" name="unit">
-                                      <option value="HR">HR</option>
-                                      <option value="Facilities">Facilities</option>
-                                      <option value="IT">IT</option>
-                                      <option value="Procurement">Procurement</option>
-                                      <option value="Travel">Travel</option>
-                                      <option value="Transport">Transport</option>
-                                    </select>
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                    <label for="manager">Project Manager</label>
-                                    <select class="form-control" id="manager" name="manager">
-                                      <option value="Director">Director</option>
-                                      <option value="Head">Head of Division</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <!-- Project Type & Partner -->
-                                <div class="form-row">
-                                  <div class="form-group col-md-6">
-                                    <label for="project_type">Type of project</label>
-                                    <select class="form-control" id="project_type" name="project_type">
-                                      <option value="HRM">HRM</option>
-                                      <option value="Admin">Admin</option>
-                                    </select>
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                    <label for="partner">Partner</label>
-                                    <select class="form-control" id="partner" name="partner">
-                                      <option value="AfDB">AfDB</option>
-                                      <option value="AUC">AUC</option>
-                                      <option value="MS-1">MS-1</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <!-- Budget -->
-                                <div class="form-group">
-                                  <label for="budget">Budget (USD)</label>
-                                  <input type="number" step="0.01" class="form-control" id="budget" name="budget" placeholder="Enter budget amount">
-                                </div>
-                                <!-- Phases -->
-                                <div class="form-group mt-4">
-                                  <label class="d-block">Project Phases</label>
-                                  <div class="form-row">
-                                    <div class="col-md-6">
-                                      <div class="form-check mb-2">
-                                          <input class="form-check-input" type="checkbox" value="tor" id="phaseTor" name="phases[]">
-                                          <label class="form-check-label font-weight-bold text-maroon" for="phaseTor">Terms of Reference</label>
-                                        </div>
-
-                                        <div class="ml-4 pl-3 border-left">
-                                          <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="subphases[tor][]" value="needs_analysis" id="tor1">
-                                            <label class="form-check-label" for="tor1">Preparation</label>
-                                          </div>
-                                          <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="subphases[tor][]" value="objectives_definition" id="tor2">
-                                            <label class="form-check-label" for="tor2">Availability of funds</label>
-                                          </div>
-                                          <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="subphases[tor][]" value="stakeholder_consultation" id="tor3">
-                                            <label class="form-check-label" for="tor3">Validation</label>
-                                          </div>
-                                          <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="subphases[tor][]" value="drafting_tor" id="tor4">
-                                            <label class="form-check-label" for="tor4">SG Approval</label>
-                                          </div>
-                                          <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="subphases[tor][]" value="approval" id="tor5">
-                                            <label class="form-check-label" for="tor5">Procurement Request</label>
-                                          </div>
-                                        </div>
-
-                                      </div>
-                                      <div class="col-md-6">
-                                         <!-- Phase: Procurement -->
-                                <div class="form-check mb-2">
-                                  <input class="form-check-input" type="checkbox" value="procurement" id="phaseProcurement" name="phases[]">
-                                  <label class="form-check-label text-maroon font-weight-bold" for="phaseProcurement">Procurement</label>
-                                </div>
-
-                                <!-- Type of Procurement (hidden by default) -->
-                                <div id="procurementTypeContainer" class="ml-4 mb-2 d-none">
-                                  <label class="font-weight-bold">Type of Procurement:</label>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="procurement_type" id="afcfta" value="afcfta">
-                                    <label class="form-check-label" for="afcfta">AfCFTA Procurement</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="procurement_type" id="partner" value="partner">
-                                    <label class="form-check-label" for="partner">Partner Procurement</label>
-                                  </div>
-                                </div>
-
-                                <!-- AfCFTA Sub-phases (hidden by default) -->
-                                <div id="afcftaSubphases" class="ml-5 d-none">
-                                  <label class="font-weight-bold">AfCFTA Procurement Sub-phases:</label>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[procurement_afcfta][]" value="needs_assessment" id="afcfta1">
-                                    <label class="form-check-label" for="afcfta1">Tender document</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[procurement_afcfta][]" value="rfp_preparation" id="afcfta2">
-                                    <label class="form-check-label" for="afcfta2">Advertisement</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[procurement_afcfta][]" value="advertising" id="afcfta3">
-                                    <label class="form-check-label" for="afcfta3">Evaluation & Negociation</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[procurement_afcfta][]" value="evaluation" id="afcfta4">
-                                    <label class="form-check-label" for="afcfta4">Award</label>
-                                  </div>
-                                </div>
-                                      </div>
-                                  </div>
-                                 
-
-                                 
-                                <!-- Phase: Implementation -->
-                                <div class="form-check mb-2">
-                                  <input class="form-check-input" type="checkbox" value="implementation" id="phaseImplementation" name="phases[]">
-                                  <label class="form-check-label text-maroon font-weight-bold" for="phaseImplementation">Implementation</label>
-                                </div>
-
-                                <!-- Sous-phases statiques -->
-                                <div id="implementationSubphases" class="ml-4">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[implementation][]" value="launch_meeting" id="imp1">
-                                    <label class="form-check-label" for="imp1">Team Set</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[implementation][]" value="work_plan" id="imp2">
-                                    <label class="form-check-label" for="imp2">Work Plan</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input dynamic-trigger" type="checkbox" name="subphases[implementation][]" value="activities" id="imp3">
-                                    <label class="form-check-label" for="imp3">Development</label>
-                                  </div>
-
-                                  <!-- Zone dynamique pour "Project Activities" -->
-                                  <div id="dynamicActivities" class="ml-4 mt-2 d-none">
-                                    <label>Development phases:</label>
-                                    <div id="activityInputs">
-                                      <div class="form-row align-items-center mb-2">
-                                        <div class="col">
-                                          <input type="text" name="implementation_activities[]" class="form-control" placeholder="Enter activity title">
-                                        </div>
-                                        <div class="col-auto">
-                                          <button type="button" class="btn btn-sm btn-outline-primary add-activity">Add</button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[implementation][]" value="monitoring" id="imp4">
-                                    <label class="form-check-label" for="imp4">Control & Validation</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[implementation][]" value="reporting" id="imp5">
-                                    <label class="form-check-label" for="imp5">Training</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="subphases[implementation][]" value="closing" id="imp6">
-                                    <label class="form-check-label" for="imp6">Service</label>
-                                  </div>
-                                </div>
-                          </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-primary">Save Project</button>
-                        </div>
-                      </form>
-                    </div>
+              <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                  <!-- Back Button -->
+                  <div>
+                      <a href="{{ url()->previous() }}" class="btn btn-outline-success btn-back shadow-sm transition-all">
+                          <i class="fe fe-arrow-left mr-2"></i> Back
+                      </a>
                   </div>
+
+                  <!-- Page Title -->
+                  <div>
+                      <h2 class="mb-0 page-title text-black">List of Projects</h2>
+                  </div>
+
+                  <!-- Add Project Button -->
+                  <div>
+                      <button type="button" class="btn mb-2 bg-maroon text-white" data-toggle="modal" data-target="#projectModal">
+                          <i class="fe fe-plus mx-1"></i> <a href="{{ route('projects.create') }}" class="text-white text-decoration-none">Add new</a>
+                      </button>
+                  </div>
+              </div>
+              <div class="row align-items-center mb-4">
+                        <div class="col-12">
+                             @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+                        </div>
                 </div>
 
-                        </div>
-                </div> <!-- .row -->
+                </div>
+              </div> <!-- .row -->
               <div class="row items-align-center my-4  d-none d-lg-flex">
                 <div class="col-md">
                   <ul class="nav nav-pills justify-content-start">
                     <li class="nav-item">
-                      <a class="nav-link active bg-transparent pr-2 pl-0 text-primary" href="#">All <span class="badge badge-pill bg-gold text-white pb-2 pt-2 ml-2">28</span></a>
+                      <a class="nav-link active bg-transparent pr-2 pl-0 {{ request('status') === null ? 'active text-primary' : 'text-dark' }}" href="{{ route('allprojects') }}">All <span class="badge badge-pill bg-gold text-white pb-2 pt-2 ml-2">{{ $counts['all'] }}</span></a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link text-maroon px-2" href="#">Pending <span class="badge badge-pill bg-maroon border text-white pb-2 pt-2 ml-2">05</span></a>
+                      <a class="nav-link {{ request('status') === 'Not started' ? 'active text-maroon' : 'text-dark' }}"
+                        href="{{ route('allprojects', ['status' => 'Not started']) }}">
+                        Not Started
+                        <span class="badge badge-pill bg-maroon border text-white pb-2 pt-2 ml-2">{{ $counts['Not started'] }}</span>
+                      </a>
+
+                      
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link text-yellow px-2" href="#">Processing <span class="badge badge-pill bg-yellow border text-white pb-2 pt-2 ml-2">13</span></a>
+                      <a class="nav-link {{ request('status') === 'In progress' ? 'active text-yellow' : 'text-dark' }}"
+                        href="{{ route('allprojects', ['status' => 'In progress']) }}">
+                        In Progress
+                        <span class="badge badge-pill bg-yellow border text-white pb-2 pt-2 ml-2">{{ $counts['In progress'] }}</span>
+                      </a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link text-green px-2" href="#">Completed <span class="badge badge-pill bg-green border text-white pb-2 pt-2 ml-2">10</span></a>
+                      <a class="nav-link {{ request('status') === 'Completed' ? 'active text-green' : 'text-dark' }}"
+                        href="{{ route('allprojects', ['status' => 'Completed']) }}">
+                        Completed
+                        <span class="badge badge-pill bg-green border text-white pb-2 pt-2 ml-2">{{ $counts['Completed'] }}</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link {{ request('status') === 'Cancelled' ? 'active text-green' : 'text-dark' }}"
+                        href="{{ route('allprojects', ['status' => 'Cancelled']) }}">
+                        Cancelled
+                        <span class="badge badge-pill bg-maroon border text-white pb-2 pt-2 ml-2">{{ $counts['Cancelled'] }}</span>
+                      </a>
                     </li>
                   </ul>
                 </div>
                 <div class="col-md-auto ml-auto text-right">
                   <span class="small bg-white border py-1 px-2 rounded mr-2">
-                    <a href="#" class="text-muted"><i class="fe fe-x mx-1"></i></a>
-                    <span class="text-muted">Status : <strong>Pending</strong></span>
+                    <span class="text-muted">Status : <strong>{{ $status ?? 'All' }}</strong></span>
                   </span>
-                  <button type="button" class="btn" data-toggle="modal" data-target=".modal-slide"><span class="fe fe-filter fe-16 text-muted"></span></button>
-                  <button type="button" class="btn"><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
                 </div>
               </div>
-              
               <div class="row">
                 <div class="col-md-12">
                   <!-- table -->
-                  <table class="table table-borderless table-striped">
-                    <thead>
+                  <table class="table table-borderless table-striped table-hover">
+                    <thead class="text-white bg-maroon">
                       <tr>
                         <th>ID</th>
                         <th></th>
                         <th>Title</th>
-                        <th>Create At</th>
+                        <th>Start Date</th>
                         <th>Budget</th>
                         <th>Partner</th>
-                        <th>Status</th>  
+                        <th>Project Manager</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td class="text-muted medium">0001</td>
-                        <td class="text-center"><span class="dot dot-lg bg-secondary mr-2"></span></td>
-                        <th scope="col">Administration Data</th>
-                        <td class="text-black medium">Jun 02, 2025</td>
-                        <td class="medium">O$</td>
-                        <td class="medium">No Partner</td>
-                        <td>
-                          <span class="medium">Completed</span>
-                          <div class="progress mt-2" style="height: 3px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </td>
-                        
-                          <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-                      <tr>
-                        <td class="text-muted small">0002</td>
-                        <td class="text-center"><span class="dot dot-lg bg-success mr-2"></span></td>
-                        <th scope="col">AfCFTA Disaster readeness</th>
-                        <td class="medium">May 4, 2025</td>
-                        <td class="medium">15,000$</td>
-                        <td class="medium">MS-3</td>
-                        <td>
-                          <span class="small text-muted">Completed</span>
-                          <div class="progress mt-2" style="height: 3px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </td>
-                        <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
+                      @forelse($projects as $project)
                         <tr>
-                        <td class="text-muted small">0003</td>
-                        <td class="text-center"><span class="dot dot-lg bg-secondary mr-2"></span></td>
-                        <th scope="col">AHRM Communication</th>
-                        <td class="medium">Jun 02, 2025</td>
-                        <td class="medium">20,000$</td>
-                        <td class="medium">BIASHARA</td>
-                        <td>
-                          <span class="medium">Completed</span>
-                          <div class="progress mt-2" style="height: 3px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </td>
+                          <td class="{{ statusColorClass($project->status) }}">
+                              #{{ str_pad($project->id, 4, '0', STR_PAD_LEFT) }}
+                          </td>
+                          <td class="text-center">
+                            @php
+                              $colors = [
+                                'Not started' => 'bg-secondary',
+                                'In progress' => 'bg-yellow',
+                                'Completed'   => 'bg-green',
+                                'Cancelled'   => 'bg-red',
+                                'Waiting Approval' => 'bg-blue',
+                                'Delayed'    => 'bg-orange',
+                                'Under review' => 'bg-purple',  
+                              ];
+                            @endphp
+                            <span class="dot dot-lg {{ $colors[$project->status] ?? 'bg-secondary' }}"></span>
+                          </td>
+                          <td>{{ $project->title }}</td>
+                          <td>{{ \Carbon\Carbon::parse($project->start_date)->format('M d, Y') }}</td>
+                          <td>${{ number_format($project->budget ?? 0, 2) }}</td>
+                          <td>
+                            {{ $project->partners->isEmpty()
+                                ? 'No Partner'
+                                : $project->partners->pluck('name')->join(', ') }}
+                          </td>
+                          <td>
+                              {{ $project->projectManager->firstname ?? '' }} {{ $project->projectManager->lastname ?? '' }}
+                          </td>
                         
-                         <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-                      <tr>
-                        <td class="text-muted medium">0004</td>
-                        <td class="text-center"><span class="dot dot-lg bg-success mr-2"></span></td>
-                        <th scope="col">AfCFTA Library</th>
-                        <td class="medium">May 4, 2025</td>
-                        <td class="medium">60,000$</td>
-                        <td class="medium">EU-TAF</td>
-                        <td>
-                          <span class="medium">Completed</span>
-                          <div class="progress mt-2" style="height: 3px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </td>
-                         <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-                        <tr>
-                        <td class="text-muted small">0005</td>
-                        <td class="text-center"><span class="dot dot-lg bg-secondary mr-2"></span></td>
-                        <th scope="col">AfCFTA IT training</th>
-                        <td class="medium">Jun 02, 2025</td>
-                        <td class="medium">40,000$</td>
-                        <td class="medium">AfDB</td>
-                        <td>
-                          <span class="small text-muted">Completed</span>
-                          <div class="progress mt-2" style="height: 3px;">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </td>
-                        
-                         <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-                      <tr>
-                        <td class="text-muted small">0006</td>
-                        <td class="text-center"><span class="dot dot-lg bg-success mr-2"></span></td>
-                        <th scope="col">AfCFTA IT Smart Campus</th>
-                        <td class="medium">May 4, 2025</td>
-                        <td class="medium">70,000$</td>
-                        <td class="medium">AUC</td>
-                        <td>
-                          <span class="small text-muted">Completed</span>
-                          <div class="progress mt-2" style="height: 3px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </td>
-                        <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-                    
-                      <tr>
-                        <td class="text-muted small">0001</td>
-                        <td class="text-center"><span class="dot dot-lg bg-secondary mr-2"></span></td>
-                        <th scope="col">AfCFTA Career Development Plan</th>
-                        <td class="medium">Jun 02, 2025</td>
-                        <td class="medium">O$</td>
-                        <td class="medium">No Partner</td>
-                        <td>
-                          <span class="medium">Completed</span>
-                          <div class="progress mt-2" style="height: 3px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </td>
-                        
-                        <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-                      <tr>
-                        <td class="text-muted small">0002</td>
-                        <td class="text-center"><span class="dot dot-lg bg-danger mr-2"></span></td>
-                        <th scope="col">AfCFTA DEAI Strategy</th>
-                        <td class="medium">May 4, 2025</td>
-                        <td class="medium">15,000$</td>
-                        <td class="medium">MS-3</td>
-                        <td>
-                          <span class="small text-muted">Completed</span>
-                          <div class="progress mt-2" style="height: 3px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </td>
-                        <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-                     
-                      <tr>
-                          <td class="text-muted small">0003</td>
-                          <td class="text-center"><span class="dot dot-lg bg-success mr-2"></span></td>
-                          <th scope="col">AfCFTA Organizational Culture</th>
-                          <td class="medium">May 4, 2025</td>
-                          <td class="medium">15,000$</td>
-                          <td class="medium">MS-3</td>
-                          <td>
-                            <span class="small text-muted">Completed</span>
-                            <div class="progress mt-2" style="height: 3px;">
-                              <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                          <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2 align-items-center">
+                              <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none"><i class="fe fe-edit-2"></i></a>
+                              <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
+                              <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
+                                  @csrf
+                                  @method('DELETE')
+                                  <button class="btn btn-sm text-danger" title="Delete">
+                                      <i class="fe fe-trash-2"></i>
+                                  </button>
+                              </form>
                             </div>
                           </td>
-                          <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-
-                      <tr>
-                          <td class="text-muted small">0004</td>
-                          <td class="text-center"><span class="dot dot-lg bg-success mr-2"></span></td>
-                          <th scope="col">AfCFTA Recruitment </th>
-                          <td class="medium">May 4, 2025</td>
-                          <td class="medium">15,000$</td>
-                          <td class="medium">MS-3</td>
-                          <td>
-                            <span class="small text-muted">Completed</span>
-                            <div class="progress mt-2" style="height: 3px;">
-                              <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                          </td>
-                          <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-
-                      <tr>
-                          <td class="text-muted small">0005</td>
-                          <td class="text-center"><span class="dot dot-lg bg-primary mr-2"></span></td>
-                          <th scope="col">AfCFTA Staff Survey </th>
-                          <td class="medium">May 4, 2025</td>
-                          <td class="medium">15,000$</td>
-                          <td class="medium">MS-3</td>
-                          <td>
-                            <span class="small text-muted">Pending</span>
-                            <div class="progress mt-2" style="height: 3px;">
-                              <div class="progress-bar bg-warning" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                          </td>
-                          <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
-
-                      <tr>
-                          <td class="text-muted small">0005</td>
-                          <td class="text-center"><span class="dot dot-lg bg-warning mr-2"></span></td>
-                          <th scope="col">AHRMD SOP and manual</th>
-                          <td class="medium">May 4, 2025</td>
-                          <td class="medium">15,000$</td>
-                          <td class="medium">MS-3</td>
-                          <td>
-                            <span class="small text-muted">Pending</span>
-                            <div class="progress mt-2" style="height: 3px;">
-                              <div class="progress-bar bg-success" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                          </td>
-                          <td class="text-center">
-                            <!-- Edit -->
-                            <a href="#" class="text-primary mr-2 text-decoration-none" title="Edit">
-                              <i class="fe fe-edit-2"></i>
-                            </a>
-                            <!-- View -->
-                            <a href="#" class="text-info mr-2 text-decoration-none" title="View">
-                              <i class="fe fe-eye"></i>
-                            </a>
-                            <!-- Remove -->
-                            <a href="#" class="text-danger mr-2 text-decoration-none" title="Remove">
-                              <i class="fe fe-trash-2"></i>
-                            </a>
-                            <!-- Assign -->
-                            <a href="#" class="text-warning text-decoration-none" title="Assign">
-                              <i class="fe fe-user-plus"></i>
-                            </a>
-                          </td>
-                      </tr>
+                        </tr>
+                      @empty
+                        <tr><td colspan="8" class="text-center text-muted">No projects found.</td></tr>
+                      @endforelse
                     </tbody>
+
                   </table>
                  
                 </div> <!-- .col -->
@@ -774,5 +262,34 @@
         e.target.closest(".form-row").remove();
       }
     });
+  });
+</script>
+
+<script>
+  // Affiche le spinner quand on clique sur "Retour arrière" ou on recharge
+  window.addEventListener("pageshow", function (event) {
+    const spinner = document.getElementById("loading-spinner");
+
+    if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+      spinner.style.display = "flex";
+    }
+  });
+
+  // Affiche le spinner manuellement quand on clique sur les liens de retour
+  document.querySelectorAll('.btn-back, .btn-refresh').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.getElementById("loading-spinner").style.display = "flex";
+    });
+  });
+</script>
+
+<script>
+  $('#deleteModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget); // Bouton qui déclenche le modal
+    var projectId = button.data('id');   // ID du projet depuis data-id
+    var action = '{{ url('/projects') }}/' + projectId;
+
+    // Mettre à jour l'action du formulaire dans le modal
+    $('#deleteProjectForm').attr('action', action);
   });
 </script>

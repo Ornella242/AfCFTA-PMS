@@ -9,8 +9,13 @@ class Partner extends Model
     use HasFactory;
     protected $fillable = ['name'];
 
+    // public function users()
+    // {
+    //     return $this->belongsToMany(User::class, 'partner_user')->withTimestamps();
+    // }
     public function projects()
     {
-        return $this->belongsToMany(Project::class);
+        return $this->belongsToMany(Project::class, 'partner_project', 'partner_id', 'project_id');
     }
+
 }

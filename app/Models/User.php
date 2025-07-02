@@ -50,13 +50,22 @@ class User extends Authenticatable
     }
 
     public function role()
-{
-    return $this->belongsTo(Role::class);
-}
+    {
+        return $this->belongsTo(Role::class);
+    }
 
-public function unit()
-{
-    return $this->belongsTo(Unit::class);
-}
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 
+    public function managedProjects()
+    {
+        return $this->hasMany(Project::class, 'project_manager_id');
+    }
+
+       public function projectsManaged()
+    {
+        return $this->hasMany(Project::class, 'project_manager_id');
+    }
 }

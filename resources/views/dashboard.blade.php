@@ -428,6 +428,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </script>
 
+{{-- <script>
+    window.addEventListener("load", function () {
+        const loader = document.getElementById("loader-wrapper");
+        if (loader) {
+            loader.style.display = "none";
+        }
+    });
+</script> --}}
 
 
  

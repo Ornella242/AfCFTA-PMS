@@ -371,5 +371,34 @@
       gtag('js', new Date());
       gtag('config', 'UA-56159088-1');
     </script>
+
+    <script>
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href && href.startsWith('/') && !href.startsWith('#')) {
+                e.preventDefault();
+                document.getElementById('page-transition').classList.add('fade-out');
+                setTimeout(() => window.location.href = href, 300);
+            }
+        });
+    });
+</script>
+
+<style>
+.fade-out {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeOutDown 0.3s ease-in forwards;
+}
+
+@keyframes fadeOutDown {
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+</style>
+
   </body>
 </html>

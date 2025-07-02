@@ -1,32 +1,33 @@
 @include('partials.navbar')
+ <div id="loading-spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
+  <div class="spinner-grow mr-3 text-success" role="status" style="width: 5rem; height: 5rem;">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
 <main role="main" class="main-content">
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-12">
-                <div class="row align-items-center mb-4">
-                    <div class="col">
-                        <h2 class="mb-2 page-title text-maroon">Users</h2>
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                    <!-- Back Button -->
+                    <div>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-success btn-back shadow-sm transition-all">
+                            <i class="fe fe-arrow-left mr-2"></i> Back
+                        </a>
                     </div>
-                    <div class="col-auto">
-                      <button type="button" class="btn mb-2 bg-green  text-white" data-toggle="modal" data-target="#varyModalUser" data-whatever="@mdo"><i class="fe fe-user-plus mx-1"></i>Add new user</button>
-                        @if(session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        @endif
 
-                        @if(session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session('error') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        @endif
-                        <div class="modal fade" id="varyModalUser" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
+                    <!-- Page Title -->
+                    <div>
+                        <h2 class="mb-0 page-title text-maroon">List of Users</h2>
+                    </div>
+
+                    <!-- Add User Button -->
+                    <div>
+                        <button type="button" class="btn bg-green  text-white" data-toggle="modal" data-target="#varyModalUser" data-whatever="@mdo">
+                            <i class="fe fe-user-plus mx-1"></i>Add new user
+                        </button>
+                         <!-- Modal -->
+                         <div class="modal fade" id="varyModalUser" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -83,14 +84,35 @@
                     </div>
                 </div>
             </div>
+            <div class="row align-items-center mt-2">
+                <div class="col-12">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+                </div>
+            </div>
               <div class="row my-4">
                 <!-- Small table -->
                 <div class="col-md-12">
                   <div class="card shadow">
                     <div class="card-body">
                       <!-- table -->
-                      <table class="table datatables" id="dataTable-1">
-                        <thead>
+                      <table class="table datatables table-striped" id="dataTable-1">
+                        <thead class="bg-green text-white">
                           <tr>
                             <th>#</th>
                             <th>Name</th>
@@ -301,5 +323,23 @@
         modal.find('#edit_role_id').val(role_id);
         modal.find('#editUserForm').attr('action', '/users/' + id); // Route vers UserController@update
     });
+</script>
+
+<script>
+  // Affiche le spinner quand on clique sur "Retour arrière" ou on recharge
+  window.addEventListener("pageshow", function (event) {
+    const spinner = document.getElementById("loading-spinner");
+
+    if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+      spinner.style.display = "flex";
+    }
+  });
+
+  // Affiche le spinner manuellement quand on clique sur les liens de retour
+  document.querySelectorAll('.btn-back, .btn-refresh').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.getElementById("loading-spinner").style.display = "flex";
+    });
+  });
 </script>
 

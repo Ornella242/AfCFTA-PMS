@@ -1,36 +1,32 @@
 @include('partials.navbar')
-<main role="main" class="main-content">
+ <div id="loading-spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
+  <div class="spinner-grow mr-3 text-success" role="status" style="width: 3rem; height: 3rem;">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-12">
-                <div class="row align-items-center mb-4">
-                    <div class="col">
-                        <h2 class="mb-2 page-title text-black">Roles</h2>
-                          @if(session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        @endif
-
-                        @if(session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session('error') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        @endif
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                    <!-- Back Button -->
+                    <div>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-success btn-back shadow-sm transition-all">
+                            <i class="fe fe-arrow-left mr-2"></i> Back
+                        </a>
                     </div>
-                   <div class="col-auto">
-                        <!-- Button -->
-                        <button type="button" class="btn mb-2 bg-green text-white" data-toggle="modal" data-target="#assignRoleModal">
+
+                    <!-- Page Title -->
+                    <div>
+                        <h2 class="mb-0 page-title text-black">List of roles</h2>
+                    </div>
+
+                    <!-- Assign Role Button -->
+                    <div>
+                        <button type="button" class="btn bg-green text-white" data-toggle="modal" data-target="#assignRoleModal">
                             <i class="fe fe-user-plus mx-1"></i> Assign role
                         </button>
-
-                        <!-- Modal -->
+                         <!-- Modal -->
                         <div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="assignRoleLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <form method="POST" action="{{ route('assign.role') }}">
@@ -74,7 +70,28 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <div class="row align-items-center mb-4">
+                    <div class="col">
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+                    </div>
                 </div>
              </div>
               <div class="row">
@@ -264,4 +281,22 @@ document.getElementById('searchUserInput').addEventListener('keyup', function ()
         }
     });
 });
+</script>
+
+<script>
+  // Affiche le spinner quand on clique sur "Retour arrière" ou on recharge
+  window.addEventListener("pageshow", function (event) {
+    const spinner = document.getElementById("loading-spinner");
+
+    if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+      spinner.style.display = "flex";
+    }
+  });
+
+  // Affiche le spinner manuellement quand on clique sur les liens de retour
+  document.querySelectorAll('.btn-back, .btn-refresh').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.getElementById("loading-spinner").style.display = "flex";
+    });
+  });
 </script>

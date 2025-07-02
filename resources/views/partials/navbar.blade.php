@@ -26,7 +26,8 @@
     <link rel="stylesheet" href="{{ asset('css/app-dark.css') }}" id="darkTheme" disabled>
     <link rel="stylesheet" href="{{ asset('css/dataTables.bootstrap4.css') }}">
   </head>
-      
+   
+ 
   <body class="vertical  light">
     <div class="wrapper">
       <nav class="topnav navbar navbar-light">
@@ -59,14 +60,19 @@
             </a>
 
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    Log out
-                </a>
+              <a class="dropdown-item" href="{{ route('password.change') }}">
+                  Change Password
+              </a>
 
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-            </div>
+              <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                  Log out
+              </a>
+
+              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                  @csrf
+              </form>
+          </div>
+
         </li>
         </ul>
       </nav>
@@ -98,7 +104,7 @@
           </p>
           <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item w-100">
-              <a href="{{ url('/addnewproject') }}" class="nav-link">
+              <a href="{{ url('/projects/create') }}" class="nav-link">
                 <i class="fe fe-plus-circle fe-16"></i>
                 <span class="ml-3 item-text text-black">New Project</span>
               </a>
@@ -108,9 +114,14 @@
             <li class="nav-item w-100 d-flex justify-content-between align-items-center">
               <a href="{{ url('/allprojects') }}" class="nav-link d-flex align-items-center">
                 <i class="fe fe-box fe-16"></i>
+
                 <span class="ml-3 item-text">All Projects</span>
               </a>
-              <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">8</span>
+               @if(isset($totalProjects))
+                <span class="badge badge-pill bg-green text-white mr-3 pt-2 pb-2">
+                   {{ $totalProjects }}
+                </span>
+              @endif 
             </li>
           </ul>
           <ul class="navbar-nav flex-fill w-100 mb-2">
@@ -119,7 +130,11 @@
                 <i class="fe fe-users fe-16"></i>
                 <span class="ml-3 item-text">HRM Projects</span>
               </a>
-              <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">5</span>
+              @if(isset($totalProjectsHRM))
+                <span class="badge badge-pill bg-yellow text-white mr-3 pt-2 pb-2">
+                  {{ $totalProjectsHRM }}
+                </span>
+              @endif 
             </li>
           </ul>
           <ul class="navbar-nav flex-fill w-100 mb-2">
@@ -128,7 +143,11 @@
                 <i class="fe fe-shield fe-16"></i>
                 <span class="ml-3 item-text">Admin Projects</span>
               </a>
-              <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">3</span>
+               @if(isset($totalProjectsAdmin))
+                <span class="badge badge-pill bg-maroon text-white mr-3 pt-2 pb-2">
+                  {{ $totalProjectsAdmin }}
+                </span>
+              @endif 
             </li>
           </ul>
       
@@ -252,7 +271,11 @@
                 <i class="fe fe-box fe-16"></i>
                 <span class="ml-3 item-text">All Projects</span>
               </a>
-              <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">8</span>
+              @if(isset($totalProjects))
+                <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">
+                   {{ $totalProjects }}
+                </span>
+              @endif 
             </li>
           </ul>
           <ul class="navbar-nav flex-fill w-100 mb-2">
@@ -261,7 +284,11 @@
                 <i class="fe fe-users fe-16"></i>
                 <span class="ml-3 item-text">HRM Projects</span>
               </a>
-              <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">5</span>
+              @if(isset($totalProjectsHRM))
+                <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">
+                   {{ $totalProjectsHRM }}
+                </span>
+              @endif 
             </li>
           </ul>
           <ul class="navbar-nav flex-fill w-100 mb-2">
@@ -270,7 +297,11 @@
                 <i class="fe fe-shield fe-16"></i>
                 <span class="ml-3 item-text">Admin Projects</span>
               </a>
-              <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">3</span>
+              @if(isset($totalProjectsAdmin))
+                <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">
+                   {{ $totalProjectsAdmin }}
+                </span>
+              @endif 
             </li>
           </ul>
       
@@ -317,6 +348,11 @@
       </nav>
       </aside>
     </div> <!-- .wrapper -->
+    <!-- Loader -->
+    {{-- <div id="loader-wrapper">
+        <div id="loader"></div>
+    </div> --}}
+
 
   </body>
 </html>

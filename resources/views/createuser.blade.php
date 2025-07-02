@@ -1,11 +1,21 @@
 @include('partials.navbar')
-<main role="main" class="main-content">
-  <div class="container-fluid">
+<div id="loading-spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
+  <div class="spinner-grow mr-3 text-success" role="status" style="width: 3rem; height: 3rem;">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<main role="main" class="main-content fade-in" id="page-transition">
+  <div class="container-fluid bg-grey">
     <div class="row justify-content-center">
-      <div class="col-12 col-xl-10">
+      <div class="col-12">
+        <div class="w-100 text-left mt-3 ml-3">
+          <a href="{{ url()->previous() }}" class="btn btn-outline-success btn-back shadow-sm transition-all">
+            <i class="fe fe-arrow-left mr-2"></i> Back
+          </a>
+        </div>
         <div class="row align-items-center my-4">
           <div class="col">
-            <h2 class="h3 mb-0 page-title">New user</h2>
+            <h2 class="h2 mb-0 page-title text-center">New user form</h2>
           </div>
           @if(session('success'))
               <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -28,8 +38,7 @@
         </div>
         <form action="{{ route('users.store') }}" method="POST">
           @csrf
-          <hr class="my-4">
-          <h5 class="mb-2 mt-4 text-maroon">User details</h5>
+          <h5 class="mb-2 mt-1 text-maroon">User details</h5>
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="firstname">Firstname</label>
@@ -64,9 +73,11 @@
             </div>
           </div>
           <div>
-          <button type="submit" class="btn mb-2 bg-maroon text-white">
-            <i class="fe fe-user-plus mx-1"></i>Add
-          </button>
+          <div class="col-md-12 d-flex justify-content-end">
+            <button type="submit" class="btn mb-2 bg-maroon text-white">
+              <i class="fe fe-user-plus mx-1"></i>Add
+            </button>
+          </div>
           </div>
         </form>
       </div>

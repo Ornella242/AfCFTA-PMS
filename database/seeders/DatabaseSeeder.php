@@ -23,6 +23,10 @@ class DatabaseSeeder extends Seeder
         RoleSeeder::class,
         UnitSeeder::class,
         UserSeeder::class,
+        PhaseSeeder::class,
+        PartnerSeeder::class,
+        SubphaseSeeder::class,
+        SubphasePercentageSeeder::class,
     ]);
     }
 }
