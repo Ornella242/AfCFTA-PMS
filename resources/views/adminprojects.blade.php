@@ -202,13 +202,73 @@
                           <div class="d-flex justify-content-center gap-2 align-items-center">
                             <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none"><i class="fe fe-edit-2"></i></a>
                             <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
-                            <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm text-danger" title="Delete">
-                                    <i class="fe fe-trash-2"></i>
+                            @if($project->status === 'Cancelled')
+                                {{-- Bouton de réactivation --}}
+                                <!-- Reactivate Trigger Button -->
+                                <button class="btn btn-sm text-success" title="Reactivate Project" data-toggle="modal" data-target="#reactivateProjectModal{{ $project->id }}">
+                                  <i class="fe fe-refresh-ccw"></i>
                                 </button>
-                            </form>
+
+                                <!-- Reactivate Modal -->
+                                <div class="modal fade" id="reactivateProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="reactivateProjectModalLabel{{ $project->id }}" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <form action="{{ route('projects.reactivate', $project->id) }}" method="POST">
+                                      @csrf
+                                      @method('PATCH')
+                                      <div class="modal-content">
+                                        <div class="modal-header bg-success text-white">
+                                          <h5 class="modal-title" id="reactivateProjectModalLabel{{ $project->id }}">
+                                            Reactivate Project
+                                          </h5>
+                                          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                          <p>Are you sure you want to <strong>reactivate</strong> the project <strong>{{ $project->title }}</strong>?</p>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                          <button type="submit" class="btn btn-success">Reactivate</button>
+                                        </div>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+
+                              @else
+                                {{-- Bouton de suppression --}}
+                                <button class="btn btn-sm text-danger" data-toggle="modal" data-target="#deleteProjectModal{{ $project->id }}">
+                                  <i class="fe fe-trash-2"></i>
+                                </button>
+                              @endif
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <form action="{{ route('projects.requestDelete', $project->id) }}" method="POST">
+                                  @csrf
+                                  <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                      <h5 class="modal-title text-white" id="deleteProjectModalLabel">Delete Project Request</h5>
+                                      <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <p class="text-black h5">Why do you want to delete this project?</p>
+                                      <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                      <button type="submit" class="btn btn-danger">Request Deletion</button>
+                                    </div>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
                           </div>
                         </td>
                       </tr>

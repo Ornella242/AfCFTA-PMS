@@ -45,5 +45,6 @@ class Kernel extends HttpKernel
         'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         'role.redirect' => \App\Http\Middleware\RoleMiddleware::class, // Pour notre redirection personnalisée
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'is_admin' => \App\Http\Middleware\IsAdmin::class,
     ];
 }

@@ -337,44 +337,69 @@
                         </div>
                       </form>
 
-                      {{-- Afficher les activités de développement --}}
-                      @if($sub->name === 'development' && $project->developmentDetails->count())
+                      @if($sub->name === 'development')
                         <div class="mt-3 ml-4">
                           <strong>Development Activities:</strong>
-                          <ul class="list-group mt-2">
-                            @foreach($project->developmentDetails as $activity)
-                              <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                  <strong>{{ $activity->title }}</strong>
-                                  @if($activity->notes)
-                                    <div><small class="text-muted">{{ $activity->notes }}</small></div>
-                                  @endif
+
+                          {{-- Liste des activités déjà enregistrées --}}
+                          @if($project->developmentDetails->count())
+                            <ul class="list-group mt-2 mb-3">
+                              @foreach($project->developmentDetails as $activity)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                  <div>
+                                    <strong>{{ $activity->title }}</strong>
+                                    @if($activity->notes)
+                                      <div><small class="text-muted">{{ $activity->notes }}</small></div>
+                                    @endif
+                                  </div>
+
+                                  <form method="POST" action="{{ route('developmentDetails.updateStatus', $activity->id) }}" class="d-flex align-items-center">
+                                    @csrf @method('PATCH')
+
+                                    <select name="status" class="form-control form-control-sm mr-2 status-select">
+                                      @foreach(['Not started', 'In progress', 'Completed','Cancelled','Delayed','Waiting Approval','Under review'] as $status)
+                                        <option value="{{ $status }}" {{ $activity->status == $status ? 'selected' : '' }}>
+                                          {{ $status }}
+                                        </option>
+                                      @endforeach
+                                    </select>
+
+                                    <input type="text" name="reason" class="form-control form-control-sm mr-2 reason-input"
+                                      placeholder="Reason" style="display: none;" value="{{ $activity->reason ?? '' }}">
+
+                                    <button class="btn btn-sm btn-outline-success">Save</button>
+                                  </form>
+                                </li>
+                              @endforeach
+                            </ul>
+                          @endif
+
+                          {{-- Formulaire d’ajout dynamique --}}
+                          <form method="POST" action="{{ route('developmentDetails.store') }}">
+                            @csrf
+                            <input type="hidden" name="project_id" value="{{ $project->id }}">
+
+                            <div id="activityInputs">
+                              <div class="form-row align-items-center mb-2">
+                                <div class="col">
+                                  <input type="text" name="development_activities[]" class="form-control" placeholder="Enter activity title">
                                 </div>
+                                <div class="col-auto">
+                                  <button type="button" class="btn btn-sm btn-outline-primary add-activity">Add</button>
+                                </div>
+                              </div>
+                            </div>
 
-                                <form method="POST" action="{{ route('developmentDetails.updateStatus', $activity->id) }}" class="d-flex align-items-center">
-                                  @csrf @method('PATCH')
-
-                                  <select name="status" class="form-control form-control-sm mr-2 status-select">
-                                    @foreach(['Not started', 'In progress', 'Completed','Cancelled','Delayed','Waiting Approval','Under review'] as $status)
-                                      <option value="{{ $status }}" {{ $activity->status == $status ? 'selected' : '' }}>
-                                        {{ $status }}
-                                      </option>
-                                    @endforeach
-                                  </select>
-
-                                  <input type="text" name="reason" class="form-control form-control-sm mr-2 reason-input"
-                                    placeholder="Reason" style="display: none;" value="{{ $activity->reason ?? '' }}">
-
-                                  <button class="btn btn-sm btn-outline-success">Save</button>
-                                </form>
-                              </li>
-                            @endforeach
-                          </ul>
+                            <button type="submit" class="btn btn-success btn-sm mt-2">Save Activities</button>
+                          </form>
                         </div>
                       @endif
 
+
                     </li>
                   @endforeach
+                 
+
                 </ul>
               </div>
             </div>
@@ -462,3 +487,31 @@
     });
   });
 </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const addButtonClass = "add-activity";
+    const container = document.getElementById("activityInputs");
+
+    container.addEventListener("click", function (e) {
+      if (e.target.classList.contains(addButtonClass)) {
+        const newInput = document.createElement("div");
+        newInput.className = "form-row align-items-center mb-2";
+        newInput.innerHTML = `
+          <div class="col">
+            <input type="text" name="development_activities[]" class="form-control" placeholder="Enter activity title">
+          </div>
+          
+          <div class="col-auto">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-activity">Remove</button>
+          </div>`;
+        container.appendChild(newInput);
+      }
+
+      if (e.target.classList.contains("remove-activity")) {
+        e.target.closest(".form-row").remove();
+      }
+    });
+  });
+</script>
+

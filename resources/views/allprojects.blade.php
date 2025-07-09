@@ -13,14 +13,44 @@ function statusColorClass($status) {
 }
 @endphp
 @include('partials.navbar')
-<div id="loading-spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
+{{-- <div id="loading-spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
   <div class="spinner-grow mr-3 text-success" role="status" style="width: 5rem; height: 5rem;">
     <span class="sr-only">Loading...</span>
   </div>
-</div>
+</div> --}}
 <main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
           <div class="row justify-content-center">
+            <div class="col-12">
+              @if($deletionRequests->count())
+                <div class="alert alert-warning">
+                  <h5>Project Deletion Requests</h5>
+
+                  @foreach($deletionRequests as $request)
+                    <div class="card mb-2">
+                      <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                          <p><strong>{{ $request->requester->firstname }} {{ $request->requester->lastname }}</strong> wants to delete <strong>{{ $request->project->title }}</strong></p>
+                          <p><strong>Reason:</strong> {{ $request->reason }}</p>
+                        </div>
+                        <div class="d-flex">
+                          <form action="{{ route('deletionRequests.approve', $request->id) }}" method="POST" class="mr-2">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                          </form>
+
+                          <form action="{{ route('deletionRequests.decline', $request->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  @endforeach
+                </div>
+              @endif
+            </div>
             <div class="col-12">
               <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
                   <!-- Back Button -->
@@ -168,6 +198,7 @@ function statusColorClass($status) {
                                       <i class="fe fe-trash-2"></i>
                                   </button>
                               </form>
+                             
                             </div>
                           </td>
                         </tr>

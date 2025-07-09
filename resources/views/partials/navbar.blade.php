@@ -150,6 +150,19 @@
               @endif 
             </li>
           </ul>
+
+          <p class="text-maroon nav-heading mt-4 mb-1">
+            <span>Reports Management</span>
+          </p>
+          <ul class="navbar-nav flex-fill w-100 mb-2">
+            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a class="nav-link d-flex align-items-center" href="{{ url('/reports') }}">
+                  <i class="fe fe-book fe-16"></i>
+                  <span class="ml-3 item-text">Reports</span>
+                </a>
+                <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">16</span>
+            </li>
+          </ul>
       
           <p class="text-maroon nav-heading mt-4 mb-1">
             <span>Tasks Management</span>
@@ -189,18 +202,7 @@
               <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">7</span>
             </li>
           </ul>
-          <p class="text-maroon nav-heading mt-4 mb-1">
-            <span>Reports Management</span>
-          </p>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-                <a class="nav-link d-flex align-items-center" href="{{ url('/reports') }}">
-                  <i class="fe fe-book fe-16"></i>
-                  <span class="ml-3 item-text">Reports</span>
-                </a>
-                <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">16</span>
-            </li>
-          </ul>
+          
           <p class="text-maroon nav-heading mt-4 mb-1">
             <span>User Management</span>
           </p>

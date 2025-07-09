@@ -7169,7 +7169,80 @@ a.text-dark:hover, a.text-dark:focus {
   background: #ffffff; }
 .bg-grey {
   background: #EBEAE5; }
-  
+.bg-grey {
+  background: #EBEAE5; }
+
+  .table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .clickable-row:hover {
+    background-color: #f1f1f1 !important;
+  }
+
+.underline {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(to right, #9E2140, #C3A466); /* dégradé violet-bleu */
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.custom-simple-card:hover .underline {
+  width: 100px;
+}
+
+  .gradient-card {
+  border: 2px solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(to right, var(--gradient), var(--gradient));
+  border-radius: 12px;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+}
+
+.gradient-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-card-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.custom-simple-card {
+  border-radius: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-simple-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.underline {
+  width: 40px;
+  height: 3px;
+  background-color: #ccc;
+  border-radius: 2px;
+}
+
+
+.underline {
+  width: 50px;
+  border-top: 2px dashed var(--card-gradient);
+}
+
 /* End background colors */
 
  .transition-all {

@@ -266,44 +266,6 @@
 
 
 
-
-
-
-{{-- <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const procurementCheckbox = document.getElementById("phase_{{ $phases->firstWhere('name', 'procurement')?->id }}");
-    const procurementTypeContainer = document.getElementById("procurementTypeContainer");
-    const afcftaRadio = document.getElementById("afcfta");
-    const partnerRadio = document.getElementById("procurement_type_partner");
-    const afcftaSubphases = document.getElementById("afcftaSubphases");
-
-    if (procurementCheckbox) {
-      procurementCheckbox.addEventListener("change", function () {
-        if (this.checked) {
-          procurementTypeContainer.classList.remove("d-none");
-        } else {
-          procurementTypeContainer.classList.add("d-none");
-          afcftaSubphases.classList.add("d-none");
-          afcftaRadio.checked = false;
-          partnerRadio.checked = false;
-        }
-      });
-    }
-
-    if (afcftaRadio) {
-      afcftaRadio.addEventListener("change", function () {
-        afcftaSubphases.classList.remove("d-none");
-      });
-    }
-
-    if (partnerRadio) {
-      partnerRadio.addEventListener("change", function () {
-        afcftaSubphases.classList.add("d-none");
-      });
-    }
-  });
-</script> --}}
-
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const triggerCheckbox = document.querySelector(".dynamic-trigger");

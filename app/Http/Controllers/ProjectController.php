@@ -13,22 +13,25 @@ use App\Models\Project;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Role;
+use App\Models\DevelopmentDetail;
+use App\Mail\ProjectDeletionRequestMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ProjectDeletionRequest;
+
+
 
 class ProjectController extends Controller
 {
-    // public function index()
-    // {
-        
-    //     $projects = Project::with(['unit', 'projectManager', 'phases'])->latest()->get();
-
-    //     return view('allprojects', compact('projects'));
-    // }
-
     public function index(Request $r)
     {
         // dd('All Projects Page');
         $status = $r->query('status');
         $managerName = $r->query('manager');
+
+        $deletionRequests = ProjectDeletionRequest::with('project', 'requester')
+                        ->where('approved', false)
+                        ->get();
 
         $q = Project::with('partners');
 
@@ -75,7 +78,7 @@ class ProjectController extends Controller
                 'Cancelled'   => Project::where('status', 'Cancelled')->count(),
             ];
 
-            return view('allprojects', compact('projects', 'status', 'counts','partners', 'managers'));
+            return view('allprojects', compact('projects', 'status', 'counts','partners', 'managers','deletionRequests'));
     }
 
 
@@ -542,20 +545,49 @@ class ProjectController extends Controller
     }
 
 
-    public function destroy($id)
-    {
-        $project = Project::findOrFail($id);
+    // public function destroy($id)
+    // {
+    //     $project = Project::findOrFail($id);
 
-        // Supprimer les relations si nécessaire
-        $project->partners()->detach();
-        $project->subphases()->detach();
-        $project->phases()->detach();
-        $project->developmentDetails()->delete();
+    //     // Supprimer les relations si nécessaire
+    //     $project->partners()->detach();
+    //     $project->subphases()->detach();
+    //     $project->phases()->detach();
+    //     $project->developmentDetails()->delete();
 
-        $project->delete();
+    //     $project->delete();
 
-        return redirect()->route('allprojects')->with('success', 'Project deleted successfully.');
-    }
+    //     return redirect()->route('allprojects')->with('success', 'Project deleted successfully.');
+    // }
+
+    public function requestDelete(Request $request, $id)
+{
+    $request->validate(['reason' => 'required|string']);
+    $project = Project::findOrFail($id);
+
+    // Store reason (create a model if needed)
+    \App\Models\ProjectDeletionRequest::create([
+        'project_id' => $project->id,
+        'requested_by' => Auth::id(),
+        'reason' => $request->reason,
+    ]);
+
+    // Notify admins via email
+    $admins =  \App\Models\User::whereHas('role', function ($query) {
+                    $query->where('name', 'Admin');
+                })->get();
+   
+    $user = Auth::user();
+    foreach ($admins as $admin) {
+        Mail::to($admin->email)->send(new \App\Mail\ProjectDeletionRequestMail(
+            $project,
+            $request->reason,
+            Auth::user()
+        ));   
+     }
+
+    return back()->with('success', 'Deletion request sent to administrators.');
+}
 
 
     public function hrmProjects(Request $request)
@@ -649,5 +681,20 @@ class ProjectController extends Controller
             ];
         return view('adminprojects', compact('projects', 'counts', 'status','highPriorityProjects'));
     }
+
+    public function reactivate(Project $project)
+    {
+        if ($project->status === 'Cancelled' && $project->previous_status) {
+             $project->status = $project->previous_status;
+            // $project->status = $project->previous_status ?? 'Not started';
+            $project->previous_status = null;
+            $project->save();
+
+            return back()->with('success', 'Project successfully reactivated.');
+        }
+
+        return back()->with('error', 'Project cannot be reactivated.');
+    }
+
 
 };

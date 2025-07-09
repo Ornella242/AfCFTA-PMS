@@ -7,7 +7,10 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Middleware\Authenticate;
 use  App\Http\Controllers\DevelopmentDetailController;
+use App\Http\Controllers\ProjectDeletionRequestController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -20,9 +23,7 @@ Route::post('/logout', function () {
 
 // protégé par auth
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+   Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 
@@ -31,12 +32,11 @@ Route::get('/', function () {
     return view('auth.register');
 });
 Route::view('/login', 'auth.login');
-Route::view('/dashboard', 'dashboard');
-Route::view('/newproject', 'newproject');
-Route::view('/allprojects', 'allprojects');
-Route::view('/adminprojects', 'adminprojects');
-Route::view('/hrmprojects', 'hrmprojects');
-Route::view('/projectdetail', 'projectdetail');
+// Route::view('/newproject', 'newproject');
+// Route::view('/allprojects', 'allprojects');
+// Route::view('/adminprojects', 'adminprojects');
+// Route::view('/hrmprojects', 'hrmprojects');
+// Route::view('/projectdetail', 'projectdetail');
 
 Route::view('/alltasks', 'alltasks');
 Route::view('/edittask', 'edittask');
@@ -94,3 +94,28 @@ Route::patch('/development-details/{id}/update-status', [DevelopmentDetailContro
 Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 Route::get('/hrmprojects', [ProjectController::class, 'hrmProjects'])->name('projects.hrm');
 Route::get('/adminprojects', [ProjectController::class, 'adminProjects'])->name('projects.admin');
+
+Route::post('/development-details', [DevelopmentDetailController::class, 'store'])->name('developmentDetails.store');
+// Route::put('/development-details/{id}', [DevelopmentDetailController::class, 'update'])->name('developmentDetails.update');
+// Route::delete('/development-details/{id}', [DevelopmentDetailController::class, 'destroy'])->name('developmentDetails.destroy');
+
+Route::post('/projects/{id}/request-delete', [ProjectController::class, 'requestDelete'])->name('projects.requestDelete');
+Route::post('/projects/{id}/approve-deletion', [ProjectController::class, 'approveDeletion'])->middleware('admin')->name('projects.approveDeletion');
+// Route::middleware(['auth', 'is_admin'])->group(function () {
+//     Route::get('/admin/deletion-requests', [ProjectDeletionRequestController::class, 'index'])->name('deletionRequests.index');
+//     Route::patch('/admin/deletion-requests/{id}/approve', [ProjectDeletionRequestController::class, 'approve'])->name('deletionRequests.approve');
+// });
+
+// Route::middleware(['auth'])->group(function () {
+//     Route::get('/admin/deletion-requests', [ProjectDeletionRequestController::class, 'index'])->name('deletionRequests.index');
+// });
+// Route::post('/admin/deletion-requests/{id}/approve', [ProjectDeletionRequestController::class, 'approve'])
+//     ->name('deletionRequests.approve');
+
+Route::post('/deletion-requests/{id}/approve', [ProjectDeletionRequestController::class, 'approve'])
+    ->name('deletionRequests.approve');
+
+Route::delete('/deletion-requests/{id}/decline', [ProjectDeletionRequestController::class, 'decline'])
+    ->name('deletionRequests.decline');
+
+Route::patch('/projects/{project}/reactivate', [ProjectController::class, 'reactivate'])->name('projects.reactivate');
