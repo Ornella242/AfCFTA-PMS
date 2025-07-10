@@ -358,7 +358,7 @@
         });
       }
     </script>
-    <script src="js/apps.js"></script>
+    <script src="{{ asset('js/apps.js') }}"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>
@@ -386,18 +386,18 @@
 </script>
 
 <style>
-.fade-out {
-    opacity: 1;
-    transform: translateY(0);
-    animation: fadeOutDown 0.3s ease-in forwards;
-}
+  .fade-out {
+      opacity: 1;
+      transform: translateY(0);
+      animation: fadeOutDown 0.3s ease-in forwards;
+  }
 
-@keyframes fadeOutDown {
-    to {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-}
+  @keyframes fadeOutDown {
+      to {
+          opacity: 0;
+          transform: translateY(20px);
+      }
+  }
 </style>
 
   </body>

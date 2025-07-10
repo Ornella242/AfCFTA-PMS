@@ -5,7 +5,10 @@
             <div class="col-12">
               <div class="row align-items-center mb-4">
                 <div class="col">
-                  <h2 class="h3 page-title text-black"><small class="h3 text-maroon text-uppercase">Report</small><br />#0001</h2>
+                  <h2 class="h3 page-title text-black">
+                    <small class="h3 text-maroon text-uppercase">Report</small><br />
+                    {{ $report->code ?? '#0000' }}
+                  </h2>
                 </div>
                 <div class="col-auto">
                   <button type="button" class="btn bg-yellow text-white"><i class="fe fe-printer fe-16"></i> Print</button>
@@ -24,10 +27,10 @@
                         </div>
                         <hr style="border-top: 3px solid #C2A756; margin-top: 0;">
 
-                    <div class="row mb-5">
-                    <div class="col-12 mb-4">
-                        <h3 class="mb-0  mt-2 text-uppercase">Report #0001 | Administration Data</h3>
-                        <p class="text-muted"> Generated 07th June <br />By Ornella AHOUANDOGBO </p>
+                    <div class="row mb-2">
+                    <div class="col-12 mb-2">
+                        <h3 class="mb-0  mt-2 text-uppercase">Report {{ $report->code ?? '#0000' }} | {{ $report->project->title}}</h3>
+                        <p class="text-black font-bold"> Generated {{ \Carbon\Carbon::parse($report->generated_at)->format('d/m/Y') }} <br />By {{ $report->user->firstname .' '. $report->user->lastname}} </p>
                     </div>
                     </div> <!-- /.row -->
                     <div class="row align-items-center my-4">
@@ -84,136 +87,54 @@
 
                     <div class="row my-4">
                         <div class="col-md-12">
-                        <div class="mb-4">
+                        <div class="mb-2">
                             <div class="card-header">
-                            <strong class="card-title h5">Administrative services dashboard</strong>
+                            <strong class="card-title h5">Description: {{ $report->project->description}}</strong>
                             </div>
                             <div class="card-body">
-                            <dl class="row align-items-center mb-0">
-                                <dt class="col-sm-2 mb-3 text-muted">Created by</dt>
-                                <dd class="col-sm-4 mb-3">
-                                <strong>Brown Asher</strong>
-                                </dd>
-                                <dt class="col-sm-2 mb-3 text-muted">Assigned to</dt>
-                                <dd class="col-sm-4 mb-3">
-                                <strong>Kelley Sonya</strong>
-                                </dd>
-                            </dl>
-                            <dl class="row mb-0">
-                                <dt class="col-sm-2 mb-3 text-muted">Type</dt>
-                                <dd class="col-sm-4 mb-3">Admin</dd>
-                                <dt class="col-sm-2 mb-3 text-muted">Unit</dt>
-                                <dd class="col-sm-4 mb-3">Admin</dd>
-                                <dt class="col-sm-2 mb-3 text-muted">Priority</dt>
-                                <dd class="col-sm-4 mb-3">
-                                <span class="badge badge-pill badge-danger pt-1">High</span>
-                                
-                                </dd>
-                                <dt class="col-sm-2 mb-3 text-muted">Status</dt>
-                                <dd class="col-sm-4 mb-3">
-                                <span class="dot dot-md bg-warning text-yellow mr-2 "></span> Processing <div class="dropdown d-inline">
-                                    <button class="btn btn-sm p-0 dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="sr-only">Change status</span>
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item text-maroon" href="#">Pending</a>
-                                    <a class="dropdown-item text-green" href="#">Completed</a>
-                                    </div>
-                                </div>
-                                </dd>
-                                <dt class="col-sm-2 mb-3 text-muted">Created On</dt>
-                                <dd class="col-sm-4 mb-3">2025-06-05 1:08pm</dd>
-                                <dt class="col-sm-2 mb-3 text-muted">Last Update</dt>
-                                <dd class="col-sm-4 mb-3">2025-06-05 1:08pm</dd>
-                            </dl>
+                                <dl class="row align-items-center mb-0">
+                                    <dt class="col-sm-2 mb-3 text-muted">Created by</dt>
+                                    <dd class="col-sm-4 mb-3">
+                                    <strong>{{ $project->creator->firstname . ' ' . $project->creator->lastname }}</strong>
+                                    </dd>
+                                    <dt class="col-sm-2 mb-3 text-muted">Assigned to</dt>
+                                    <dd class="col-sm-4 mb-3">
+                                    <strong>{{$report->project->projectManager->firstname .' '. $report->project->projectManager->lastname }}</strong>
+                                    </dd>
+                                </dl>
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-2 mb-3 text-muted">Type</dt>
+                                    <dd class="col-sm-4 mb-3">{{ $project->type}}</dd>
+                                    <dt class="col-sm-2 mb-3 text-muted">Unit</dt>
+                                    <dd class="col-sm-4 mb-3">{{ $project->unit->name}}</dd>
+                                    <dt class="col-sm-2 mb-3 text-muted">Priority</dt>
+                                    <dd class="col-sm-4 mb-3">
+                                    <span class="badge badge-pill badge-danger pt-1">{{ $project->priority}}</span>
+                                    
+                                    </dd>
+                                    <dt class="col-sm-2 mb-3 text-muted">Status</dt>
+                                    <dd class="col-sm-4 mb-3">
+                                        <strong>
+                                            {{ $project->status}} 
+                                        </strong>
+                                    </dd>
+                                    <dt class="col-sm-2 mb-3 text-muted">Start Date</dt>
+                                    <dd class="col-sm-4 mb-3">{{ \Carbon\Carbon::parse($project->start_date)->format('d/m/Y') }} </dd>
+                                    <dt class="col-sm-2 mb-3 text-muted">End Date</dt>
+                                    <dd class="col-sm-4 mb-3">{{ \Carbon\Carbon::parse($project->end_date)->format('d/m/Y') }}</dd>
+                                </dl>
                             </div> <!-- .card-body -->
                         </div> <!-- .card -->
                          
                         <div class="mb-4">
                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <strong class="card-title h5 mb-0">Associated Tasks</strong>
+                                <strong class="card-title h5 mb-0">Activity report</strong>
                                 <div class="d-flex align-items-center">
                                     <span class="mr-3 d-flex align-items-center">
                                     <i class="fe fe-layers mr-1"></i>3
                                     </span>
-                                       <!-- Modal -->
-                                    <div class="modal fade" id="createtask" tabindex="-1" role="dialog" aria-labelledby="createtask" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h5 class="modal-title" id="defaultModalLabel">Create task</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                            </div>
-                                        <div class="modal-body">
-                                                <form action="" method="POST">
-                                                    @csrf
-                                                    {{-- Project name --}}
-                                                    <div class="form-group">
-                                                        <label for="project_name">Project name</label>
-                                                        <select class="form-control" id="unit" name="unit">
-                                                            <option value="">Administration Data</option>
-                                                            <option value="">Administration Data</option>
-                                                            <option value="">Administration Data</option>
-                                                            <!-- Tu peux ajouter d'autres unités -->
-                                                        </select>
-                                                    </div>
-                                                   
-                                                    <!-- Title -->
-                                                    <div class="form-group">
-                                                    <label for="title">Title</label>
-                                                    <input type="text" class="form-control" id="title" name="title" placeholder="Enter task title" required>
-                                                    </div>
-                                                    <!-- Description -->
-                                                    <div class="form-group">
-                                                    <label for="description">Description</label>
-                                                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter task description"></textarea>
-                                                    </div>
-                                                    <!-- Start Date & End Date -->
-                                                    <div class="form-row">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="start_date">Start Date</label>
-                                                        <input type="date" class="form-control" id="start_date" name="start_date" required>
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="end_date">End Date</label>
-                                                        <input type="date" class="form-control" id="end_date" name="end_date" required>
-                                                    </div>
-                                                    </div>
-                                                    <!-- Priority & Status -->
-                                                    <div class="form-row">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="priority">Priority</label>
-                                                        <select class="form-control" id="priority" name="priority">
-                                                        <option value="high">High</option>
-                                                        <option value="medium">Medium</option>
-                                                        <option value="low">Low</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label for="status">Status</label>
-                                                        <select class="form-control" id="status" name="status">
-                                                        <option value="pending" class="text-maroon">Pending</option>
-                                                        <option value="processing" class="text-yellow">Processing</option>
-                                                        <option value="completed" class="text-green">Completed</option>
-                                                        </select>
-                                                    </div>
-                                                    </div>
-                                                 
-                                                </div>
-
-                                                <!-- Footer -->
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn bg-maroon text-white">Add task</button>
-                                                </div>
-                                                </form>
-                                        </div>                                              
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                </div>   
+                            </div>
                             <div class="card-body p-0">
                                 <table class="table mb-0 table-hover">
                                 <thead class="thead-light">

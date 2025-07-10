@@ -177,7 +177,7 @@
           </dd>
 
           {{-- BUDGET --}}
-          <dt class="col-sm-2 mb-3 text-black">Budget</dt>
+          {{-- <dt class="col-sm-2 mb-3 text-black">Budget</dt>
           <dd class="col-sm-4 mb-3">
             <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'budget']) }}">
               @csrf @method('PATCH')
@@ -186,8 +186,25 @@
                 <button class="btn btn-sm btn-outline-success ml-2">Save</button>
               </div>
             </form>
-          </dd>
+          </dd> --}}
 
+          <dt class="col-sm-2 mb-3 text-black">Budget</dt>
+          <dd class="col-sm-4 mb-3">
+            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id]) }}" id="budgetForm">
+              @csrf
+              @method('PATCH')
+              <input type="hidden" name="field" value="budget">
+              <input type="hidden" name="reason" id="budgetReason">
+              
+              <div class="d-flex align-items-center">
+                <input type="number" step="0.01" name="value" id="budgetValue" class="form-control form-control-sm" value="{{ $project->budget }}">
+                {{-- <button type="button" class="btn btn-sm btn-outline-success ml-2" data-toggle="modal" data-target="#budgetModal">Save</button> --}}
+                <button type="button" class="btn btn-sm btn-outline-success ml-2" onclick="$('#budgetModal').modal('show')">Save</button>
+              </div>
+            </form>
+          </dd>
+          
+         
           {{-- PROCUREMENT TYPE --}}
         <dt class="col-sm-2 mb-3 text-black">Procurement</dt>
           <dd class="col-sm-4 mb-3 text-black">
@@ -221,7 +238,7 @@
               </form>
             </dd>
           </dl>
-
+          
 
             {{-- Subphases --}}
             <hr style="border: none; height: 6px; background: linear-gradient(to right, #1b1311, #feb47b);">
@@ -403,16 +420,35 @@
                 </ul>
               </div>
             </div>
-
-
             @endforeach
-
-
-        </div>
-      </div>
+        </div>      
+      </div>    
     </div>
-
+     
   @include('partials.footer')   
+ <div class="modal fade" id="budgetModal" tabindex="-1" role="dialog" aria-labelledby="budgetModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                  <h5 class="modal-title" id="budgetModalLabel">Justify Budget Change</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label for="reasonInput">Reason for budget change</label>
+                    <textarea class="form-control" id="reasonInput" rows="3" placeholder="Provide a justification..." required></textarea>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary" id="confirmBudgetChange">Confirm</button>
+                </div>
+              </div>
+            </div>
+      </div>
+
 </main>
 
 <script>
@@ -512,6 +548,27 @@
         e.target.closest(".form-row").remove();
       }
     });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const confirmBtn = document.getElementById('confirmBudgetChange');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', function () {
+        const reason = document.getElementById('reasonInput').value.trim();
+
+        if (reason === '') {
+          alert('Please provide a reason for the budget change.');
+          return;
+        }
+
+        document.getElementById('budgetReason').value = reason;
+        document.getElementById('budgetForm').submit();
+      });
+    } else {
+      console.warn('❗ Bouton #confirmBudgetChange non trouvé dans le DOM.');
+    }
   });
 </script>
 

@@ -11,6 +11,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 use  App\Http\Controllers\DevelopmentDetailController;
 use App\Http\Controllers\ProjectDeletionRequestController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -119,3 +120,4 @@ Route::delete('/deletion-requests/{id}/decline', [ProjectDeletionRequestControll
     ->name('deletionRequests.decline');
 
 Route::patch('/projects/{project}/reactivate', [ProjectController::class, 'reactivate'])->name('projects.reactivate');
+Route::get('/projects/{project}/report', [ReportController::class, 'viewReport'])->name('projects.viewReport');

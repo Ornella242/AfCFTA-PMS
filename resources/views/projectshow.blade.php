@@ -13,11 +13,17 @@
           </a>
       </div>
       <div class="card shadow mb-4">
+      
         <div class="card-header bg-gold text-white d-flex justify-content-between align-items-center">
           <strong class="card-title h3 text-white mt-3">{{ $project->title }}</strong>
-          <span class="float-right">
+          
+          <div class="d-flex align-items-center">
+            <a href="{{ route('projects.viewReport', $project->id) }}" class="btn btn-sm btn-light text-black font-bold mr-3 shadow-sm">
+              <i class="fe fe-file-text text-green mr-1"></i> View Report
+            </a>
+
             <span class="badge badge-pill bg-green text-white pb-2 pt-2">{{ $project->type }}</span>
-          </span>
+          </div>
         </div>
         <div class="card-body">
           <dl class="row align-items-center mb-0">

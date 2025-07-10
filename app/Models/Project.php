@@ -21,7 +21,8 @@ class Project extends Model
         'project_manager_id',
         'type',
         'budget',
-        'procurement_type'
+        'procurement_type',
+        'created_by'
     ];
 
 
@@ -70,6 +71,10 @@ class Project extends Model
         });
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
 
 }

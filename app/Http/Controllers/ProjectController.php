@@ -18,6 +18,7 @@ use App\Mail\ProjectDeletionRequestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ProjectDeletionRequest;
+use App\Models\Report;
 
 
 
@@ -120,7 +121,9 @@ class ProjectController extends Controller
         'budget' => 'nullable|numeric|min:0',
         'subphases' => 'nullable|array',
         'procurement_type' => 'nullable|in:afcfta,partner',
+         
         ]);
+        $validated['created_by'] = Auth::id();
         //   dd($validated); 
 
         $validated['start_date'] = Carbon::createFromFormat('m/d/Y', $validated['start_date'])->format('Y-m-d');
@@ -140,8 +143,9 @@ class ProjectController extends Controller
             'project_manager_id' => $validated['project_manager_id'],
             'type' => $request->type,
             'budget' => $request->budget ?? null,
+            'created_by' => Auth::id(),
         ]);
-        // dd($project);
+        //  dd($project);
         // 3. Attacher les partenaires (many-to-many)
         if ($request->has('partners') && is_array($request->partners)) {
             $project->partners()->sync($request->partners); // Met à jour les partenaires
@@ -397,7 +401,21 @@ class ProjectController extends Controller
             }
 
         } else {
-            // Autres champs simples
+            // Ajout du 9/7/2025
+          if ($field === 'budget' && empty($request->input('reason'))) {
+            return redirect()->back()->with('error', 'Please provide a reason for the budget change.');
+        }
+
+        // Stocker l'ancienne valeur du budget avant modification
+        if ($field === 'budget') {
+            $oldBudget = $project->budget;
+
+            // Stocker raison + date + ancienne valeur
+            $project->budget_change_reason = $request->input('reason');
+            $project->budget_changed_at = now();
+            $project->previous_budget = $oldBudget;
+        }
+        // dd($field, $value);
             $project->$field = $value;
             $project->save();
         }
@@ -561,33 +579,33 @@ class ProjectController extends Controller
     // }
 
     public function requestDelete(Request $request, $id)
-{
-    $request->validate(['reason' => 'required|string']);
-    $project = Project::findOrFail($id);
+    {
+        $request->validate(['reason' => 'required|string']);
+        $project = Project::findOrFail($id);
 
-    // Store reason (create a model if needed)
-    \App\Models\ProjectDeletionRequest::create([
-        'project_id' => $project->id,
-        'requested_by' => Auth::id(),
-        'reason' => $request->reason,
-    ]);
+        // Store reason (create a model if needed)
+        \App\Models\ProjectDeletionRequest::create([
+            'project_id' => $project->id,
+            'requested_by' => Auth::id(),
+            'reason' => $request->reason,
+        ]);
 
-    // Notify admins via email
-    $admins =  \App\Models\User::whereHas('role', function ($query) {
-                    $query->where('name', 'Admin');
-                })->get();
-   
-    $user = Auth::user();
-    foreach ($admins as $admin) {
-        Mail::to($admin->email)->send(new \App\Mail\ProjectDeletionRequestMail(
-            $project,
-            $request->reason,
-            Auth::user()
-        ));   
-     }
+        // Notify admins via email
+        $admins =  \App\Models\User::whereHas('role', function ($query) {
+                        $query->where('name', 'Admin');
+                    })->get();
+    
+        $user = Auth::user();
+        foreach ($admins as $admin) {
+            Mail::to($admin->email)->send(new \App\Mail\ProjectDeletionRequestMail(
+                $project,
+                $request->reason,
+                Auth::user()
+            ));   
+        }
 
-    return back()->with('success', 'Deletion request sent to administrators.');
-}
+        return back()->with('success', 'Deletion request sent to administrators.');
+    }
 
 
     public function hrmProjects(Request $request)
@@ -636,7 +654,7 @@ class ProjectController extends Controller
         return view('hrmprojects', compact('projects', 'counts', 'status','highPriorityProjects'));
     }
 
-        public function adminProjects(Request $request)
+    public function adminProjects(Request $request)
     {
         $projects = Project::with([
             'phases' => function ($q) {
@@ -696,5 +714,31 @@ class ProjectController extends Controller
         return back()->with('error', 'Project cannot be reactivated.');
     }
 
+    // public function viewReport(Project $project)
+    // {
+    //     return view('viewreport', compact('project'));
+    // }
+
+    // public function viewReport(Project $project)
+    // {
+    //     // Crée d'abord le rapport sans code ni titre pour récupérer l'ID
+    //     $report = Report::create([
+    //         'project_id'   => $project->id,
+    //         'user_id'      => Auth::id(),
+    //         'format'       => 'web',
+    //         'generated_at' => now(),
+    //     ]);
+
+    //     // Crée le code de rapport : #TYPE + ID (ex: #ADMIN4)
+    //     $code = '#' . strtoupper($project->type) . $report->id;
+
+    //     // Met à jour le rapport avec le code et le titre (ex: "#Project Alpha")
+    //     $report->update([
+    //         'code'  => $code,
+    //         'title' => '#' . $project->title,
+    //     ]);
+
+    //     return view('viewreport', compact('project', 'report'));
+    // }
 
 };
