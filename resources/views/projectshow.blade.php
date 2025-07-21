@@ -166,21 +166,47 @@
                                     @endif
 
                                     {{-- Activités de développement --}}
+                                  
                                     @if($sub->name === 'development' && $project->developmentDetails->count())
-                                        <div class="mt-2 ml-3">
-                                            <strong>Development Activities:</strong>
-                                            <ul class="list-group mt-1">
-                                                @foreach($project->developmentDetails as $activity)
-                                                    <li class="list-group-item">
-                                                        {{ $activity->title }}
-                                                        @if($activity->notes)
-                                                            <div><small class="text-muted">{{ $activity->notes }}</small></div>
-                                                        @endif
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
+                                      <div class="mt-2 ml-3">
+                                          <strong>Development Activities:</strong>
+                                          <ul class="list-group mt-1">
+                                              @foreach($project->developmentDetails as $activity)
+                                                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                      {{-- Titre et notes --}}
+                                                      <div>
+                                                          <strong>{{ $activity->title }}</strong>
+                                                          @if($activity->notes)
+                                                              <div><small class="text-muted">{{ $activity->notes }}</small></div>
+                                                          @endif
+                                                      </div>
+
+                                                      {{-- Infos à droite : budget + statut + date --}}
+                                                      <div class="text-right">
+                                                          <small class="text-muted">
+                                                              @if($activity->budget_activity > 0)
+                                                                  ${{ number_format($activity->budget_activity, 2) }}
+                                                              @else
+                                                                  No budget dedicated
+                                                              @endif
+
+                                                              {{-- Statut de paiement --}}
+                                                              @if($activity->payment_status)
+                                                                  | {{ $activity->payment_status }}
+
+                                                                  {{-- Date si payé --}}
+                                                                  @if($activity->payment_status === 'Paid' && $activity->payment_date)
+                                                                      on {{ \Carbon\Carbon::parse($activity->payment_date)->format('d M Y') }}
+                                                                  @endif
+                                                              @endif
+                                                          </small>
+                                                      </div>
+                                                  </li>
+                                              @endforeach
+                                          </ul>
+                                      </div>
                                     @endif
+
                                 </li>
                             @endforeach
                         </ul>

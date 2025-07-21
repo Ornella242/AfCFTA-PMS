@@ -3328,6 +3328,19 @@ input[type="button"].btn-block {
 .card-link + .card-link {
   margin-left: 1.25rem; }
 
+.table-thick-border {
+    border: 1px solid #5e5252 !important;
+}
+
+.table-thick-border th,
+.table-thick-border td {
+    border: 1px solid #5e5252 !important;
+}
+
+.text-black{
+  color: #000000 !important; }
+
+
 .card-header {
   padding: 0.75rem 1.25rem;
   margin-bottom: 0;
@@ -3337,6 +3350,13 @@ input[type="button"].btn-block {
     border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0; }
   .card-header + .list-group .list-group-item:first-child {
     border-top: 0; }
+
+.card-header-report {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: #ffffff;
+  border-bottom: 2px solid #aa4e10; }
+
 
 .card-footer {
   padding: 0.75rem 1.25rem;

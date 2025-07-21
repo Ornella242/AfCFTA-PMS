@@ -176,17 +176,6 @@
             </form>
           </dd>
 
-          {{-- BUDGET --}}
-          {{-- <dt class="col-sm-2 mb-3 text-black">Budget</dt>
-          <dd class="col-sm-4 mb-3">
-            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'budget']) }}">
-              @csrf @method('PATCH')
-              <div class="d-flex align-items-center">
-                <input type="number" step="0.01" name="value" class="form-control form-control-sm" value="{{ $project->budget }}">
-                <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-              </div>
-            </form>
-          </dd> --}}
 
           <dt class="col-sm-2 mb-3 text-black">Budget</dt>
           <dd class="col-sm-4 mb-3">
@@ -203,6 +192,8 @@
               </div>
             </form>
           </dd>
+
+      
           
          
           {{-- PROCUREMENT TYPE --}}
@@ -237,6 +228,17 @@
                 </div>
               </form>
             </dd>
+
+            <dt class="col-sm-2 text-black">Budget Code</dt>
+              <dd class="col-sm-10">
+                <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'budget_code']) }}">
+                  @csrf @method('PATCH')
+                  <div class="d-flex align-items-center">
+                    <input type="text" class="form-control form-control-sm" name="budget_code" value={{ $project->budget_code }} >
+                    <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+                  </div>
+                </form>
+              </dd>
           </dl>
           
 
@@ -339,7 +341,7 @@
                                   <input type="text" class="form-control" value="{{ $status }}" readonly>
                               </div>
                             @else
-                              <select name="status" class="form-control form-control-sm status-select" data-subphase="{{ $sub->id }}">
+                              <select name="status" class="form-control form-control-sm status-select" data-subphase="{{ $sub->id }}" data-subphase-name="{{ $sub->name }}">
                                   @foreach(['Not started','In progress','Completed','Cancelled','Delayed','Waiting Approval','Under review'] as $option)
                                       <option value="{{ $option }}" {{ $status == $option ? 'selected' : '' }}>{{ $option }}</option>
                                   @endforeach
@@ -347,6 +349,14 @@
 
                               <input type="text" name="reason" class="form-control form-control-sm ml-2 reason-input"
                                   placeholder="Reason" style="display: none;" value="{{ $sub->pivot->reason ?? '' }}">
+                                @if($sub->name === 'award')
+                                  <input type="text"
+                                        name="award_person_name"
+                                        class="form-control form-control-sm ml-2 award-input"
+                                        placeholder="Award responsible name"
+                                        style="{{ $sub->pivot->status === 'Completed' ? '' : 'display:none;' }}"
+                                        value="{{ $sub->pivot->award_person_name ?? '' }}">
+                                @endif
 
                               <button type="submit" class="btn btn-sm btn-outline-success ml-2">Save</button>
                             @endif
@@ -362,13 +372,16 @@
                           @if($project->developmentDetails->count())
                             <ul class="list-group mt-2 mb-3">
                               @foreach($project->developmentDetails as $activity)
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{-- <li class="list-group-item d-flex justify-content-between align-items-center">
+                                 
+
                                   <div>
                                     <strong>{{ $activity->title }}</strong>
-                                    @if($activity->notes)
-                                      <div><small class="text-muted">{{ $activity->notes }}</small></div>
-                                    @endif
+                                      @if($activity->budget_activity)
+                                        <div><small class="text-muted">Budget: ${{ number_format($activity->budget_activity, 2) }}</small></div>
+                                      @endif
                                   </div>
+
 
                                   <form method="POST" action="{{ route('developmentDetails.updateStatus', $activity->id) }}" class="d-flex align-items-center">
                                     @csrf @method('PATCH')
@@ -386,32 +399,109 @@
 
                                     <button class="btn btn-sm btn-outline-success">Save</button>
                                   </form>
+                                </li> --}}
+                                <li class="list-group-item">
+                                  <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                      <strong>{{ $activity->title }}</strong>
+                                     
+                                      <div class="ms-3"> {{-- Ou ml-3 si Bootstrap 4 --}}
+                                        @if(!is_null($activity->budget_activity))
+                                          <small class="text-black mr-2">Budget: ${{ number_format($activity->budget_activity, 2) }}</small>
+
+                                          @if($activity->payment_status)
+                                            <small class="text-black mr-2">| Status: {{ $activity->payment_status }}</small>
+                                          @endif
+
+                                          @if($activity->payment_status === 'Paid' && $activity->payment_date)
+                                            <small class="text-muted mr-2">
+                                              on {{ \Carbon\Carbon::parse($activity->payment_date)->format('d M Y') }}
+                                            </small>
+                                          @endif
+                                          <button type="button" class="btn btn-sm btn-link p-0 edit-budget-btn text-decoration-none" data-activity-id="{{ $activity->id }}">
+                                            <i class="fe fe-edit-2 text-maroon fe-16 "></i>
+                                          </button>
+
+                                        @else
+                                          <small class="text-muted mr-2">No budget dedicated</small>
+                                        @endif
+                                      </div>
+                                    
+                                      {{-- Formulaire de paiement caché --}}
+                                      <form method="POST" action="{{ route('developmentDetails.updatePayment', $activity->id) }}"
+                                            class="payment-form mt-2" id="payment-form-{{ $activity->id }}" style="display: none;">
+                                        @csrf @method('PATCH')
+                                        
+                                        <div class="form-row align-items-center">
+                                          
+                                          <div class="col-auto">
+                                            <select name="payment_status" class="form-control form-control-sm payment-status">
+                                              <option value="">Select Payment Status</option>
+                                              <option value="Paid" {{ $activity->payment_status == 'Paid' ? 'selected' : '' }}>Paid</option>
+                                              <option value="Unpaid" {{ $activity->payment_status == 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
+                                            </select>
+                                          </div>
+
+                                          <div class="col-auto payment-date-field" style="{{ $activity->payment_status == 'Paid' ? '' : 'display: none;' }}">
+                                            <input type="date" name="payment_date" value="{{ $activity->payment_date }}" class="form-control form-control-sm">
+                                          </div>
+
+                                          <div class="col-auto">
+                                            <button class="btn btn-sm btn-outline-success">Save</button>
+                                          </div>
+                                        </div>
+                                      </form>
+                                    </div>
+
+                                    {{-- Formulaire de statut activité --}}
+                                    <form method="POST" action="{{ route('developmentDetails.updateStatus', $activity->id) }}" class="d-flex align-items-center">
+                                      @csrf @method('PATCH')
+
+                                      <select name="status" class="form-control form-control-sm mr-2 status-select">
+                                        @foreach(['Not started', 'In progress', 'Completed','Cancelled','Delayed','Waiting Approval','Under review'] as $status)
+                                          <option value="{{ $status }}" {{ $activity->status == $status ? 'selected' : '' }}>
+                                            {{ $status }}
+                                          </option>
+                                        @endforeach
+                                      </select>
+
+                                      <input type="text" name="reason" class="form-control form-control-sm mr-2 reason-input"
+                                        placeholder="Reason" style="display: none;" value="{{ $activity->reason ?? '' }}">
+
+                                      <button class="btn btn-sm btn-outline-success">Save</button>
+                                    </form>
+                                  </div>
                                 </li>
+
                               @endforeach
                             </ul>
                           @endif
 
-                          {{-- Formulaire d’ajout dynamique --}}
+
                           <form method="POST" action="{{ route('developmentDetails.store') }}">
                             @csrf
                             <input type="hidden" name="project_id" value="{{ $project->id }}">
 
                             <div id="activityInputs">
-                              <div class="form-row align-items-center mb-2">
+                              <div class="form-row align-items-center mb-2 activity-row">
                                 <div class="col">
-                                  <input type="text" name="development_activities[]" class="form-control" placeholder="Enter activity title">
+                                  <input type="text" name="development_activities[0][title]" class="form-control" placeholder="Activity title">
+                                </div>
+                                <div class="col">
+                                  <input type="number" step="0.01" name="development_activities[0][budget]" class="form-control" placeholder="Budget">
                                 </div>
                                 <div class="col-auto">
-                                  <button type="button" class="btn btn-sm btn-outline-primary add-activity">Add</button>
+                                  <button type="button" class="btn btn-sm btn-outline-danger remove-activity">X</button>
                                 </div>
                               </div>
                             </div>
 
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addActivityRow">Add Activity</button>
                             <button type="submit" class="btn btn-success btn-sm mt-2">Save Activities</button>
                           </form>
+
                         </div>
                       @endif
-
 
                     </li>
                   @endforeach
@@ -570,5 +660,55 @@
       console.warn('❗ Bouton #confirmBudgetChange non trouvé dans le DOM.');
     }
   });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Clic sur icône crayon
+    document.querySelectorAll('.edit-budget-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const activityId = this.dataset.activityId;
+        document.getElementById('payment-form-' + activityId).style.display = 'block';
+      });
+    });
+
+    // Afficher champ date si "Paid"
+    document.querySelectorAll('.payment-status').forEach(function (select) {
+      select.addEventListener('change', function () {
+        const parent = this.closest('.payment-form');
+        const dateField = parent.querySelector('.payment-date-field');
+        if (this.value === 'Paid') {
+          dateField.style.display = 'block';
+        } else {
+          dateField.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Délégation : toutes les sélections de statut
+  document.body.addEventListener('change', function (e) {
+    if (!e.target.matches('.status-select')) return;
+
+    const select = e.target;
+    const isAward = select.dataset.subphaseName === 'award';
+    if (!isAward) return;
+
+    const container = select.closest('form');
+    const awardInput = container.querySelector('.award-input');
+
+    if (select.value === 'Completed') {
+      awardInput.style.display = 'block';
+    } else {
+      awardInput.style.display = 'none';
+      awardInput.value = '';
+    }
+  });
+
+});
 </script>
 

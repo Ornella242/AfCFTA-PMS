@@ -77,6 +77,7 @@ class ProjectController extends Controller
                 'In progress' => Project::where('status', 'In progress')->count(),
                 'Completed'   => Project::where('status', 'Completed')->count(),
                 'Cancelled'   => Project::where('status', 'Cancelled')->count(),
+                'Closed'   => Project::where('status', 'Closed')->count(),
             ];
 
             return view('allprojects', compact('projects', 'status', 'counts','partners', 'managers','deletionRequests'));
@@ -121,6 +122,7 @@ class ProjectController extends Controller
         'budget' => 'nullable|numeric|min:0',
         'subphases' => 'nullable|array',
         'procurement_type' => 'nullable|in:afcfta,partner',
+        'budget_code' => 'nullable|string|max:50', // Ajout du budget code
          
         ]);
         $validated['created_by'] = Auth::id();
@@ -144,6 +146,7 @@ class ProjectController extends Controller
             'type' => $request->type,
             'budget' => $request->budget ?? null,
             'created_by' => Auth::id(),
+            'budget_code' => $request->budget_code, // Ajout du budget code
         ]);
         //  dd($project);
         // 3. Attacher les partenaires (many-to-many)
@@ -152,8 +155,7 @@ class ProjectController extends Controller
         } else {
             $project->partners()->detach(); // Aucun partenaire sélectionné, on vide la relation
         }
-        // dd($project->partners);
-        // 3.1 Si le projet a un partenaire spécifique, on l'ajoute
+    //    Si le projet a un partenaire spécifique, on l'ajoute
         if ($request->input('procurement_type') === 'partner' && $request->has('partner_id')) {
             $partnerId = $request->input('partner_id');
             $project->partners()->syncWithoutDetaching([$partnerId]);
@@ -166,11 +168,6 @@ class ProjectController extends Controller
             }
         }
 
-        // 3.3 Pour débogage, tu peux décommenter la ligne suivante pour voir les partenaires attachés
-        // dd($project->partners);
-
-        // 3.4 Pour vérifier les partenaires attachés
-        // dd($project->partners);
         // 4. Gérer les sous-phases cochées
         $subphaseSyncData = [];
 
@@ -184,12 +181,9 @@ class ProjectController extends Controller
         }
 
        
-        $selectedSubphases = $request->input('subphases', []); // contient subphases[phase_id][]
-        // dd($selectedSubphases);
-        // $selectedPhaseIds = array_keys($selectedSubphases);
+        $selectedSubphases = $request->input('subphases', []); 
         $selectedPhaseIds = array_filter(array_keys($selectedSubphases), fn($id) => is_numeric($id));
-
-        // dd($selectedPhaseIds);
+        // Enregistrer les phases sélectionnées
         if (!empty($selectedPhaseIds)) {
             $project->phases()->sync($selectedPhaseIds); // Enregistre les phases dans project_phase
         }
@@ -222,6 +216,7 @@ class ProjectController extends Controller
         
         // b) Sous-phases AfCFTA Procurement
         if ($request->procurement_type === 'afcfta' && $request->has('subphases.procurement_afcfta')) {
+            
             foreach ($request->input('subphases.procurement_afcfta') as $subId) {
                 $subphaseSyncData[$subId] = ['percentage' => 0];
             }
@@ -244,22 +239,26 @@ class ProjectController extends Controller
             }
         }
 
-            // 5. Activités dynamiques de développement
+       
+
         if ($request->has('development_activities')) {
-            foreach ($request->input('development_activities') as $activityTitle) {
-                if (!empty($activityTitle)) {
+            foreach ($request->input('development_activities') as $activity) {
+                if (!empty($activity['title'])) {
                     $project->developmentDetails()->create([
-                        'title' => $activityTitle,
+                        'title' => $activity['title'],
+                        'budget_activity' => $activity['budget'] ?? null,
                         'subphase_id' => Subphase::where('name', 'development')->value('id'),
                     ]);
                 }
             }
         }
 
+
         return redirect()->route('allprojects')->with('success', 'Project created successfully.');
     }
 
-   
+ 
+
 
 
 
@@ -275,6 +274,7 @@ class ProjectController extends Controller
             'project_manager_id' => 'required|exists:users,id',
             'type' => 'required|in:HRM,Admin',
             'budget' => 'nullable|numeric',
+            'budget_code' => 'nullable|string|max:50', // Ajout du budget code
         ]);
 
         $validated['start_date'] = Carbon::parse($validated['start_date'])->format('Y-m-d');
@@ -300,12 +300,16 @@ class ProjectController extends Controller
 
         // Activités de développement (tu peux optimiser avec diff)
         $project->developmentDetails()->delete();
-        foreach ($request->input('development_activities', []) as $title) {
+       foreach ($request->input('development_activities', []) as $activity) {
             $project->developmentDetails()->create([
-                'title' => $title,
-                'subphase_id' => Subphase::where('name', 'development')->value('id')
+                'title' => $activity['title'],
+                'budget' => $activity['budget'] ?? null,
+                'payment_status' => $activity['payment_status'] ?? 'Unpaid',
+                'payment_date' => $activity['payment_date'] ?? null,
+                'subphase_id' => Subphase::where('name', 'development')->value('id'),
             ]);
         }
+
 
         return redirect()->route('allprojects')->with('success', 'Project updated successfully.');
     }
@@ -441,143 +445,316 @@ class ProjectController extends Controller
         return redirect()->back()->with('success', "$label updated successfully.");
     }
 
+ 
     public function updateSubphaseStatus(Request $request, $projectId, $subphaseId)
-    {
-        $status = $request->input('status');
-        $reason = $request->input('reason');
+        {
+        $request->validate([
+                'status' => 'required|string',
+                'reason' => 'nullable|string',
+                'award_person_name' => 'nullable|string|max:255',
+            ]);
+            $status = $request->input('status');
+            $reason = $request->input('reason');
 
-        $project = Project::findOrFail($projectId);
-        $subphase = Subphase::findOrFail($subphaseId);
-        $defaultPercentage = $subphase->default_percentage;
 
-        $allSubphases = $project->subphases()->with('phase')->orderBy('position')->get();
+            $project = Project::findOrFail($projectId);
+            $subphase = Subphase::findOrFail($subphaseId);
+            $defaultPercentage = $subphase->default_percentage;
 
-        $currentIndex = $allSubphases->search(function ($item) use ($subphaseId) {
-            return $item->id == $subphaseId;
-        });
+            $allSubphases = $project->subphases()->with('phase')->orderBy('position')->get();
 
-        if ($status === 'Completed') {
-            $previousNotCompleted = $allSubphases->take($currentIndex)->first(function ($sp) {
-                return $sp->pivot->status !== 'Completed';
+            $currentIndex = $allSubphases->search(function ($item) use ($subphaseId) {
+                return $item->id == $subphaseId;
             });
 
-            if ($previousNotCompleted) {
-                $prevPhase = \App\Models\Phase::find($previousNotCompleted->phase_id);
-                $prevPhaseName = $prevPhase->label ?? ucfirst($prevPhase->name);
-                $prevSubName = $previousNotCompleted->label ?? $previousNotCompleted->name;
-                $prevStatus = $previousNotCompleted->pivot->status;
+            if ($status === 'Completed') {
+                $previousNotCompleted = $allSubphases->take($currentIndex)->first(function ($sp) {
+                    return $sp->pivot->status !== 'Completed';
+                });
 
-                return redirect()->back()->with('error', "Cannot complete this subphase because previous subphase \"$prevSubName\" in phase \"$prevPhaseName\" is still \"$prevStatus\".");
+                if ($previousNotCompleted) {
+                    $prevPhase = \App\Models\Phase::find($previousNotCompleted->phase_id);
+                    $prevPhaseName = $prevPhase->label ?? ucfirst($prevPhase->name);
+                    $prevSubName = $previousNotCompleted->label ?? $previousNotCompleted->name;
+                    $prevStatus = $previousNotCompleted->pivot->status;
+
+                    return redirect()->back()->with('error', "Cannot complete this subphase because previous subphase \"$prevSubName\" in phase \"$prevPhaseName\" is still \"$prevStatus\".");
+                }
             }
-        }
 
-        switch ($status) {
-            case 'Not started':
-                $percentage = 0;
-                break;
-            case 'In progress':
-                $percentage = $defaultPercentage / 2;
-                break;
-            case 'Completed':
-                $percentage = $defaultPercentage;
-                break;
-            default:
-                $percentage = $subphase->pivot->percentage ?? 0;
-                break;
-        }
-
-        $project->subphases()->updateExistingPivot($subphaseId, [
-            'status' => $status,
-            'percentage' => $percentage,
-            'reason' => $reason
-        ]);
-
-        $phaseId = $subphase->phase_id;
-        if (!$project->phases->pluck('id')->contains($phaseId)) {
-            $project->phases()->attach($phaseId, ['percentage' => 0, 'status' => 'Not started']);
-        }
-        $subphases = $project->subphases()->where('phase_id', $phaseId)->get();
-        $totalDefault = $subphases->sum('default_percentage');
-        $achieved = $subphases->sum(function ($s) {
-            return $s->pivot->percentage;
-        });
-
-        $phasePercentage = $totalDefault > 0 ? round(($achieved / $totalDefault) * 100, 2) : 0;
-
-        $allCompleted = $subphases->every(function ($s) {
-            return $s->pivot->status === 'Completed';
-        });
-
-        $phaseUpdate = ['percentage' => $phasePercentage];
-        if ($allCompleted) {
-            $phaseUpdate['status'] = 'Completed';
-        }
-        $project->phases()->updateExistingPivot($phaseId, $phaseUpdate);
-
-        $firstSubphase = $allSubphases->first();
-        $lastSubphase = $allSubphases->last();
-        if ($firstSubphase && $firstSubphase->id == $subphaseId) {
-            if ($status === 'In progress' || $status === 'Completed') {
-                $project->status = 'In progress';
-                $project->save();
-            }elseif ($status === 'Not started') {
-                $project->status = 'Not started';
+            switch ($status) {
+                case 'Not started':
+                    $percentage = 0;
+                    break;
+                case 'In progress':
+                    $percentage = $defaultPercentage / 2;
+                    break;
+                case 'Completed':
+                    $percentage = $defaultPercentage;
+                    break;
+                default:
+                    $percentage = $subphase->pivot->percentage ?? 0;
+                    break;
             }
-            $project->save();
-        }
 
-        if ($lastSubphase && $lastSubphase->id == $subphaseId && $status === 'Completed') {
-            $incomplete = $allSubphases->first(function ($sp) {
-                return $sp->pivot->status !== 'Completed';
-            });
-            if (!$incomplete) {
-                $project->status = 'Completed';
-                $project->save();
+        $pivotData = [
+                'status'     => $status,
+                'percentage' => $percentage,
+                'reason'     => $reason,
+            ];
+
+            // On ajoute award_person_name *exactement comme reason* sans condition
+            if ($subphase->name === 'award') {
+                $pivotData['award_person_name'] = $request->input('award_person_name');
             }
-        }
 
+            $project->subphases()->updateExistingPivot($subphaseId, $pivotData);
 
-        $allPhases = $project->phases()->with('subphases')->get();
-        $totalProjectDefault = 0;
-        $totalAchieved = 0;
-
-        foreach ($allPhases as $phase) {
-            $subs = $project->subphases()->where('phase_id', $phase->id)->get();
-            $phaseDefault = $subs->sum('default_percentage');
-            $phaseAchieved = $subs->sum(function ($s) {
+            $phaseId = $subphase->phase_id;
+            if (!$project->phases->pluck('id')->contains($phaseId)) {
+                $project->phases()->attach($phaseId, ['percentage' => 0, 'status' => 'Not started']);
+            }
+            $subphases = $project->subphases()->where('phase_id', $phaseId)->get();
+            $totalDefault = $subphases->sum('default_percentage');
+            $achieved = $subphases->sum(function ($s) {
                 return $s->pivot->percentage;
             });
 
-            $totalProjectDefault += $phaseDefault;
-            $totalAchieved += $phaseAchieved;
+            $phasePercentage = $totalDefault > 0 ? round(($achieved / $totalDefault) * 100, 2) : 0;
 
-            $phasePercentage = $phaseDefault > 0 ? round(($phaseAchieved / $phaseDefault) * 100, 2) : 0;
-            $project->phases()->updateExistingPivot($phase->id, ['percentage' => $phasePercentage]);
+            $allCompleted = $subphases->every(function ($s) {
+                return $s->pivot->status === 'Completed';
+            });
+
+            $phaseUpdate = ['percentage' => $phasePercentage];
+            if ($allCompleted) {
+                $phaseUpdate['status'] = 'Completed';
+            }
+            $project->phases()->updateExistingPivot($phaseId, $phaseUpdate);
+
+            $firstSubphase = $allSubphases->first();
+            $lastSubphase = $allSubphases->last();
+            if ($firstSubphase && $firstSubphase->id == $subphaseId) {
+                if ($status === 'In progress' || $status === 'Completed') {
+                    $project->status = 'In progress';
+                    $project->save();
+                }elseif ($status === 'Not started') {
+                    $project->status = 'Not started';
+                }
+                $project->save();
+            }
+            // Met à jour le pivot AVANT toute vérification
+            $project->subphases()->updateExistingPivot($subphaseId, [
+                'status' => $status,
+            ]);
+            $allSubphases = $project->subphases;
+            
+            if ($lastSubphase && $lastSubphase->id == $subphaseId && $status === 'Completed') {
+                $incomplete = $allSubphases->first(function ($sp) {
+                    return $sp->pivot->status !== 'Completed';
+                });
+                if (!$incomplete) {
+                    $project->status = 'Completed';
+                    $project->save();
+                }
+            }
+
+
+            $allPhases = $project->phases()->with('subphases')->get();
+            $totalProjectDefault = 0;
+            $totalAchieved = 0;
+
+            foreach ($allPhases as $phase) {
+                $subs = $project->subphases()->where('phase_id', $phase->id)->get();
+                $phaseDefault = $subs->sum('default_percentage');
+                $phaseAchieved = $subs->sum(function ($s) {
+                    return $s->pivot->percentage;
+                });
+
+                $totalProjectDefault += $phaseDefault;
+                $totalAchieved += $phaseAchieved;
+
+                $phasePercentage = $phaseDefault > 0 ? round(($phaseAchieved / $phaseDefault) * 100, 2) : 0;
+                $project->phases()->updateExistingPivot($phase->id, ['percentage' => $phasePercentage]);
+            }
+
+            $projectPercentage = $totalProjectDefault > 0 ? round(($totalAchieved / $totalProjectDefault) * 100, 2) : 0;
+            $project->percentage = $projectPercentage;
+            $project->save();
+
+            return redirect()->back()->with('success', "Subphase status and progress updated successfully.");
         }
 
-        $projectPercentage = $totalProjectDefault > 0 ? round(($totalAchieved / $totalProjectDefault) * 100, 2) : 0;
-        $project->percentage = $projectPercentage;
-        $project->save();
-
-        return redirect()->back()->with('success', "Subphase status and progress updated successfully.");
-    }
-
-
-    // public function destroy($id)
+    // public function updateSubphaseStatus(Request $request, $projectId, $subphaseId)
     // {
-    //     $project = Project::findOrFail($id);
+    //     // 1. Validation
+    //     $request->validate([
+    //         'status'            => 'required|string',
+    //         'reason'            => 'nullable|string',
+    //         'award_person_name' => 'nullable|string|max:255',
+    //     ]);
 
-    //     // Supprimer les relations si nécessaire
-    //     $project->partners()->detach();
-    //     $project->subphases()->detach();
-    //     $project->phases()->detach();
-    //     $project->developmentDetails()->delete();
+    //     $status = $request->input('status');
+    //     $reason = $request->input('reason');
 
-    //     $project->delete();
+    //     // 2. Contexte
+    //     $project  = Project::findOrFail($projectId);
+    //     $subphase = Subphase::findOrFail($subphaseId);
 
-    //     return redirect()->route('allprojects')->with('success', 'Project deleted successfully.');
+    //     // ↪️  UN SEUL pivot par (project, subphase)  — sinon on a un doublon en BD
+    //     $pivot = $project->subphases()
+    //                     ->where('subphase_id', $subphaseId)
+    //                     ->firstOrFail()   // Lévera une exception si doublon
+    //                     ->pivot;
+
+    //     /* ---------------------------------------------------------------------
+    //     CALCUL / MISE À JOUR DU normalized_percentage
+    //     ------------------------------------------------------------------ */
+
+    //     if (!is_null($pivot->normalized_percentage)) {
+    //         $normalized = $pivot->normalized_percentage;
+    //     } else {
+    //         // Calcul à la volée (pour ancien projet ou si oubli)
+    //         $phaseId      = $subphase->phase_id;
+    //         $subsInPhase  = $project->subphases()->where('phase_id', $phaseId)->get();
+    //         $totalDefault = $subsInPhase->sum('default_percentage');
+
+    //         $normalized = $totalDefault > 0
+    //             ? ($subphase->default_percentage / $totalDefault) * 100
+    //             : 0;
+
+    //         // On stocke pour les prochaines mises à jour
+    //         $project->subphases()->updateExistingPivot($subphaseId, [
+    //             'normalized_percentage' => round($normalized, 2),
+    //         ]);
+    //     }
+
+    //     /* ---------------------------------------------------------------------
+    //     BLOCAGE : impossible de terminer si les précédentes ne sont pas "Completed"
+    //     ------------------------------------------------------------------ */
+    //     $allSubphases = $project->subphases()
+    //                             ->with('phase')
+    //                             ->orderBy('position')
+    //                             ->get();
+
+    //     $currentIndex = $allSubphases->search(fn ($s) => $s->id == $subphaseId);
+
+    //     if ($status === 'Completed') {
+    //         $prevNotCompleted = $allSubphases
+    //             ->take($currentIndex)
+    //             ->first(fn ($s) => $s->pivot->status !== 'Completed');
+
+    //         if ($prevNotCompleted) {
+    //             $prevPhaseName = $prevNotCompleted->phase->label
+    //                         ?? ucfirst($prevNotCompleted->phase->name);
+    //             $prevSubName   = $prevNotCompleted->label
+    //                         ?? $prevNotCompleted->name;
+    //             $prevStatus    = $prevNotCompleted->pivot->status;
+
+    //             return back()->with(
+    //                 'error',
+    //                 "Cannot complete this sub‑phase because \"$prevSubName\" ".
+    //                 "in phase \"$prevPhaseName\" is still \"$prevStatus\"."
+    //             );
+    //         }
+    //     }
+
+    //     /* ---------------------------------------------------------------------
+    //     POURCENTAGE à attribuer
+    //     ------------------------------------------------------------------ */
+    //     $percentage = match ($status) {
+    //         'Not started' => 0,
+    //         'In progress' => $normalized / 2,
+    //         'Completed'   => $normalized,
+    //         default       => $pivot->percentage ?? 0,
+    //     };
+
+    //     /* ---------------------------------------------------------------------
+    //     Cas particulier  : sous‑phase  DEVELOPMENT
+    //     ------------------------------------------------------------------ */
+    //     if ($subphase->name === 'development') {
+    //         $details = $project->developmentDetails()
+    //                         ->where('subphase_id', $subphaseId)
+    //                         ->get();
+
+    //         // Somme des % des activités
+    //         $sumDetails = $details->sum('percentage');
+
+    //         // On écrase le pourcentage calculé par match()
+    //         $percentage = round($sumDetails, 2);
+
+    //         // Statut déduit des activités
+    //         $allDone  = $details->every(fn ($d) => $d->status === 'Completed');
+    //         $anyProg  = $details->contains(fn ($d) => $d->status === 'In progress');
+
+    //         $status = $allDone
+    //             ? 'Completed'
+    //             : ($anyProg || $sumDetails > 0 ? 'In progress' : 'Not started');
+    //     }
+
+    //     /* ---------------------------------------------------------------------
+    //     MISE À JOUR PIVOT project_subphase
+    //     ------------------------------------------------------------------ */
+    //     $pivotData = [
+    //         'status'     => $status,
+    //         'percentage' => $percentage,
+    //         'reason'     => $reason,
+    //     ];
+
+    //     if ($subphase->name === 'award') {
+    //         $pivotData['award_person_name'] = $request->input('award_person_name');
+    //     }
+
+    //     $project->subphases()->updateExistingPivot($subphaseId, $pivotData);
+
+    //     /* ---------------------------------------------------------------------
+    //     MISE À JOUR   PHASE  (progression + statut)
+    //     ------------------------------------------------------------------ */
+    //     $phaseId         = $subphase->phase_id;
+    //     $subphasesPhase  = $project->subphases()->where('phase_id', $phaseId)->get();
+    //     $phasePercentage = $subphasesPhase->sum(fn ($s) => $s->pivot->percentage);
+    //     $phaseCompleted  = $subphasesPhase->every(fn ($s) => $s->pivot->status === 'Completed');
+
+    //     $project->phases()->updateExistingPivot($phaseId, [
+    //         'percentage' => round($phasePercentage, 2),
+    //         'status'     => $phaseCompleted ? 'Completed' : 'In progress',
+    //     ]);
+
+    //     /* ---------------------------------------------------------------------
+    //     STATUT GLOBAL   PROJET
+    //     ------------------------------------------------------------------ */
+    //     $first = $allSubphases->first();
+    //     $last  = $allSubphases->last();
+
+    //     if ($first && $first->id == $subphaseId) {
+    //         $project->status = in_array($status, ['In progress', 'Completed'])
+    //             ? 'In progress'
+    //             : 'Not started';
+    //     }
+
+    //     if ($last && $last->id == $subphaseId && $status === 'Completed') {
+    //         $incomplete = $allSubphases->first(fn ($s) => $s->pivot->status !== 'Completed');
+    //         if (!$incomplete) {
+    //             $project->status = 'Completed';
+    //         }
+    //     }
+
+    //     /* ---------------------------------------------------------------------
+    //     RECALCUL   POURCENTAGE GLOBAL  DU PROJET
+    //     ------------------------------------------------------------------ */
+    //     $totalAchieved = $project->phases()
+    //                             ->get()
+    //                             ->sum(fn ($p) => $p->pivot->percentage);
+
+    //     $project->percentage = round($totalAchieved, 2);
+    //     $project->save();
+
+    //     return back()->with('success', 'Sub‑phase status and progress updated successfully.');
     // }
 
+
+
+  
     public function requestDelete(Request $request, $id)
     {
         $request->validate(['reason' => 'required|string']);
@@ -650,6 +827,7 @@ class ProjectController extends Controller
                 'In progress' => Project::where('type', 'HRM')->where('status', 'In progress')->count(),
                 'Completed' => Project::where('type', 'HRM')->where('status', 'Completed')->count(),
                 'Cancelled' => Project::where('type', 'HRM')->where('status', 'Cancelled')->count(),
+                'Closed'   => Project::where('status', 'Closed')->count(),
             ];
         return view('hrmprojects', compact('projects', 'counts', 'status','highPriorityProjects'));
     }
@@ -696,6 +874,7 @@ class ProjectController extends Controller
                 'In progress' => Project::where('type', 'Admin')->where('status', 'In progress')->count(),
                 'Completed' => Project::where('type', 'Admin')->where('status', 'Completed')->count(),
                 'Cancelled' => Project::where('type', 'Admin')->where('status', 'Cancelled')->count(),
+                'Closed'   => Project::where('status', 'Closed')->count(),
             ];
         return view('adminprojects', compact('projects', 'counts', 'status','highPriorityProjects'));
     }
@@ -714,31 +893,20 @@ class ProjectController extends Controller
         return back()->with('error', 'Project cannot be reactivated.');
     }
 
-    // public function viewReport(Project $project)
-    // {
-    //     return view('viewreport', compact('project'));
-    // }
 
-    // public function viewReport(Project $project)
-    // {
-    //     // Crée d'abord le rapport sans code ni titre pour récupérer l'ID
-    //     $report = Report::create([
-    //         'project_id'   => $project->id,
-    //         'user_id'      => Auth::id(),
-    //         'format'       => 'web',
-    //         'generated_at' => now(),
-    //     ]);
 
-    //     // Crée le code de rapport : #TYPE + ID (ex: #ADMIN4)
-    //     $code = '#' . strtoupper($project->type) . $report->id;
+    public function close(Request $request, Project $project)
+{
+    if ($project->status !== 'Completed') {
+        return redirect()->back()->with('error', 'Only completed projects can be closed.');
+    }
 
-    //     // Met à jour le rapport avec le code et le titre (ex: "#Project Alpha")
-    //     $report->update([
-    //         'code'  => $code,
-    //         'title' => '#' . $project->title,
-    //     ]);
+    $project->status = 'Closed';
+    $project->close_comment = $request->input('close_comment');
+    $project->closed_at = now(); // optional
+    $project->save();
 
-    //     return view('viewreport', compact('project', 'report'));
-    // }
+    return redirect()->route('allprojects')->with('success', 'Project has been closed.');
+}
 
 };

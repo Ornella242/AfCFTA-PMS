@@ -117,6 +117,10 @@
                       <label for="budget" class="text-black">Budget (USD)</label>
                       <input type="number" step="0.01" name="budget" id="budget" class="form-control bg-light shadow-sm border-0 rounded-xl" placeholder="Enter budget amount">
                     </div>
+                    <div class="form-group col-md-4">
+                      <label for="budget_code" class="text-black">Budget Code</label>
+                      <input type="text" name="budget_code" id="budget_code" class="form-control bg-light shadow-sm border-0 rounded-xl" placeholder="Enter budget code">
+                    </div>
                   </div>
                 </div>
               </div>
@@ -154,12 +158,17 @@
                         </div>
                         <div id="afcftaSubphases" class="ml-4 d-none">
                           <label class="font-weight-bold">AfCFTA Procurement Sub-phases:</label>
-                          @foreach($phase->subphases->where('type', 'afcfta') as $sub)
-                            <div class="form-check">
-                              <input class="form-check-input" type="checkbox" name="subphases[procurement_afcfta][]" value="{{ $sub->id }}" id="afcfta_{{ $sub->id }}">
-                              <label class="form-check-label" for="afcfta_{{ $sub->id }}">{{ $sub->label ?? $sub->name }}</label>
-                            </div>
-                          @endforeach
+                        @foreach($phase->subphases->where('type', 'afcfta') as $sub)
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              name="subphases[procurement_afcfta][]"
+                              value="{{ $sub->id }}"
+                              id="afcfta_{{ $sub->id }}">
+                            <label class="form-check-label" for="afcfta_{{ $sub->id }}">{{ $sub->label ?? $sub->name }}</label>
+                          </div>
+                        @endforeach
                         </div>
                       </div>
                     @endif
@@ -175,16 +184,33 @@
                           @if($sub->name === 'development')
                             <div id="dynamicActivities" class="ml-3 mt-2 d-none">
                               <label>Development phases:</label>
-                              <div id="activityInputs">
+                              {{-- <div id="activityInputs">
                                 <div class="form-row align-items-center mb-2">
                                   <div class="col">
                                     <input type="text" name="development_activities[]" class="form-control" placeholder="Enter activity title">
+                                  </div>
+                                  <div class="col">
+                                    <input type="number" step="0.01" name="budget_activities[]" class="form-control" placeholder="Activity Budget (optional)">
+                                  </div>
+                                  <div class="col-auto">
+                                    <button type="button" class="btn btn-sm btn-outline-primary add-activity">Add</button>
+                                  </div>
+                                </div>
+                              </div> --}}
+                              <div id="activityInputs">
+                                <div class="form-row align-items-center mb-2" data-index="0">
+                                  <div class="col">
+                                    <input type="text" name="development_activities[0][title]" class="form-control" placeholder="Enter activity title">
+                                  </div>
+                                  <div class="col">
+                                    <input type="number" step="0.01" name="development_activities[0][budget]" class="form-control" placeholder="Activity Budget (optional)">
                                   </div>
                                   <div class="col-auto">
                                     <button type="button" class="btn btn-sm btn-outline-primary add-activity">Add</button>
                                   </div>
                                 </div>
                               </div>
+                              
                             </div>
                           @endif
                         @endforeach
@@ -266,7 +292,7 @@
 
 
 
-<script>
+{{-- <script>
   document.addEventListener("DOMContentLoaded", function () {
     const triggerCheckbox = document.querySelector(".dynamic-trigger");
     const dynamicSection = document.getElementById("dynamicActivities");
@@ -300,6 +326,9 @@
             <div class="col">
               <input type="text" name="development_activities[]" class="form-control" placeholder="Enter activity title">
             </div>
+            <div class="col">
+              <input type="number" step="0.01" name="budget_activities[]" class="form-control" placeholder="Activity Budget (optional)">
+            </div>
             <div class="col-auto">
               <button type="button" class="btn btn-sm btn-outline-danger remove-activity">Remove</button>
             </div>`;
@@ -315,7 +344,73 @@
       });
     }
   });
+</script> --}}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const triggerCheckbox = document.querySelector(".dynamic-trigger");
+    const dynamicSection = document.getElementById("dynamicActivities");
+    const activityInputs = document.getElementById("activityInputs");
+    const addButtonClass = "add-activity";
+    let index = 1; // L'index commence à 1 car l'input initial est à 0
+
+    // ✅ Réaction au clic sur la checkbox
+    if (triggerCheckbox && dynamicSection) {
+        triggerCheckbox.addEventListener("change", function () {
+            if (this.checked) {
+                dynamicSection.classList.remove("d-none");
+            } else {
+                dynamicSection.classList.add("d-none");
+                // Réinitialiser les inputs
+                activityInputs.innerHTML = `
+                    <div class="form-row align-items-center mb-2" data-index="0">
+                        <div class="col">
+                            <input type="text" name="development_activities[0][title]" class="form-control" placeholder="Enter activity title">
+                        </div>
+                        <div class="col">
+                            <input type="number" step="0.01" name="development_activities[0][budget]" class="form-control" placeholder="Activity Budget (optional)">
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-sm btn-outline-primary add-activity">Add</button>
+                        </div>
+                    </div>`;
+                index = 1;
+            }
+        });
+    }
+
+    // ✅ Ajouter une nouvelle ligne
+    activityInputs.addEventListener("click", function (e) {
+        if (e.target.classList.contains(addButtonClass)) {
+            const newInput = document.createElement("div");
+            newInput.className = "form-row align-items-center mb-2";
+            newInput.setAttribute("data-index", index);
+
+            newInput.innerHTML = `
+                <div class="col">
+                    <input type="text" name="development_activities[${index}][title]" class="form-control" placeholder="Enter activity title">
+                </div>
+                <div class="col">
+                    <input type="number" step="0.01" name="development_activities[${index}][budget]" class="form-control" placeholder="Activity Budget (optional)">
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-activity">Remove</button>
+                </div>`;
+
+            activityInputs.appendChild(newInput);
+            index++;
+        }
+    });
+
+    // ✅ Supprimer une ligne
+    activityInputs.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-activity")) {
+            e.target.closest(".form-row").remove();
+        }
+    });
+});
 </script>
+
 
 <script>
   // Affiche le spinner quand on clique sur "Retour arrière" ou on recharge
@@ -347,4 +442,5 @@
     </script>
 
  <script src='{{ asset('js/select2.min.js') }}'></script>
-@include('partials.footer')
+ 
+ @include('partials.footer')

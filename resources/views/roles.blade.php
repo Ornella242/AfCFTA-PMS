@@ -27,48 +27,7 @@
                             <i class="fe fe-user-plus mx-1"></i> Assign role
                         </button>
                          <!-- Modal -->
-                        <div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="assignRoleLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <form method="POST" action="{{ route('assign.role') }}">
-                                    @csrf
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="assignRoleLabel">Assign role</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-
-                                        <div class="modal-body">
-                                            <!-- User & Role Selection -->
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="user_id">User</label>
-                                                    <select class="form-control" id="user_id" name="user_id" required>
-                                                        <option value="">-- Select a user --</option>
-                                                        @foreach($users as $user)
-                                                            <option value="{{ $user->id }}">{{ $user->firstname }} {{ $user->lastname }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    <label for="role_id">Role</label>
-                                                    <select class="form-control" id="role_id" name="role_id" required>
-                                                        @foreach($roles as $role)
-                                                            <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="modal-footer">
-                                            <button type="submit" class="btn bg-green text-white">Assign</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                       
                     </div>
                 </div>
 
@@ -193,7 +152,48 @@
             </form>
         </div>
         </div>
+ <div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="assignRoleLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <form method="POST" action="{{ route('assign.role') }}">
+                                    @csrf
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="assignRoleLabel">Assign role</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
 
+                                        <div class="modal-body">
+                                            <!-- User & Role Selection -->
+                                            <div class="form-row">
+                                                <div class="form-group col-md-6">
+                                                    <label for="user_id">User</label>
+                                                    <select class="form-control" id="user_id" name="user_id" required>
+                                                        <option value="">-- Select a user --</option>
+                                                        @foreach($users as $user)
+                                                            <option value="{{ $user->id }}">{{ $user->firstname }} {{ $user->lastname }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="role_id">Role</label>
+                                                    <select class="form-control" id="role_id" name="role_id" required>
+                                                        @foreach($roles as $role)
+                                                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn bg-green text-white">Assign</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
       </main>
       <script>
 
@@ -258,14 +258,14 @@
 
 
 <script>
-function openRoleEditModal(userId, userName) {
-    document.getElementById('editUserId').value = userId;
-    document.getElementById('editUserName').innerText = `Change role for: ${userName}`;
-    document.getElementById('editUserRoleForm').action = `/users/${userId}/update-role`;
-    // Optionnel: tu peux pré-sélectionner le rôle actuel ici si tu le passes dans loadRoleUsers()
+    function openRoleEditModal(userId, userName) {
+        document.getElementById('editUserId').value = userId;
+        document.getElementById('editUserName').innerText = `Change role for: ${userName}`;
+        document.getElementById('editUserRoleForm').action = `/users/${userId}/update-role`;
+        // Optionnel: tu peux pré-sélectionner le rôle actuel ici si tu le passes dans loadRoleUsers()
 
-    $('#editUserRoleModal').modal('show');
-}
+        $('#editUserRoleModal').modal('show');
+    }
 </script>
 
 <script>

@@ -12,7 +12,11 @@ class DevelopmentDetail extends Model
         'project_id',
         'subphase_id',
         'title',
-        'notes',
+        'status',
+        'reason',
+        'budget_activity', // New field for budget activity
+        'payment_status',
+        'payment_date',
     ];
 
     public function project()

@@ -121,3 +121,5 @@ Route::delete('/deletion-requests/{id}/decline', [ProjectDeletionRequestControll
 
 Route::patch('/projects/{project}/reactivate', [ProjectController::class, 'reactivate'])->name('projects.reactivate');
 Route::get('/projects/{project}/report', [ReportController::class, 'viewReport'])->name('projects.viewReport');
+Route::patch('/development-details/{id}/update-payment', [DevelopmentDetailController::class, 'updatePayment'])->name('developmentDetails.updatePayment');
+Route::patch('/projects/{project}/close', [ProjectController::class, 'close'])->name('projects.close');

@@ -8,6 +8,7 @@ function statusColorClass($status) {
         'Waiting Approval' => 'bg-info text-white',
         'Delayed' => 'bg-orange text-white',
         'Under review' => 'bg-primary text-white',
+        'Closed'   => 'bg-gold text-white',
         default => 'bg-light text-dark',
     };
 }
@@ -131,6 +132,13 @@ function statusColorClass($status) {
                         <span class="badge badge-pill bg-maroon border text-white pb-2 pt-2 ml-2">{{ $counts['Cancelled'] }}</span>
                       </a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link {{ request('status') === 'Closed' ? 'active text-green' : 'text-dark' }}"
+                        href="{{ route('allprojects', ['status' => 'Closed']) }}">
+                        Closed
+                        <span class="badge badge-pill bg-green border text-white pb-2 pt-2 ml-2">{{ $counts['Closed'] }}</span>
+                      </a>
+                    </li>
                   </ul>
                 </div>
                 <div class="col-md-auto ml-auto text-right">
@@ -171,6 +179,7 @@ function statusColorClass($status) {
                                 'Waiting Approval' => 'bg-blue',
                                 'Delayed'    => 'bg-orange',
                                 'Under review' => 'bg-purple',  
+                                'Closed'   => 'bg-green',
                               ];
                             @endphp
                             <span class="dot dot-lg {{ $colors[$project->status] ?? 'bg-secondary' }}"></span>
@@ -187,7 +196,7 @@ function statusColorClass($status) {
                               {{ $project->projectManager->firstname ?? '' }} {{ $project->projectManager->lastname ?? '' }}
                           </td>
                         
-                          <td class="text-center">
+                          {{-- <td class="text-center">
                             <div class="d-flex justify-content-center gap-2 align-items-center">
                               <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none"><i class="fe fe-edit-2"></i></a>
                               <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
@@ -198,9 +207,119 @@ function statusColorClass($status) {
                                       <i class="fe fe-trash-2"></i>
                                   </button>
                               </form>
-                             
+                           
+
                             </div>
-                          </td>
+                          </td> --}}
+                          <td class="text-center">
+                          <div class="d-flex justify-content-center gap-2 align-items-center">
+                            @if ($project->status !=='Closed')
+                              <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none"><i class="fe fe-edit-2"></i></a>
+                            @endif
+
+                            <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
+                              @if($project->status === 'Cancelled')
+                                {{-- Bouton de réactivation --}}
+                                <!-- Reactivate Trigger Button -->
+                                <button class="btn btn-sm text-success" title="Reactivate Project" data-toggle="modal" data-target="#reactivateProjectModal{{ $project->id }}">
+                                  <i class="fe fe-refresh-ccw"></i>
+                                </button>
+
+                                <!-- Reactivate Modal -->
+                                <div class="modal fade" id="reactivateProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="reactivateProjectModalLabel{{ $project->id }}" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <form action="{{ route('projects.reactivate', $project->id) }}" method="POST">
+                                      @csrf
+                                      @method('PATCH')
+                                      <div class="modal-content">
+                                        <div class="modal-header bg-success text-white">
+                                          <h5 class="modal-title" id="reactivateProjectModalLabel{{ $project->id }}">
+                                            Reactivate Project
+                                          </h5>
+                                          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                          <p>Are you sure you want to <strong>reactivate</strong> the project <strong>{{ $project->title }}</strong>?</p>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                          <button type="submit" class="btn btn-success">Reactivate</button>
+                                        </div>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+
+                             
+                                @elseif($project->status !== 'Closed')
+                                {{-- Bouton de suppression --}}
+                                <button class="btn btn-sm text-danger" data-toggle="modal" data-target="#deleteProjectModal{{ $project->id }}">
+                                  <i class="fe fe-trash-2"></i>
+                                </button>
+                              @endif
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <form action="{{ route('projects.requestDelete', $project->id) }}" method="POST">
+                                  @csrf
+                                  <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                      <h5 class="modal-title text-white" id="deleteProjectModalLabel">Delete Project Request</h5>
+                                      <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <p class="text-black h5">Why do you want to delete this project?</p>
+                                      <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                      <button type="submit" class="btn btn-danger">Request Deletion</button>
+                                    </div>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+
+                            @if($project->status === 'Completed')
+                              <!-- Close button triggers modal -->
+                              <button class="btn btn-sm text-danger" data-toggle="modal" data-target="#closeProjectModal{{ $project->id }}" title="Close Project">
+                                  <i class="fe fe-lock"></i>
+                              </button>
+                              <!-- Modal -->
+                              <div class="modal fade" id="closeProjectModal{{ $project->id }}" tabindex="-1" aria-labelledby="closeProjectModalLabel{{ $project->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <form method="POST" action="{{ route('projects.close', $project->id) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="closeProjectModalLabel{{ $project->id }}">Close Project</h5>
+                                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <div class="mb-3">
+                                          <label for="close_comment_{{ $project->id }}" class="form-label">Add a comment</label>
+                                          <textarea name="close_comment" class="form-control" id="close_comment_{{ $project->id }}" rows="3" placeholder="Enter a final comment before closing the project..."></textarea>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-danger">Close Project</button>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                            @endif
+                          </div>
+                        </td>
                         </tr>
                       @empty
                         <tr><td colspan="8" class="text-center text-muted">No projects found.</td></tr>

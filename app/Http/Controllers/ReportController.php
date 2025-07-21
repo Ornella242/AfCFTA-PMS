@@ -10,26 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
-    // public function store(Request $request)
-    // {
-    //     $project = Project::findOrFail($request->project_id);
-
-    //     $report = new Report();
-    //     $report->project_id = $project->id;
-    //     $report->user_id = Auth::id(); // L'utilisateur qui génère le rapport
-    //     $report->format = 'web';
-    //     $report->generated_at = now();
-
-    //     // Génération du code : #TYPE + ID
-    //     $nextId = (Report::max('id') ?? 0) + 1;
-    //     $report->code = '#' . strtoupper($project->type) . $nextId;
-    //     $report->title = '#' . $project->title;
-
-    //     $report->save();
-
-    //     return redirect()->route('reports.show', $report->id);
-    // }
-
+   
     public function viewReport(Project $project)
     {
         // dd($project);

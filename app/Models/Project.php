@@ -22,9 +22,9 @@ class Project extends Model
         'type',
         'budget',
         'procurement_type',
-        'created_by'
+        'created_by',
+        'budget_code', // New field for budget code
     ];
-
 
     // 🔗 Relations
     public function unit()
@@ -55,7 +55,7 @@ class Project extends Model
     public function subphases()
     {
         return $this->belongsToMany(Subphase::class, 'project_subphase')
-                    ->withPivot('percentage','procurement_type', 'status', 'reason')
+                    ->withPivot('percentage','procurement_type', 'status', 'reason','award_person_name')
                     ->withTimestamps();
     }
 

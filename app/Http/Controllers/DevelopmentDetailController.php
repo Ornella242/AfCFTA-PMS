@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\DevelopmentDetail;
+use App\Models\Project;
+use App\Models\Subphase;
 
 class DevelopmentDetailController extends Controller
 {
@@ -97,7 +99,8 @@ class DevelopmentDetailController extends Controller
         $allSubphasesCompleted = true;
 
         foreach ($subphases as $s) {
-            $achievedPhase += ($s->pivot->percentage / 100) * $s->default_percentage;
+            // $achievedPhase += ($s->pivot->percentage / 100) * $s->default_percentage;
+            $achievedPhase += $s->pivot->percentage;
             if ($s->pivot->status !== 'Completed') {
                 $allSubphasesCompleted = false;
             }
@@ -110,7 +113,7 @@ class DevelopmentDetailController extends Controller
             'status' => $allSubphasesCompleted ? 'Completed' : 'In progress'
         ]);
 
-        // ✅ Recalcul global du projet
+        // Recalcul global du projet
         $allPhases = $project->phases()->with('subphases')->get();
         $totalProjectDefault = 0;
         $totalAchieved = 0;
@@ -121,7 +124,8 @@ class DevelopmentDetailController extends Controller
             $phaseAchieved = 0;
 
             foreach ($subs as $s) {
-                $phaseAchieved += ($s->pivot->percentage / 100) * $s->default_percentage;
+                // $phaseAchieved += ($s->pivot->percentage / 100) * $s->default_percentage;
+                $phaseAchieved += $s->pivot->percentage;
             }
 
             $totalProjectDefault += $phaseDefault;
@@ -139,56 +143,75 @@ class DevelopmentDetailController extends Controller
         return redirect()->back()->with('success', 'Development activity status and progress updated.');
     }
 
-
- public function store(Request $request)
-{
-    $request->validate([
-        'project_id' => 'required|exists:projects,id',
-        'development_activities' => 'required|array',
-        'development_activities.*' => 'required|string|max:255',
-    ]);
-
-    // 🔍 Récupérer la sous-phase "development"
-    $developmentSubphase = \App\Models\Subphase::where('name', 'development')->firstOrFail();
-
-    // ✅ Créer les enregistrements
-    foreach ($request->development_activities as $index => $title) {
-        \App\Models\DevelopmentDetail::create([
-            'project_id'   => $request->project_id,
-            'subphase_id'  => $developmentSubphase->id,
-            'title'        => $title,
-            'status'       => 'Not started',
+  
+   public function store(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'development_activities' => 'required|array',
+            'development_activities.*.title' => 'required|string|max:255',
+            'development_activities.*.budget' => 'nullable|numeric|min:0',
         ]);
+
+        $developmentSubphase = \App\Models\Subphase::where('name', 'development')->firstOrFail();
+
+        foreach ($request->development_activities as $activity) {
+            \App\Models\DevelopmentDetail::create([
+                'project_id'   => $request->project_id,
+                'subphase_id'  => $developmentSubphase->id,
+                'title'        => $activity['title'],
+                'budget_activity' => $activity['budget'] ?? null,
+                'status'       => 'Not started',
+            ]);
+        }
+        // dd($request->development_activities);
+        return redirect()->back()->with('success', 'Development activities added successfully.');
     }
 
-    return redirect()->back()->with('success', 'Development activities added successfully.');
-}
+
+    public function updatePayment(Request $request, $id)
+    {
+        $request->validate([
+            'payment_status' => 'nullable|in:Paid,Unpaid',
+            'payment_date' => 'nullable|date|before_or_equal:today',
+        ]);
+
+        $detail = \App\Models\DevelopmentDetail::findOrFail($id);
+        $detail->payment_status = $request->payment_status;
+        
+        // Si payé, on enregistre la date. Sinon on la met à null.
+        $detail->payment_date = $request->payment_status === 'Paid' ? $request->payment_date : null;
+        
+        $detail->save();
+
+        return redirect()->back()->with('success', 'Payment details updated.');
+    }
 
 
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'title' => 'required|string|max:255',
-        'status' => 'required|string',
-        'reason' => 'nullable|string',
-    ]);
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'status' => 'required|string',
+            'reason' => 'nullable|string',
+        ]);
 
-    $detail = \App\Models\DevelopmentDetail::findOrFail($id);
-    $detail->update([
-        'title' => $request->title,
-        'status' => $request->status,
-        'reason' => $request->reason,
-    ]);
+        $detail = \App\Models\DevelopmentDetail::findOrFail($id);
+        $detail->update([
+            'title' => $request->title,
+            'status' => $request->status,
+            'reason' => $request->reason,
+        ]);
 
-    return redirect()->back()->with('success', 'Activity updated.');
-}
+        return redirect()->back()->with('success', 'Activity updated.');
+    }
 
-public function destroy($id)
-{
-    \App\Models\DevelopmentDetail::findOrFail($id)->delete();
-    return redirect()->back()->with('success', 'Activity deleted.');
-}
+    public function destroy($id)
+    {
+        \App\Models\DevelopmentDetail::findOrFail($id)->delete();
+        return redirect()->back()->with('success', 'Activity deleted.');
+    }
 
 
 
