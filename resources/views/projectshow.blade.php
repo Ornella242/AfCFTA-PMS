@@ -26,58 +26,106 @@
           </div>
         </div>
         <div class="card-body">
-          <dl class="row align-items-center mb-0">
-            <dt class="col-sm-2 mb-3 text-black">Unit</dt>
-            <dd class="col-sm-4 mb-3">
-              <strong>{{ $project->unit->name ?? '-' }}</strong>
-            </dd>
-            <dt class="col-sm-2 mb-3 text-black">Project Manager</dt>
-            <dd class="col-sm-4 mb-3">
-              <strong>{{ $project->projectManager->firstname . ' ' . $project->projectManager->lastname ?? '-' }}</strong>
-            </dd>
-          </dl>
+          <div class="table-responsive">
+              <table class="table table-bordered table-striped">
+                  <tbody>
+                      <tr>
+                          <th class="text-nowrap text-black">Unit</th>
+                          <td>{{ $project->unit->name ?? '-' }}</td>
 
-          <dl class="row mb-0">
-            <dt class="col-sm-2 mb-3 text-black">Partners</dt>
-            <dd class="col-sm-10 mb-3">
-              @forelse($project->partners as $partner)
-                <span class="badge badge-primary pt-2 pb-2">{{ $partner->name }}</span>
-              @empty
-                <span class="text-black">None</span>
-              @endforelse
-            </dd>
+                          <th class="text-nowrap text-black">Project Manager</th>
+                          <td>{{ $project->projectManager->firstname . ' ' . $project->projectManager->lastname ?? '-' }}</td>
+                      </tr>
 
-            <dt class="col-sm-2 mb-3 text-black">Priority</dt>
-            <dd class="col-sm-4 mb-3">
-              <span class="badge badge-pill pt-2 pb-2 text-white text-2xl 
-                {{ $project->priority === 'High' ? 'badge-danger' : ($project->priority === 'Medium' ? 'badge-warning' : 'badge-secondary') }}">
-                {{ $project->priority }}
-              </span>
-            </dd>
+                      <tr>
+                          <th class="text-black">PMA</th>
+                          <td>
+                              @forelse($project->assistants as $pma)
+                                  <span class="badge bg-success me-1 text-white p-2">{{ $pma->firstname . ' ' . $pma->lastname }}</span>
+                              @empty
+                                  <span>None</span>
+                              @endforelse
+                          </td>
 
-            <dt class="col-sm-2 mb-3 text-black">Status</dt>
-            <dd class="col-sm-4 mb-3">
-              <span class="dot dot-md bg-info mr-2 text-black"></span> {{ $project->status }}
-            </dd>
+                          <th class="text-black">Members</th>
+                          <td>
+                              @forelse($project->members as $member)
+                                  <span class="badge bg-info me-1 p-2 text-white">{{ $member->firstname . ' ' . $member->lastname }}</span>
+                              @empty
+                                  <span>None</span>
+                              @endforelse
+                          </td>
+                      </tr>
 
-            <dt class="col-sm-2 mb-3 text-black">Start Date</dt>
-            <dd class="col-sm-4 mb-3 text-black">{{ \Carbon\Carbon::parse($project->start_date)->format('M d, Y') }}</dd>
+                      <tr>
+                          <th class="text-black">Partners</th>
+                          <td>
+                              @forelse($project->partners as $partner)
+                                  <span class="badge bg-primary me-1 p-2 text-white">{{ $partner->name }}</span>
+                              @empty
+                                  <span>None</span>
+                              @endforelse
+                          </td>
 
-            <dt class="col-sm-2 mb-3 text-black">End Date</dt>
-            <dd class="col-sm-4 mb-3 text-black">{{ \Carbon\Carbon::parse($project->end_date)->format('M d, Y') }}</dd>
+                          <th class="text-black">Procurement Type</th>
+                          <td>
+                              {{ $project->subphases->contains('name', 'partner_procurement') ? 'Partner Procurement' : 'AfCFTA Procurement' }}
+                          </td>
+                      </tr>
 
-            <dt class="col-sm-2 mb-3 text-black">Budget</dt>
-            <dd class="col-sm-4 mb-3 text-black">${{ number_format($project->budget, 2) }}</dd>
+                      <tr>
+                          <th class="text-black">Priority</th>
+                          <td>
+                              <span class="badge text-white p-2
+                                  {{ $project->priority === 'High' ? 'bg-danger' : ($project->priority === 'Medium' ? 'bg-warning text-white' : 'bg-secondary') }}">
+                                  {{ $project->priority }}
+                              </span>
+                          </td>
 
-            <dt class="col-sm-2 mb-3 text-black">Procurement Type</dt>
-            <dd class="col-sm-4 mb-3 text-black">
-              {{-- Vérifie si le projet a une sous-phase de type "partner_procurement" --}}
-              {{ $project->subphases->contains('name', 'partner_procurement') ? 'Partner Procurement' : 'AfCFTA Procurement' }}
-            </dd>
+                          <th class="text-black">Status</th>
+                          <td>
+                            @php
+                                $status = $project->status;
+                                $statusClass = match ($status) {
+                                    'Not started' => 'bg-gray',
+                                    'Waiting approval' => 'bg-primary',
+                                    'In progress' => 'bg-yellow',
+                                    'Completed' => 'bg-green',
+                                    'Delayed' => 'bg-maroon',
+                                    'Cancelled' => 'bg-red',
+                                    default => 'bg-info',
+                                };
+                            @endphp
 
-            <dt class="col-sm-2 text-black">Description</dt>
-            <dd class="col-sm-10">{{ $project->description }}</dd>
-          </dl>
+                            <span class="badge {{ $statusClass }} p-2 text-white">
+                                {{ $status }}
+                            </span>
+                          </td>
+                      </tr>
+
+                      <tr>
+                          <th class="text-black">Start Date</th>
+                          <td>{{ \Carbon\Carbon::parse($project->start_date)->format('M d, Y') }}</td>
+
+                          <th class="text-black">End Date</th>
+                          <td>{{ \Carbon\Carbon::parse($project->end_date)->format('M d, Y') }}</td>
+                      </tr>
+
+                      <tr>
+                          <th class="text-black">Budget</th>
+                          <td>${{ number_format($project->budget, 2) }}</td>
+
+                          <th class="text-black">Budget Code</th>
+                          <td>{{ $project->budget_code ?? '-' }}</td>
+                      </tr>
+
+                      <tr>
+                          <th class="text-black">Description</th>
+                          <td colspan="3">{{ $project->description }}</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
 
           {{-- Subphases --}}
         <hr style="border: none; height: 6px; background: linear-gradient(to right, #1b1311, #feb47b);">

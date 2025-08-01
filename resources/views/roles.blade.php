@@ -53,7 +53,7 @@
                     </div>
                 </div>
              </div>
-              <div class="row">
+              {{-- <div class="row">
                 @foreach($roles as $role)
                 <div class="col-md-4 mb-4">
                     <div class="card shadow {{ 
@@ -88,9 +88,52 @@
                     </div>
                 </div>
                 @endforeach
-              </div>
+              </div> --}}
+                <div class="row">
+                    @foreach($roles as $role)
+                        <div class="col-md-4 mb-4">
+                            <div 
+                                class="card shadow-lg border-0 text-white 
+                                    {{ 
+                                        $role->name === 'Admin' ? 'bg-yellow' : 
+                                        ($role->name === 'Project Manager' ? 'bg-maroon' : 
+                                        ($role->name === 'Project Manager Assistant' ? 'bg-gold' : 'bg-green')) 
+                                    }}"
+                                style="cursor: pointer; border-radius: 1rem;"
+                                onclick="loadRoleUsers({{ $role->id }})"
+                                data-role-id="{{ $role->id }}"
+                            >
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="card-title text-uppercase mb-1 text-white">{{ $role->name }}</h5>
+                                            <p class="mb-2 small">
+                                                @if($role->name === 'Admin' || $role->name === 'Project Manager')
+                                                    Full access on the system
+                                                @else
+                                                    Limited access on the system
+                                                @endif
+                                            </p>
+                                            <span class="badge rounded-pill bg-light text-dark px-3 py-1">
+                                                {{ $role->users_count }} user{{ $role->users_count > 1 ? 's' : '' }}
+                                            </span>
+                                        </div>
+                                        <div class="display-4">
+                                            <i class="fe 
+                                                {{ 
+                                                    $role->name === 'Admin' ? 'fe-shield' : 
+                                                    ($role->name === 'Project Manager' ? 'fe-user' : 'fe-users') 
+                                                }}">
+                                            </i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
 
-              <div class="col-md-12">
+              {{-- <div class="col-md-12">
                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="h5 mb-0">Role details</h6>
                         <div class="form-group mb-0">
@@ -114,7 +157,43 @@
 
                   </table>
                 </div>
-              </div>
+              </div> --}}
+
+              <div class="col-md-12">
+    <div class="card shadow-sm border-0 rounded-lg">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h6 class="h5 text-primary mb-0">
+                    <i class="fe fe-users"></i> Role Details
+                </h6>
+                <div class="form-group mb-0">
+                    <input type="text" class="form-control rounded-pill shadow-sm" id="searchUserInput" placeholder="🔍 Search by name..." style="width: 250px;">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped table-borderless align-middle">
+                    <thead class="bg-light text-primary">
+                        <tr role="row">
+                            <th scope="col">#ID</th>
+                            <th scope="col"><i class="fe fe-user text-green"></i> Name</th>
+                            <th scope="col"><i class="fe fe-user text-green"></i> Unit</th>
+                            <th scope="col">⚙️ Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roleUsersTableBody">
+                        <tr>
+                            <td colspan="4" class="text-muted text-center">
+                                Click on a role card to see details.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
             </div>
           </div> <!-- .row -->
         </div> <!-- .container-fluid -->
@@ -152,7 +231,7 @@
             </form>
         </div>
         </div>
- <div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="assignRoleLabel" aria-hidden="true">
+        <div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="assignRoleLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <form method="POST" action="{{ route('assign.role') }}">
                                     @csrf
@@ -193,7 +272,7 @@
                                     </div>
                                 </form>
                             </div>
-                        </div>
+        </div>
       </main>
       <script>
 

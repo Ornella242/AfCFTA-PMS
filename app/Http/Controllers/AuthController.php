@@ -25,7 +25,7 @@ class AuthController extends Controller
             $role = $user->role->name; // Assure-toi que 'role' est une relation dans le modèle User
 
             if ($role === 'Member' || $role === 'Project Assistant') {
-                return redirect()->intended('/allprojects');
+                return redirect()->intended('/dashboardpma');
             }
 
             return redirect()->intended('/dashboard');

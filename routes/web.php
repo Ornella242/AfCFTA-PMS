@@ -27,7 +27,9 @@ Route::middleware('auth')->group(function () {
    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
-
+Route::middleware('auth')->group(function () {
+   Route::get('/dashboardpma', [DashboardController::class, 'pma'])->name('dashboard.pma');
+});
 
 Route::get('/', function () {
     return view('auth.register');
@@ -59,15 +61,10 @@ Route::get('/register', [RegisterController::class, 'create'])->name('register.f
 Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
 
-
 Route::get('/roles', [RoleController::class, 'roleOverview'])->name('roles.overview');
 Route::get('/roles/{id}/users', [RoleController::class, 'getRoleUsers']);
 Route::put('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
 Route::post('/assign-role', [UserController::class, 'assignRole'])->name('assign.role');
-
-
-
-// Route::post('/projects/store', [ProjectController::class, 'store'])->name('projects.store');
 
 
 Route::post('/change-password', [AuthController::class, 'showChangePasswordForm'])->name('password.update');
@@ -97,21 +94,9 @@ Route::get('/hrmprojects', [ProjectController::class, 'hrmProjects'])->name('pro
 Route::get('/adminprojects', [ProjectController::class, 'adminProjects'])->name('projects.admin');
 
 Route::post('/development-details', [DevelopmentDetailController::class, 'store'])->name('developmentDetails.store');
-// Route::put('/development-details/{id}', [DevelopmentDetailController::class, 'update'])->name('developmentDetails.update');
-// Route::delete('/development-details/{id}', [DevelopmentDetailController::class, 'destroy'])->name('developmentDetails.destroy');
 
 Route::post('/projects/{id}/request-delete', [ProjectController::class, 'requestDelete'])->name('projects.requestDelete');
 Route::post('/projects/{id}/approve-deletion', [ProjectController::class, 'approveDeletion'])->middleware('admin')->name('projects.approveDeletion');
-// Route::middleware(['auth', 'is_admin'])->group(function () {
-//     Route::get('/admin/deletion-requests', [ProjectDeletionRequestController::class, 'index'])->name('deletionRequests.index');
-//     Route::patch('/admin/deletion-requests/{id}/approve', [ProjectDeletionRequestController::class, 'approve'])->name('deletionRequests.approve');
-// });
-
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/admin/deletion-requests', [ProjectDeletionRequestController::class, 'index'])->name('deletionRequests.index');
-// });
-// Route::post('/admin/deletion-requests/{id}/approve', [ProjectDeletionRequestController::class, 'approve'])
-//     ->name('deletionRequests.approve');
 
 Route::post('/deletion-requests/{id}/approve', [ProjectDeletionRequestController::class, 'approve'])
     ->name('deletionRequests.approve');
@@ -123,3 +108,9 @@ Route::patch('/projects/{project}/reactivate', [ProjectController::class, 'react
 Route::get('/projects/{project}/report', [ReportController::class, 'viewReport'])->name('projects.viewReport');
 Route::patch('/development-details/{id}/update-payment', [DevelopmentDetailController::class, 'updatePayment'])->name('developmentDetails.updatePayment');
 Route::patch('/projects/{project}/close', [ProjectController::class, 'close'])->name('projects.close');
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::post('/reports/store', [ReportController::class, 'store'])->name('reports.store');
+Route::get('/reports/{report}/download', [ReportController::class, 'download'])->name('reports.download');
+Route::post('/projects/{project}/assign-team', [ProjectController::class, 'assignTeam'])->name('projects.assignTeam');
+Route::patch('/projects/{project}/update-relation', [ProjectController::class, 'updateRelation'])->name('projects.updateRelation');
+Route::post('/reports/{report}/share', [ReportController::class, 'share'])->name('reports.share');

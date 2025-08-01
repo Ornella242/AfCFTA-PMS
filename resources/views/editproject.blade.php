@@ -50,175 +50,214 @@
           </span>
         </div>
         <div class="card-body">
-          
-        <dl class="row align-items-center mb-0">
-          {{-- UNIT --}}
-          <dt class="col-sm-2 mb-3 text-black">Unit</dt>
-          <dd class="col-sm-4 mb-3">
-            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'unit_id']) }}">
-              @csrf @method('PATCH')
-              <div class="d-flex align-items-center">
-                <select name="value" class="form-control form-control-sm">
-                  @foreach($units as $unit)
-                    <option value="{{ $unit->id }}" {{ $project->unit_id == $unit->id ? 'selected' : '' }}>
-                      {{ $unit->name }}
-                    </option>
-                  @endforeach
-                </select>
-                
-                <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-              </div>
-            </form>
-          </dd>
+  <dl class="row align-items-center mb-0">
+  {{-- UNIT --}}
+  <dt class="col-sm-2 mb-3 text-black">Unit</dt>
+  <dd class="col-sm-4 mb-3">
+    <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'unit_id']) }}">
+      @csrf @method('PATCH')
+      <div class="d-flex align-items-center">
+        <select name="value" class="form-control form-control-sm">
+          @foreach($units as $unit)
+            <option value="{{ $unit->id }}" {{ $project->unit_id == $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
+          @endforeach
+        </select>
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
 
-          {{-- PROJECT MANAGER --}}
-          <dt class="col-sm-2 mb-3 text-black">Project Manager</dt>
-          <dd class="col-sm-4 mb-3">
-            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'project_manager_id']) }}">
-              @csrf @method('PATCH')
-              <div class="d-flex align-items-center">
-                <select name="value" class="form-control form-control-sm">
-                  @foreach($projectManagers as $manager)
-                    <option value="{{ $manager->id }}" {{ $project->project_manager_id == $manager->id ? 'selected' : '' }}>
-                      {{ $manager->firstname }} {{ $manager->lastname }}
-                    </option>
-                  @endforeach
-                </select>
-                <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-              </div>
-            </form>
-          </dd>
-        </dl>
+  {{-- PROJECT MANAGER --}}
+  <dt class="col-sm-2 mb-3 text-black">Project Manager</dt>
+  <dd class="col-sm-4 mb-3">
+    <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'project_manager_id']) }}">
+      @csrf @method('PATCH')
+      <div class="d-flex align-items-center">
+        <select name="value" class="form-control form-control-sm">
+          @foreach($projectManagers as $manager)
+            <option value="{{ $manager->id }}" {{ $project->project_manager_id == $manager->id ? 'selected' : '' }}>
+              {{ $manager->firstname }} {{ $manager->lastname }}
+            </option>
+            
+          @endforeach
+        </select>
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
 
-        <dl class="row mb-0">
-          {{-- PARTNERS --}}
-        <dt class="col-sm-2 mb-3 text-black">Partners</dt>
-        <dd class="col-sm-10 mb-3">
-          <div id="partners-display" onclick="togglePartnerEdit()" style="cursor: pointer;">
-            @forelse($project->partners as $partner)
-              <span class="badge badge-primary mr-1 pt-2 pb-2">{{ $partner->name }}</span>
-            @empty
-              <span class="text-black">None</span>
-            @endforelse
-            <span class="text-muted ml-2"><small>(Click to edit)</small></span>
-          </div>
+  {{-- PMA --}}
+  <dt class="col-sm-2 mb-3 text-black">PMA</dt>
+  <dd class="col-sm-4 mb-3">
+    <form method="POST" action="{{ route('projects.updateRelation', ['project' => $project->id]) }}">
+      @csrf
+      @method('PATCH') 
+      <div class="d-flex align-items-center">
+        <select name="pma_id" class="form-control form-control-sm">
+          <option value="" disabled {{ $project->assistants->isEmpty() ? 'selected' : '' }}>-- Select PMA --</option>
+          @foreach($users as $user)
+            <option value="{{ $user->id }}"
+              {{ $project->assistants->contains('id', $user->id) ? 'selected' : '' }}>
+              {{ $user->firstname }} {{ $user->lastname }}
+            </option>
+          @endforeach
+        </select>
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
+  </dd>
 
-          <form id="partners-form" method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'partners']) }}" style="display: none;">
-            @csrf @method('PATCH')
-            <div class="d-flex align-items-center mt-2">
-              <select name="value[]" class="form-control form-control-sm select2-multi" multiple style="min-width: 300px;">
-                @foreach($partners as $partner)
-                  <option value="{{ $partner->id }}" {{ $project->partners->contains($partner->id) ? 'selected' : '' }}>
-                    {{ $partner->name }}
-                  </option>
-                @endforeach
-              </select>
-              <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-            </div>
-          </form>
-        </dd>
-
-
-          {{-- PRIORITY --}}
-          <dt class="col-sm-2 mb-3 text-black">Priority</dt>
-          <dd class="col-sm-4 mb-3">
-            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'priority']) }}">
-              @csrf @method('PATCH')
-              <div class="d-flex align-items-center">
-                <select name="value" class="form-control form-control-sm">
-                  @foreach(['Low', 'Medium', 'High'] as $priority)
-                    <option value="{{ $priority }}" {{ $project->priority == $priority ? 'selected' : '' }}>
-                      {{ $priority }}
-                    </option>
-                  @endforeach
-                </select>
-                <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-              </div>
-            </form>
-          </dd>
-
-          <dt class="col-sm-2 mb-3 text-black">Status</dt>
-            <dd class="col-sm-4 mb-3">
-              <div class="d-flex align-items-center">
-                <div class="input-group input-group-sm">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text bg-light">
-                      <i class="fe fe-lock text-muted"></i> {{-- Icône de cadenas --}}
-                    </span>
-                  </div>
-                  <input type="text" class="form-control" value="{{ $project->status }}" readonly>
-                </div>
-              </div>
-            </dd>
+  {{-- Members --}}
+  <dt class="col-sm-2 mb-3 text-black">Members</dt>
+  <dd class="col-sm-4 mb-3 text-white">
+    <div id="members-display" onclick="toggleMembersEdit()" style="cursor: pointer; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+  @forelse($project->members as $member)
+    <span class="badge badge-info p-2">{{ $member->firstname }} {{ $member->lastname }}</span> 
+  @empty
+    <span class="text-muted">None</span>
+  @endforelse
+  <span class="text-muted"><small>(Edit)</small></span>
+</div>
 
 
-          {{-- START DATE --}}
-          <dt class="col-sm-2 mb-3 text-black">Start Date</dt>
-          <dd class="col-sm-4 mb-3">
-            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'start_date']) }}">
-              @csrf @method('PATCH')
-              <div class="d-flex align-items-center">
-                <input type="date" name="value" class="form-control form-control-sm" value="{{ $project->start_date }}">
-                <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-              </div>
-            </form>
-          </dd>
-
-          {{-- END DATE --}}
-          <dt class="col-sm-2 mb-3 text-black">End Date</dt>
-          <dd class="col-sm-4 mb-3">
-            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'end_date']) }}">
-              @csrf @method('PATCH')
-              <div class="d-flex align-items-center">
-                <input type="date" name="value" class="form-control form-control-sm" value="{{ $project->end_date }}">
-                <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-              </div>
-            </form>
-          </dd>
+    <form id="members-form" method="POST" action="{{ route('projects.updateRelation', ['project' => $project->id]) }}" style="display: none;">
+      @csrf
+      @method('PATCH')
+      <div class="d-flex align-items-center mt-2">
+        <select name="member_ids[]" class="form-control form-control-sm select2-multi" multiple style="min-width: 300px;">
+          @foreach($users as $user)
+            <option value="{{ $user->id }}" {{ $project->members->contains('id', $user->id) ? 'selected' : '' }}>
+              {{ $user->firstname }} {{ $user->lastname }}
+            </option>
+          @endforeach
+        </select>
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
 
 
+  {{-- PARTNERS --}}
+  <dt class="col-sm-2 mb-3 text-black">Partners</dt>
+  <dd class="col-sm-4 mb-3">
+    <div id="partners-display" onclick="togglePartnerEdit()" style="cursor: pointer;">
+      @forelse($project->partners as $partner)
+        <span class="badge badge-primary mr-1 pt-2 pb-2">{{ $partner->name }}</span>
+      @empty
+        <span class="text-black">None</span>
+      @endforelse
+      <span class="text-muted ml-2"><small>(Click to edit)</small></span>
+    </div>
+    <form id="partners-form" method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'partners']) }}" style="display: none;">
+      @csrf @method('PATCH')
+      <div class="d-flex align-items-center mt-2">
+        <select name="value[]" class="form-control form-control-sm select2-multi" multiple style="min-width: 300px;">
+          @foreach($partners as $partner)
+            <option value="{{ $partner->id }}" {{ $project->partners->contains($partner->id) ? 'selected' : '' }}>{{ $partner->name }}</option>
+          @endforeach
+        </select>
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
+
+  {{-- PROCUREMENT --}}
+  <dt class="col-sm-2 mb-3 text-black">Procurement</dt>
+  <dd class="col-sm-4 mb-3">
+    <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'procurement_type']) }}">
+      @csrf @method('PATCH')
+      <div class="d-flex align-items-center">
+        <select name="value" class="form-control form-control-sm">
+          <option value="afcfta_procurement" {{ $project->subphases->contains('name', 'afcfta') ? 'selected' : '' }}>AfCFTA Procurement</option>
+          <option value="partner_procurement" {{ $project->subphases->contains('name', 'partner_procurement') ? 'selected' : '' }}>Partner Procurement</option>
+        </select>
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
+
+  {{-- PRIORITY --}}
+  <dt class="col-sm-2 mb-3 text-black">Priority</dt>
+  <dd class="col-sm-4 mb-3">
+    <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'priority']) }}">
+      @csrf @method('PATCH')
+      <div class="d-flex align-items-center">
+        <select name="value" class="form-control form-control-sm">
+          @foreach(['Low', 'Medium', 'High'] as $priority)
+            <option value="{{ $priority }}" {{ $project->priority == $priority ? 'selected' : '' }}>{{ $priority }}</option>
+          @endforeach
+        </select>
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
+
+  {{-- STATUS --}}
+  <dt class="col-sm-2 mb-3 text-black">Status</dt>
+  <dd class="col-sm-4 mb-3">
+    <div class="input-group input-group-sm">
+      <div class="input-group-prepend">
+        <span class="input-group-text bg-light"><i class="fe fe-lock text-muted"></i></span>
+      </div>
+      <input type="text" class="form-control" value="{{ $project->status }}" readonly>
+    </div>
+  </dd>
+
+  {{-- START DATE --}}
+  <dt class="col-sm-2 mb-3 text-black">Start Date</dt>
+  <dd class="col-sm-4 mb-3">
+    <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'start_date']) }}">
+      @csrf @method('PATCH')
+      <div class="d-flex align-items-center">
+        <input type="date" name="value" class="form-control form-control-sm" value="{{ $project->start_date }}">
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
+
+  {{-- END DATE --}}
+  <dt class="col-sm-2 mb-3 text-black">End Date</dt>
+  <dd class="col-sm-4 mb-3">
+    <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'end_date']) }}">
+      @csrf @method('PATCH')
+      <div class="d-flex align-items-center">
+        <input type="date" name="value" class="form-control form-control-sm" value="{{ $project->end_date }}">
+        <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+      </div>
+    </form>
+  </dd>
+
+          {{-- BUDGET --}}
           <dt class="col-sm-2 mb-3 text-black">Budget</dt>
           <dd class="col-sm-4 mb-3">
             <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id]) }}" id="budgetForm">
-              @csrf
-              @method('PATCH')
+              @csrf @method('PATCH')
               <input type="hidden" name="field" value="budget">
               <input type="hidden" name="reason" id="budgetReason">
-              
               <div class="d-flex align-items-center">
                 <input type="number" step="0.01" name="value" id="budgetValue" class="form-control form-control-sm" value="{{ $project->budget }}">
-                {{-- <button type="button" class="btn btn-sm btn-outline-success ml-2" data-toggle="modal" data-target="#budgetModal">Save</button> --}}
                 <button type="button" class="btn btn-sm btn-outline-success ml-2" onclick="$('#budgetModal').modal('show')">Save</button>
               </div>
             </form>
           </dd>
 
-      
-          
-         
-          {{-- PROCUREMENT TYPE --}}
-        <dt class="col-sm-2 mb-3 text-black">Procurement</dt>
-          <dd class="col-sm-4 mb-3 text-black">
-            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'procurement_type']) }}">
-              @csrf
-              @method('PATCH')
-              <div class="d-flex align-items-center">
-                <select name="value" class="form-control form-control-sm">
-                  <option value="afcfta_procurement" {{ $project->subphases->contains('name', 'afcfta') ? 'selected' : '' }}>
-                    AfCFTA Procurement
-                  </option>
-                  <option value="partner_procurement" {{ $project->subphases->contains('name', 'partner_procurement') ? 'selected' : '' }}>
-                    Partner Procurement
-                  </option>
+            {{-- BUDGET MODAL --}}
 
-                </select>
-                <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-              </div>
-            </form>
-          </dd>
+            {{-- BUDGET CODE --}}
+            <dt class="col-sm-2 mb-3 text-black">Budget Code</dt>
+            <dd class="col-sm-4 mb-3">
+              <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'budget_code']) }}">
+                @csrf @method('PATCH')
+                <div class="d-flex align-items-center">
+                  <input type="text" class="form-control form-control-sm" name="budget_code" value="{{ $project->budget_code }}">
+                  <button class="btn btn-sm btn-outline-success ml-2">Save</button>
+                </div>
+              </form>
+            </dd>
 
-          {{-- DESCRIPTION --}}
-          <dt class="col-sm-2 text-black">Description</dt>
+            {{-- DESCRIPTION --}}
+            <dt class="col-sm-2 text-black">Description</dt>
             <dd class="col-sm-10">
               <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'description']) }}">
                 @csrf @method('PATCH')
@@ -228,19 +267,58 @@
                 </div>
               </form>
             </dd>
+            
+           @if (is_null($project->assistant_id) && $project->members->isEmpty())
+  <dt class="col-sm-2 text-black">Assign Team</dt>
+  <dd class="col-sm-10">
+      {{-- Select trigger --}}
+      <button class="btn btn-sm btn-outline-primary mb-2" type="button" onclick="toggleTeamOptions()">Assign PMA / Members</button>
 
-            <dt class="col-sm-2 text-black">Budget Code</dt>
-              <dd class="col-sm-10">
-                <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'budget_code']) }}">
-                  @csrf @method('PATCH')
-                  <div class="d-flex align-items-center">
-                    <input type="text" class="form-control form-control-sm" name="budget_code" value={{ $project->budget_code }} >
-                    <button class="btn btn-sm btn-outline-success ml-2">Save</button>
-                  </div>
-                </form>
-              </dd>
+      {{-- Hidden section --}}
+      <div id="teamOptions" style="display: none;">
+          <form method="POST" action="{{ route('projects.assignTeam', $project->id) }}">
+              @csrf
+
+              <div class="form-group mb-2">
+                  <label>Who do you want to assign?</label>
+                  <select class="form-control" id="teamTypeSelector" onchange="handleTeamSelection(this.value)">
+                      <option value="">-- Select --</option>
+                      <option value="pma">PMA only</option>
+                      <option value="members">Members only</option>
+                      <option value="both">PMA & Members</option>
+                  </select>
+              </div>
+
+              <div id="pmaField" class="form-group mb-2" style="display: none;">
+                  <label for="pmaSelect">Select PMA</label>
+                  <select class="form-control" id="pmaSelect" name="assistant_ids[]">
+                      @foreach($users as $user)
+                          <option value="{{ $user->id }}">{{ $user->firstname.' '.$user->lastname }}</option>
+                      @endforeach
+                  </select>
+                  <button type="button" class="btn btn-sm btn-outline-success mt-2"
+                      onclick="document.getElementById('pmaField').style.display = 'none';
+                              document.getElementById('membersField').style.display = 'block';">
+                      Next
+                  </button>
+              </div>
+
+              <div id="membersField" class="form-group mb-2" style="display: none;">
+                  <label for="membersSelect">Select Members</label>
+                  <select class="form-control js-select2" id="membersSelect" name="member_ids[]" multiple>
+                      @foreach($users as $user)
+                          <option value="{{ $user->id }}">{{ $user->firstname.' '.$user->lastname }}</option>
+                      @endforeach
+                  </select>
+              </div>
+
+              <button type="submit" class="btn btn-success btn-sm mt-2">Save Team</button>
+          </form>
+      </div>
+  </dd>
+@endif
+
           </dl>
-          
 
             {{-- Subphases --}}
             <hr style="border: none; height: 6px; background: linear-gradient(to right, #1b1311, #feb47b);">
@@ -711,4 +789,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+<script>
+    function toggleTeamOptions() {
+        const section = document.getElementById('teamOptions');
+        section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
 
+    function handleTeamSelection(value) {
+        document.getElementById('pmaField').style.display = (value === 'pma' || value === 'both') ? 'block' : 'none';
+        document.getElementById('membersField').style.display = (value === 'members' || value === 'both') ? 'block' : 'none';
+    }
+</script>
+<script>
+    $(document).ready(function() {
+        $('.js-select2').select2({
+            placeholder: "Select members",
+            width: '100%'
+        });
+    });
+</script>
+<script>
+  function toggleMembersEdit() {
+    document.getElementById('members-display').style.display = 'none';
+    document.getElementById('members-form').style.display = 'block';
+  }
+</script>
+<script>
+  $(document).ready(function() {
+    $('.select2-multi').select2({
+      width: 'resolve',
+      placeholder: "Select members"
+    });
+  });
+</script>

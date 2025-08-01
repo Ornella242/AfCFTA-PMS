@@ -18,72 +18,102 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="css/app-light.css" id="lightTheme">
     <link rel="stylesheet" href="css/app-dark.css" id="darkTheme" disabled>
+  <style>
+    .bg-register-curve {
+        background: linear-gradient(to top left, #70CA89, #70CA89);
+        clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+
+    @media (max-width: 768px) {
+        .bg-register-curve {
+            clip-path: none;
+        }
+    }
+
+   .form-control, .form-select {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 4px 8px rgba(112, 202, 137, 0.4);
+        border-color: #70CA89;
+        outline: none;
+    }
+</style>
+
   </head>
   <body class="light">
-        <canvas class="background-canvas"></canvas>
-        {{-- <canvas id="backgroundCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas> --}}
+    
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="row w-100" style="max-width: 1100px; box-shadow: 0 0 25px rgba(0,0,0,0.1); border-radius: 15px; overflow: hidden;">
+        <!-- Left: Form -->
+        <div class="col-12 col-md-7 bg-white pt-3">
+            <form method="POST" action="{{ route('register.store') }}">
+                @csrf
+                <div class="text-center mb-4">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" style="max-height: 60px;">
+                    <h3 class="mt-2 text-maroon">Registration Form</h3>
+                </div>
 
-    <div class="wrapper vh-100">
-      <div class="row align-items-center h-100">
-          <form method="POST" action="{{ route('register.store') }}" class="col-lg-6 col-md-8 col-10 mx-auto">
-            @csrf
-            <div class="mx-auto text-center my-4">
-              <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="./index.html">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="navbar-brand-img brand-md">
-              </a>
-              <h2 class="my-3 text-gold">Registration <span class="text-maroon">Form</span></h2>
-            </div>
-            <div class="form-group">
-              <label for="inputEmail4">Email</label>
-              <input type="email" name="email" class="form-control" id="inputEmail4">
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="firstname">Firstname</label>
-                <input type="text" id="firstname" name="firstname" class="form-control">
-              </div>
-              <div class="form-group col-md-6">
-                <label for="lastname">Lastname</label>
-                <input type="text" id="lastname" name="lastname" class="form-control">
-              </div>
-            </div>
-            <div class="form-row">
-                <label for="unit">Unit</label>
-                  <select class="form-control" id="unit" name="unit_id">
+                <div class="form-group">
+                    <label>Email <span class="text-danger">*</span></label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Firstname <span class="text-danger">*</span></label>
+                        <input type="text" name="firstname" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Lastname <span class="text-danger">*</span></label>
+                        <input type="text" name="lastname" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Unit <span class="text-danger">*</span></label>
+                    <select name="unit_id" class="form-control" required>
                         @foreach($units as $unit)
-                          <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                            <option value="{{ $unit->id }}">{{ $unit->name }}</option>
                         @endforeach
-                  </select>  
-            </div>
-            <hr class="my-4">
-            <div class="row mb-4">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="inputPassword5">New Password</label>
-                  <input type="password" name="password" class="form-control" id="inputPassword5">
+                    </select>
                 </div>
-                <div class="form-group">
-                  <label for="inputPassword6">Confirm Password</label>
-                  <input type="password" name="password_confirmation" class="form-control" id="inputPassword6">
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Confirm Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password_confirmation" class="form-control" required>
+                    </div>
                 </div>
-              </div>
-              <div class="col-md-6">
-                <p class="mb-2">Password requirements</p>
-                <p class="small text-muted mb-2"> To create a new password, you have to meet all of the following requirements: </p>
-                <ul class="small text-muted pl-4 mb-0">
-                  <li> Minimum 8 character </li>
-                  <li>At least one special character</li>
-                  <li>At least one number</li>
-                  <li>Can’t be the same as a previous password </li>
-                </ul>
-              </div>
-            </div>
-            <button class="btn btn-lg bg-green btn-block text-white" type="submit">
-              Sign up
-            </button>
-            <p class="mt-5 mb-3 text-muted text-center">© <span class="text-maroon">AHRMD 2025</span></p>
-          </form>
-      </div>
+
+                <button type="submit" class="btn bg-maroon text-white btn-block mt-4">
+                    Sign up
+                </button>
+
+                <p class="mt-4 text-center text-muted">© AHRMD 2025</p>
+            </form>
+        </div>
+
+        <!-- Right: Info Panel -->
+        <div class="col-12 col-md-5 d-flex flex-column justify-content-center align-items-center p-4 curve-right text-center bg-gold">
+            <h2 class="text-white">Welcome dear colleague!</h2>
+            <p  class="text-white">Already have an account? Click below to login</p>
+            <a href="{{ route('login') }}" class="btn bg-maroon text-white mb-3">LOGIN</a>
+            <img src="{{ asset('images/register.png') }}" alt="Illustration" class="img-fluid mt-3" style="max-height: 250px;">
+        </div>
+    </div>
+</div>
+
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/popper.min.js"></script>

@@ -30,7 +30,7 @@
  
   <body class="vertical  light">
     <div class="wrapper">
-      <nav class="topnav navbar navbar-light">
+      {{-- <nav class="topnav navbar navbar-light">
         <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
             <i data-feather="home"></i>
             <i class="fe fe-menu navbar-toggler-icon"></i>
@@ -75,286 +75,364 @@
 
         </li>
         </ul>
+      </nav> --}}
+      <nav class="topnav navbar navbar-light d-flex align-items-center justify-content-between">
+          <!-- Left: Sidebar toggle -->
+          <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
+              <i data-feather="home"></i>
+              <i class="fe fe-menu navbar-toggler-icon"></i>
+          </button>
+
+          <!-- Center: Project Title -->
+          <div class="mx-auto text-center my-4">
+              <span class="h3 mb-0 fw-bold text-uppercase position-relative" style="
+                  display: inline-block;
+                  padding-bottom: 6px;
+                  color: #000;
+                  text-shadow: 
+                      1px 1px 0 #ccc, 
+                      1px 1px 0 #bbb, 
+                      1px 1px 0 #aaa, 
+                      2px 2px 0 #999;
+              ">
+                  AHRMD Project Management System
+              </span>
+          </div>
+
+          <!-- Right: Notifications & User -->
+          <ul class="nav align-items-center">
+              <li class="nav-item nav-notif">
+                  <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
+                      <span class="fe fe-bell fe-16"></span>
+                      <span class="dot dot-md bg-success"></span>
+                  </a>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle text-muted pr-0 d-flex align-items-center" href="#" id="navbarDropdownMenuLink"
+                    role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                      @php
+                          $user = Auth::user();
+                          $initials = strtoupper(substr($user->firstname, 0, 1) . substr($user->lastname, 0, 1));
+                      @endphp
+
+                      <div class="avatar avatar-sm d-flex align-items-center justify-content-center rounded-circle text-white"
+                          style="background-color: #{{ substr(md5($user->email), 0, 6) }}; width: 40px; height: 40px;">
+                          <strong>{{ $initials }}</strong>
+                      </div>
+
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                      <a class="dropdown-item" href="{{ route('password.change') }}">Change Password</a>
+                      <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log out</a>
+                      <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
+                  </div>
+              </li>
+          </ul>
       </nav>
+
       <aside class="sidebar-left border-right bg-grey shadow" id="leftSidebar" data-simplebar>
         <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
           <i class="fe fe-x"><span class="sr-only"></span></i>
         </a>
         <nav class="vertnav navbar navbar-light">
           <!-- nav bar -->
-          <div class="w-100 mb-4 d-flex align-items-center">
+          {{-- <div class="w-100 mb-4 d-flex align-items-center">
                 <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="navbar-brand-img brand-md logo-img">
-                    <span class="ms-2 fw-bold text-dark h5 mb-0">AHRMD Projects</span>
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-img me-3" style="height: 50px;">
+                    <span class="ms-2 fw-bold text-dark h4 mb-0">AHRMD Projects</span>
                 </a>
-         </div>
-        @if(Auth::user()->role->name == 'Admin')
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100">
-              <a href="{{ url('/dashboard') }}" class="nav-link">
-                <i class="fe fe-home fe-16"></i>
-                <span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
-              </a>
-            </li>
-          </ul>
-        @endif
-        @if(Auth::user()->role->name == 'Admin' || Auth::user()->role->name == 'Project Manager')
-          <p class="text-maroon nav-heading mt-4 mb-1">
-            <span>Projects Management</span>
-          </p>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100">
-              <a href="{{ url('/projects/create') }}" class="nav-link">
-                <i class="fe fe-plus-circle fe-16"></i>
-                <span class="ml-3 item-text text-black">New Project</span>
-              </a>
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/allprojects') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-box fe-16"></i>
+         </div> --}}
 
-                <span class="ml-3 item-text">All Projects</span>
+          <div class="w-100 mb-1 d-flex justify-content-center align-items-center">
+              <a class="navbar-brand " href="{{ url('/') }}">
+                  <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-img" style="height: 80px;">
               </a>
-               @if(isset($totalProjects))
-                <span class="badge badge-pill bg-green text-white mr-3 pt-2 pb-2">
-                   {{ $totalProjects }}
-                </span>
-              @endif 
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/hrmprojects') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-users fe-16"></i>
-                <span class="ml-3 item-text">HRM Projects</span>
-              </a>
-              @if(isset($totalProjectsHRM))
-                <span class="badge badge-pill bg-yellow text-white mr-3 pt-2 pb-2">
-                  {{ $totalProjectsHRM }}
-                </span>
-              @endif 
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/adminprojects') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-shield fe-16"></i>
-                <span class="ml-3 item-text">Admin Projects</span>
-              </a>
-               @if(isset($totalProjectsAdmin))
-                <span class="badge badge-pill bg-maroon text-white mr-3 pt-2 pb-2">
-                  {{ $totalProjectsAdmin }}
-                </span>
-              @endif 
-            </li>
-          </ul>
+          </div>
 
-          <p class="text-maroon nav-heading mt-4 mb-1">
-            <span>Reports Management</span>
-          </p>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-                <a class="nav-link d-flex align-items-center" href="{{ url('/reports') }}">
-                  <i class="fe fe-book fe-16"></i>
-                  <span class="ml-3 item-text">Reports</span>
+         
+          @if(Auth::user()->role->name == 'Admin')
+            <ul class="navbar-nav flex-fill w-100">
+              <li class="nav-item w-100">
+                <a href="{{ url('/dashboard') }}" class="nav-link">
+                  <i class="fe fe-home fe-16"></i>
+                  <span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
                 </a>
-                <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">16</span>
-            </li>
-          </ul>
-      
-          <p class="text-maroon nav-heading mt-4 mb-1">
-            <span>Tasks Management</span>
-          </p>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/newtask') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-plus-circle fe-16"></i>
-                <span class="ml-3 item-text">New Task</span>
-              </a>
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-layers fe-16"></i>
-                <span class="ml-3 item-text">All Tasks</span>
-              </a>
-              <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">12</span>
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/hrmtasks') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-users fe-16"></i>
-                <span class="ml-3 item-text">HRM Tasks</span>
-              </a>
-              <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">5</span>
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/admintasks') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-shield fe-16"></i>
-                <span class="ml-3 item-text ">Admin Tasks</span>
-              </a>
-              <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">7</span>
-            </li>
-          </ul>
-          
-          <p class="text-maroon nav-heading mt-4 mb-1">
-            <span>User Management</span>
-          </p>
-          <ul class="navbar-nav flex-fill w-100 mb-2 d-flex justify-content-between align-items-center">
-            <li class="nav-item w-100">
-                <a class="nav-link" href="{{ url('/users/create') }}">
+              </li>
+            </ul>
+          @endif
+          @if(Auth::user()->role->name == 'Admin' || Auth::user()->role->name == 'Project Manager')
+            @if(Auth::user()->role->name == 'Project Manager')
+              <ul class="navbar-nav flex-fill w-100">
+                <li class="nav-item w-100">
+                  <a href="{{ url('/dashboardpm') }}" class="nav-link">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
+                  </a>
+                </li>
+              </ul>
+            @endif
+            <p class="text-maroon nav-heading mt-4 mb-1">
+              <span>Projects Management</span>
+            </p>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100">
+                <a href="{{ url('/projects/create') }}" class="nav-link">
                   <i class="fe fe-plus-circle fe-16"></i>
-                  <span class="ml-3 item-text">New user</span>
+                  <span class="ml-3 item-text">New Project</span>
                 </a>
-            </li>
-          </ul>
-           <ul class="navbar-nav flex-fill">
-            <li class="nav-item w-100 mb-2 d-flex justify-content-between align-items-center">
-                <a class="nav-link d-flex align-items-center" href="{{ url('/users') }}">
-                  <i class="fe fe-users fe-16"></i>
-                  <span class="ml-3 item-text">List Users</span>
-                </a>
-                @if(isset($totalUsers))
-                    <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">
-                        {{ $totalUsers }}
-                    </span>
-                @endif         
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100">
-                <a class="nav-link" href="{{ url('roles') }}">
-                  <i class="fe fe-shield fe-16"></i>
-                  <span class="ml-3 item-text">Roles</span>
-                </a>
-            </li>
-            {{-- <li class="nav-item w-100">
-                <a class="nav-link" href="widgets.html">
-                  <i class="fe fe-lock fe-16"></i>
-                  <span class="ml-3 item-text">Permissions</span>
-                </a>
-            </li> --}}
-          </ul>
-          <p class="text-muted nav-heading mt-4 mb-1">
-            <span>Settings</span>
-          </p>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100">
-              <a class="nav-link" href="{{ url('logs') }}">
-                  <i class="fe fe-activity fe-16"></i>
-                  <span class="ml-3 item-text">Logs</span>
-                </a>
-            </li>
-          </ul>
-        @endif       
-        
-      
-        @if(Auth::user()->role->name == 'Member')
-          <p class="text-maroon nav-heading mt-4 mb-1">
-            <span>Projects Management</span>
-          </p>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100">
-              <a href="{{ url('/addnewproject') }}" class="nav-link">
-                <i class="fe fe-plus-circle fe-16"></i>
-                <span class="ml-3 item-text text-black">New Project</span>
-              </a>
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/allprojects') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-box fe-16"></i>
-                <span class="ml-3 item-text">All Projects</span>
-              </a>
-              @if(isset($totalProjects))
-                <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">
-                   {{ $totalProjects }}
-                </span>
-              @endif 
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/hrmprojects') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-users fe-16"></i>
-                <span class="ml-3 item-text">HRM Projects</span>
-              </a>
-              @if(isset($totalProjectsHRM))
-                <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">
-                   {{ $totalProjectsHRM }}
-                </span>
-              @endif 
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/adminprojects') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-shield fe-16"></i>
-                <span class="ml-3 item-text">Admin Projects</span>
-              </a>
-              @if(isset($totalProjectsAdmin))
-                <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">
-                   {{ $totalProjectsAdmin }}
-                </span>
-              @endif 
-            </li>
-          </ul>
-      
-          <p class="text-maroon nav-heading mt-4 mb-1">
-            <span>Tasks Management</span>
-          </p>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/newtask') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-plus-circle fe-16"></i>
-                <span class="ml-3 item-text">New Task</span>
-              </a>
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-layers fe-16"></i>
-                <span class="ml-3 item-text">All Tasks</span>
-              </a>
-              <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">12</span>
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/hrmtasks') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-users fe-16"></i>
-                <span class="ml-3 item-text">HRM Tasks</span>
-              </a>
-              <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">5</span>
-            </li>
-          </ul>
-          <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100 d-flex justify-content-between align-items-center">
-              <a href="{{ url('/admintasks') }}" class="nav-link d-flex align-items-center">
-                <i class="fe fe-shield fe-16"></i>
-                <span class="ml-3 item-text ">Admin Tasks</span>
-              </a>
-              <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">7</span>
-            </li>
-          </ul>
-        @endif 
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/allprojects') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-box fe-16"></i>
 
-      </nav>
+                  <span class="ml-3 item-text">All Projects</span>
+                </a>
+                @if(isset($totalProjects))
+                  <span class="badge badge-pill bg-green text-white mr-3 pt-2 pb-2">
+                    {{ $totalProjects }}
+                  </span>
+                @endif 
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/hrmprojects') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-users fe-16"></i>
+                  <span class="ml-3 item-text">HRM Projects</span>
+                </a>
+                @if(isset($totalProjectsHRM))
+                  <span class="badge badge-pill bg-yellow text-white mr-3 pt-2 pb-2">
+                    {{ $totalProjectsHRM }}
+                  </span>
+                @endif 
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/adminprojects') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-shield fe-16"></i>
+                  <span class="ml-3 item-text">Admin Projects</span>
+                </a>
+                @if(isset($totalProjectsAdmin))
+                  <span class="badge badge-pill bg-maroon text-white mr-3 pt-2 pb-2">
+                    {{ $totalProjectsAdmin }}
+                  </span>
+                @endif 
+              </li>
+            </ul>
+
+            <p class="text-maroon nav-heading mt-4 mb-1">
+              <span>Reports Management</span>
+            </p>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                  <a class="nav-link d-flex align-items-center" href="{{ url('/reports') }}">
+                    <i class="fe fe-book fe-16"></i>
+                    <span class="ml-3 item-text">Reports</span>
+                  </a>
+                  <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">16</span>
+              </li>
+            </ul>
+        
+            <p class="text-maroon nav-heading mt-4 mb-1">
+              <span>Tasks Management</span>
+            </p>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/newtask') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-plus-circle fe-16"></i>
+                  <span class="ml-3 item-text">New Task</span>
+                </a>
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-layers fe-16"></i>
+                  <span class="ml-3 item-text">All Tasks</span>
+                </a>
+                <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">12</span>
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/hrmtasks') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-users fe-16"></i>
+                  <span class="ml-3 item-text">HRM Tasks</span>
+                </a>
+                <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">5</span>
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/admintasks') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-shield fe-16"></i>
+                  <span class="ml-3 item-text ">Admin Tasks</span>
+                </a>
+                <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">7</span>
+              </li>
+            </ul>
+            
+            <p class="text-maroon nav-heading mt-4 mb-1">
+              <span>User Management</span>
+            </p>
+            <ul class="navbar-nav flex-fill w-100 mb-2 d-flex justify-content-between align-items-center">
+              <li class="nav-item w-100">
+                  <a class="nav-link" href="{{ url('/users/create') }}">
+                    <i class="fe fe-plus-circle fe-16"></i>
+                    <span class="ml-3 item-text">New user</span>
+                  </a>
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill">
+              <li class="nav-item w-100 mb-2 d-flex justify-content-between align-items-center">
+                  <a class="nav-link d-flex align-items-center" href="{{ url('/users') }}">
+                    <i class="fe fe-users fe-16"></i>
+                    <span class="ml-3 item-text">List Users</span>
+                  </a>
+                  @if(isset($totalUsers))
+                      <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">
+                          {{ $totalUsers }}
+                      </span>
+                  @endif         
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100">
+                  <a class="nav-link" href="{{ url('roles') }}">
+                    <i class="fe fe-shield fe-16"></i>
+                    <span class="ml-3 item-text">Roles</span>
+                  </a>
+              </li>
+              {{-- <li class="nav-item w-100">
+                  <a class="nav-link" href="widgets.html">
+                    <i class="fe fe-lock fe-16"></i>
+                    <span class="ml-3 item-text">Permissions</span>
+                  </a>
+              </li> --}}
+            </ul>
+            <p class="text-muted nav-heading mt-4 mb-1">
+              <span>Settings</span>
+            </p>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100">
+                <a class="nav-link" href="{{ url('logs') }}">
+                    <i class="fe fe-activity fe-16"></i>
+                    <span class="ml-3 item-text">Logs</span>
+                  </a>
+              </li>
+            </ul>
+          @endif       
+          
+        
+          @if(Auth::user()->role->name == 'Member')
+            @if(Auth::user()->role->name == 'Project Manager Assistant' || Auth::user()->role->name == 'Member')
+                <ul class="navbar-nav flex-fill w-100 mb-2">
+                  <li class="nav-item w-100">
+                    <a href="{{ url('/dashboardpma') }}" class="nav-link">
+                      <i class="fe fe-home fe-16"></i>
+                      <span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
+                    </a>
+                  </li>
+                </ul>
+              @endif
+            <p class="text-maroon nav-heading mt-4 mb-1">
+              <span>Projects Management</span>
+            </p>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100">
+                <a href="{{ url('/addnewproject') }}" class="nav-link">
+                  <i class="fe fe-plus-circle fe-16"></i>
+                  <span class="ml-3 item-text">New Project</span>
+                </a>
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/allprojects') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-box fe-16"></i>
+                  <span class="ml-3 item-text">All Projects</span>
+                </a>
+                @if(isset($totalProjects))
+                  <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">
+                    {{ $totalProjects }}
+                  </span>
+                @endif 
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/hrmprojects') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-users fe-16"></i>
+                  <span class="ml-3 item-text">HRM Projects</span>
+                </a>
+                @if(isset($totalProjectsHRM))
+                  <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">
+                    {{ $totalProjectsHRM }}
+                  </span>
+                @endif 
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/adminprojects') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-shield fe-16"></i>
+                  <span class="ml-3 item-text">Admin Projects</span>
+                </a>
+                @if(isset($totalProjectsAdmin))
+                  <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">
+                    {{ $totalProjectsAdmin }}
+                  </span>
+                @endif 
+              </li>
+            </ul>
+        
+            <p class="text-maroon nav-heading mt-4 mb-1">
+              <span>Tasks Management</span>
+            </p>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/newtask') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-plus-circle fe-16"></i>
+                  <span class="ml-3 item-text">New Task</span>
+                </a>
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-layers fe-16"></i>
+                  <span class="ml-3 item-text">All Tasks</span>
+                </a>
+                <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">12</span>
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/hrmtasks') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-users fe-16"></i>
+                  <span class="ml-3 item-text">HRM Tasks</span>
+                </a>
+                <span class="badge badge-pill bg-maroon text-white mr-3 pt-1 pb-1">5</span>
+              </li>
+            </ul>
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+              <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                <a href="{{ url('/admintasks') }}" class="nav-link d-flex align-items-center">
+                  <i class="fe fe-shield fe-16"></i>
+                  <span class="ml-3 item-text ">Admin Tasks</span>
+                </a>
+                <span class="badge badge-pill bg-green text-white mr-3 pt-1 pb-1">7</span>
+              </li>
+            </ul>
+          @endif 
+
+        </nav>
       </aside>
     </div> <!-- .wrapper -->
-    <!-- Loader -->
-    {{-- <div id="loader-wrapper">
-        <div id="loader"></div>
-    </div> --}}
-
-
+   
   </body>
 </html>

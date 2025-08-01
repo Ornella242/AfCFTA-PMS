@@ -63,7 +63,7 @@ function statusColorClass($status) {
 
                   <!-- Page Title -->
                   <div>
-                      <h2 class="mb-0 page-title text-black">List of Projects</h2>
+                      <h2 class="mb-0 page-title text-black">List of all projects</h2>
                   </div>
 
                   <!-- Add Project Button -->
@@ -76,21 +76,21 @@ function statusColorClass($status) {
               <div class="row align-items-center mb-4">
                         <div class="col-12">
                              @if(session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        @endif
-                        @if(session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session('error') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        @endif
+                                  <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                      {{ session('success') }}
+                                      <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                          <span aria-hidden="true">&times;</span>
+                                      </button>
+                                  </div>
+                              @endif
+                              @if(session('error'))
+                                  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                      {{ session('error') }}
+                                      <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                          <span aria-hidden="true">&times;</span>
+                                      </button>
+                                  </div>
+                              @endif
                         </div>
                 </div>
 
@@ -141,12 +141,34 @@ function statusColorClass($status) {
                     </li>
                   </ul>
                 </div>
-                <div class="col-md-auto ml-auto text-right">
+                {{-- <div class="col-md-auto ml-auto text-right">
                   <span class="small bg-white border py-1 px-2 rounded mr-2">
                     <span class="text-muted">Status : <strong>{{ $status ?? 'All' }}</strong></span>
                   </span>
+                </div> --}}
+              </div>
+              <div class="row mb-4">
+                <div class="col-md-12">
+                  <form method="GET" action="{{ route('allprojects') }}">
+                    <div class="input-group">
+                      <input 
+                        type="text" 
+                        name="search" 
+                        class="form-control" 
+                        placeholder="Search by title, partner or project manager..."
+                        value="{{ request('search') }}"
+                      >
+                      @if(request('status'))
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                      @endif
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-primary" type="submit">Search</button>
+                      </div>
+                    </div>
+                  </form>
                 </div>
               </div>
+
               <div class="row">
                 <div class="col-md-12">
                   <!-- table -->
@@ -260,32 +282,33 @@ function statusColorClass($status) {
                                 <button class="btn btn-sm text-danger" data-toggle="modal" data-target="#deleteProjectModal{{ $project->id }}">
                                   <i class="fe fe-trash-2"></i>
                                 </button>
-                              @endif
-
-                            <!-- Delete Modal -->
-                            <div class="modal fade" id="deleteProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
-                              <div class="modal-dialog" role="document">
-                                <form action="{{ route('projects.requestDelete', $project->id) }}" method="POST">
-                                  @csrf
-                                  <div class="modal-content">
-                                    <div class="modal-header bg-danger text-white">
-                                      <h5 class="modal-title text-white" id="deleteProjectModalLabel">Delete Project Request</h5>
-                                      <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                      </button>
+                                @endif
+                                <!-- Delete Modal -->
+                              <div class="modal fade" id="deleteProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <form action="{{ route('projects.requestDelete', $project->id) }}" method="POST">
+                                    @csrf
+                                    <div class="modal-content">
+                                      <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title text-white" id="deleteProjectModalLabel">Delete Project Request</h5>
+                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <p class="text-black h5">Why do you want to delete this project?</p>
+                                        <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-danger">Request Deletion</button>
+                                      </div>
                                     </div>
-                                    <div class="modal-body">
-                                      <p class="text-black h5">Why do you want to delete this project?</p>
-                                      <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
-                                    </div>
-                                    <div class="modal-footer">
-                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                      <button type="submit" class="btn btn-danger">Request Deletion</button>
-                                    </div>
-                                  </div>
-                                </form>
+                                  </form>
+                                </div>
                               </div>
-                            </div>
+
+                          
 
                             @if($project->status === 'Completed')
                               <!-- Close button triggers modal -->
@@ -324,15 +347,21 @@ function statusColorClass($status) {
                       @empty
                         <tr><td colspan="8" class="text-center text-muted">No projects found.</td></tr>
                       @endforelse
+                      
                     </tbody>
 
                   </table>
                  
                 </div> <!-- .col -->
+                
               </div> <!-- .row -->
+              
             </div> <!-- .col-12 -->
+            
           </div> <!-- .row -->
+          
         </div> <!-- .container-fluid -->
+        
      @include('partials.footer')   
 </main>
 

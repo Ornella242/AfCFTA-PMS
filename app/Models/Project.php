@@ -76,5 +76,23 @@ class Project extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function assistants()
+    {
+        return $this->belongsToMany(User::class, 'project_user_assistants', 'project_id', 'user_id');
+    }
+
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'project_user_members', 'project_id', 'user_id');
+    }
+
+    public function currentPhase()
+    {
+        return $this->phases()
+            ->where('status', 'In progress')
+            ->orderByDesc('id') // ou created_at si plus logique
+            ->first();
+    }
+
 
 }

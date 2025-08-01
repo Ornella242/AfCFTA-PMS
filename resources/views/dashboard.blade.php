@@ -16,7 +16,7 @@
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-12">
-              <div class="row">
+              {{-- <div class="row">
                 <div class="col-md-6 col-xl-3 mb-4">
                   <div class="card shadow bg-gold text-white border-0">
                     <div class="card-body">
@@ -84,48 +84,29 @@
                     </div>
                   </div>
                 </div>
-              </div>
-
+              </div> --}}
               <div class="row">
-                @foreach ($projectManagers as $index => $manager)
-                  @php
-                      $gradient = $gradients[$index % count($gradients)];
-                      $borderColor = ['#D0627C', '#299347', '#9E2140', '#F4A51F', '#C3A466', '#70CA89'];
-                      $color = $borderColor[$index % count($borderColor)];
-                  @endphp
-                  <div class="col-md-6 col-xl-4 mb-4">
-                    <div class="card shadow custom-simple-card" style="border-left: 6px solid {{ $color }}; cursor: pointer;" data-toggle="modal" data-target="#projectsModal{{ $manager->id }}">
-                      <div class="card-body">
-                        <h5 class="font-weight-bold mb-2">{{ $manager->firstname }} {{ $manager->lastname }}</h5>
-                        <div class="underline my-2"></div>
-                        <p class="mb-0 h6">{{ $manager->managed_projects_count }} project{{ $manager->managed_projects_count > 1 ? 's' : '' }}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                
+                @php
+                  $statuses = [
+                    ['label' => 'Not started', 'color' => '#C3A466', 'icon' => 'clock'],
+                    ['label' => 'In progress', 'color' => '#F4A51F', 'icon' => 'refresh-cw'],
+                    ['label' => 'Completed', 'color' => '#299347', 'icon' => 'check-circle'],
+                    ['label' => 'Cancelled', 'color' => '#9E2140', 'icon' => 'x-circle'],
+                  ];
+                @endphp
 
-
-                  <!-- Modal (identique à avant) -->
-                  <div class="modal fade" id="projectsModal{{ $manager->id }}" tabindex="-1" role="dialog" aria-labelledby="projectsModalLabel{{ $manager->id }}" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header bg-maroon text-white">
-                          <h5 class="modal-title text-white">Projects of {{ $manager->firstname }} {{ $manager->lastname }}</h5>
-                          <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                @foreach ($statuses as $status)
+                  <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="card status-box border-0" style="background: {{ $status['color'] }};">
+                      <div class="card-body d-flex align-items-center justify-content-between">
+                        <div class="icon-circle d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.15);">
+                          <i class="fe fe-24 fe-{{ $status['icon'] }} text-white"></i>
                         </div>
-                        <div class="modal-body">
-                          @foreach ($manager->managedProjects as $project)
-                            <div class="row align-items-center my-3">
-                              <div class="col"><strong>{{ $project->title }}</strong></div>
-                              <div class="col-auto"><strong>{{ $project->percentage }}%</strong></div>
-                              <div class="col-4">
-                                <div class="progress" style="height: 6px;">
-                                  <div class="progress-bar bg-success" style="width: {{ $project->percentage }}%"></div>
-                                </div>
-                              </div>
-                            </div>
-                          @endforeach
+                        <div class="text-end text-white ms-3">
+                          <div class="h4 mb-0 fw-bold text-white">
+                            {{ $counts[$status['label']] ?? 0 }} P
+                          </div>
+                          <div class="small text-uppercase fw-semibold">{{ $status['label'] }}</div>
                         </div>
                       </div>
                     </div>

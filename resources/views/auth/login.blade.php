@@ -18,11 +18,31 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="css/app-light.css" id="lightTheme">
     <link rel="stylesheet" href="css/app-dark.css" id="darkTheme" disabled>
+    <style>
+      .card {
+          border: none;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+      .btn-outline-light:hover {
+          background-color: #ffffff;
+          color: #2C7BE5;
+      }
+
+    </style>
   </head>
   <body class="light ">
-        <canvas id="backgroundCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
-
-    <div class="wrapper vh-100">
+    <div class="wrapper d-flex align-items-center justify-content-center vh-100" style="position: relative; overflow: hidden;">
+    <!-- Bleu incurvé en arrière-plan -->
+    <div style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 60%;
+        height: 100%;
+        background: #299347;
+        clip-path: ellipse(100% 100% at 0% 50%);
+        z-index: 0;
+    "></div>
       @if(session('success'))
               <div class="alert alert-success alert-dismissible fade show" role="alert">
                   {{ session('success') }}
@@ -40,36 +60,45 @@
                   </button>
               </div>
           @endif
-      <div class="row align-items-center h-100">
-        <form method="POST" action="{{ route('login') }}" class="col-lg-3 col-md-4 col-10 mx-auto text-center">
-          @csrf
-          <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="#">
-              <img src="{{ asset('images/logo.png') }}" alt="Logo" class="navbar-brand-img brand-md">
-          </a>
-          <h1 class="h3 mb-3 text-green">Sign in</h1>
+      <div class="container d-flex align-items-center justify-content-center vh-100">
+          <div class="row w-100" style="max-width: 1000px; border-radius: 15px; overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,0.1);">
 
-          <div class="form-group">
-              <input type="email" name="email" id="inputEmail" class="form-control form-control-lg" placeholder="Email address" required autofocus>
+              <!-- Left Panel -->
+              <div class="col-12 col-md-6 d-flex flex-column align-items-center justify-content-center text-white p-4" style="background: #70CA89;">
+                  <h2 class="text-white text-center">Welcome back dear colleague!</h2>
+                  <p class="text-center">Don't have an account yet? Click on sign up</p>
+                  <a href="{{ url('/register') }}" class="btn btn-outline-light mt-1">SIGN UP</a>
+                  <img src="{{ asset('images/login.png') }}" alt="Login Illustration" class="img-fluid mt-3" style="max-height: 250px;">
+              </div>
+
+              <!-- Right Panel -->
+              <div class="col-12 col-md-6 bg-light p-5">
+                  <div class="d-flex flex-column align-items-center justify-content-center mb-4">
+                      <img src="{{ asset('images/logo.png') }}" alt="Logo" class="mb-3" style="max-height: 60px;">
+                  </div>
+
+                  <form method="POST" action="{{ route('login') }}">
+                      @csrf
+                      <h3 class="mb-4 text-center">Login to your account</h3>
+                      
+                      <div class="form-group mb-3">
+                          <input type="email" name="email" class="form-control form-control-lg" placeholder="Email" required>
+                      </div>
+                      <div class="form-group mb-3">
+                          <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" required>
+                      </div>
+                      <div class="form-group text-right mb-3">
+                          <a href="#" class="text-muted small">Forgot password?</a>
+                      </div>
+                      <div class="form-group">
+                          <button type="submit" class="btn bg-green text-white btn-block btn-lg">LOGIN</button>
+                      </div>
+                  </form>
+              </div>
           </div>
-
-          <div class="form-group">
-              <input type="password" name="password" id="inputPassword" class="form-control form-control-lg" placeholder="Password" required>
-          </div>
-
-          <div class="checkbox mb-3">
-              <label>
-                  <input type="checkbox" name="remember"> Stay logged in
-              </label>
-          </div>
-
-          <button class="btn btn-lg bg-green text-white btn-block" type="submit">
-              Let me in
-          </button>
-
-          <p class="mt-5 mb-3 text-muted text-center">© <span class="text-maroon">AHRMD 2025</span></p>
-      </form>
-
       </div>
+
+
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/popper.min.js"></script>
@@ -93,58 +122,19 @@
       gtag('js', new Date());
       gtag('config', 'UA-56159088-1');
     </script>
-    
-<script>
-  const canvas = document.getElementById('backgroundCanvas');
-  const ctx = canvas.getContext('2d');
-  const africa = new Image();
-  africa.src = 'images/logo.png'; // remplace par ton image
+ <script>
+  <script>
+  window.addEventListener('load', function() {
+    const loader = document.getElementById('pageLoader');
+    loader.classList.add('hide');
 
-  let shapes = [];
-
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
-  function createShapes(count) {
-    shapes = [];
-    for (let i = 0; i < count; i++) {
-      shapes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        dx: (Math.random() - 0.5) * 0.4,
-        dy: (Math.random() - 0.5) * 0.4,
-        size: 30 + Math.random() * 20,
-        opacity: 0.1 + Math.random() * 0.2
-      });
-    }
-  }
-
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let shape of shapes) {
-      ctx.globalAlpha = shape.opacity;
-      ctx.drawImage(africa, shape.x, shape.y, shape.size, shape.size);
-      ctx.globalAlpha = 1;
-
-      shape.x += shape.dx;
-      shape.y += shape.dy;
-
-      if (shape.x < 0 || shape.x + shape.size > canvas.width) shape.dx *= -1;
-      if (shape.y < 0 || shape.y + shape.size > canvas.height) shape.dy *= -1;
-    }
-    requestAnimationFrame(animate);
-  }
-
-  africa.onload = () => {
-    createShapes(20); // nombre de cartes animées
-    animate();
-  };
+    setTimeout(() => {
+      loader.style.display = 'none';
+    }, 500); // match la durée de l'opacité
+  });
 </script>
+
+ </script>
   </body>
 </html>
 </body>

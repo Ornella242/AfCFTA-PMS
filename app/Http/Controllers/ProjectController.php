@@ -26,6 +26,7 @@ class ProjectController extends Controller
 {
     public function index(Request $r)
     {
+        
         // dd('All Projects Page');
         $status = $r->query('status');
         $managerName = $r->query('manager');
@@ -63,6 +64,20 @@ class ProjectController extends Controller
 
         if ($r->filled('manager_id')) {
             $q->where('project_manager_id', $r->manager_id);
+        }
+
+        if ($r->filled('search')) {
+            $search = $r->search;
+            $q->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%$search%")
+                    ->orWhereHas('partners', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('projectManager', function ($q3) use ($search) {
+                        $q3->where('firstname', 'like', "%$search%")
+                            ->orWhere('lastname', 'like', "%$search%");
+                    });
+            });
         }
      // Passons $partners et $managers à la vue
         $partners = Partner::all();
@@ -257,10 +272,58 @@ class ProjectController extends Controller
         return redirect()->route('allprojects')->with('success', 'Project created successfully.');
     }
 
- 
+
+    // public function update(Request $request, Project $project)
+    // {
+    //     $validated = $request->validate([
+    //         'title' => 'required|string|max:255',
+    //         'start_date' => 'required|date',
+    //         'end_date' => 'required|date|after_or_equal:start_date',
+    //         'priority' => 'required|in:Low,Medium,High',
+    //         'status' => 'required',
+    //         'unit_id' => 'required|exists:units,id',
+    //         'project_manager_id' => 'required|exists:users,id',
+    //         'type' => 'required|in:HRM,Admin',
+    //         'budget' => 'nullable|numeric',
+    //         'budget_code' => 'nullable|string|max:50', // Ajout du budget code
+    //     ]);
+
+    //     $validated['start_date'] = Carbon::parse($validated['start_date'])->format('Y-m-d');
+    //     $validated['end_date'] = Carbon::parse($validated['end_date'])->format('Y-m-d');
+
+    //     $project->update($validated);
+
+    //     // Partenaires
+    //     $project->partners()->sync($request->input('partners', []));
+
+    //     // Sous-phases
+    //     $project->subphases()->detach();
+
+    //     $subphaseSyncData = [];
+    //     foreach ($request->input('subphases', []) as $phaseId => $subIds) {
+    //         $count = count($subIds);
+    //         $equalPercent = round(100 / $count, 2);
+    //         foreach ($subIds as $subId) {
+    //             $subphaseSyncData[$subId] = ['percentage' => $equalPercent];
+    //         }
+    //     }
+    //     $project->subphases()->attach($subphaseSyncData);
+
+    //     // Activités de développement (tu peux optimiser avec diff)
+    //     $project->developmentDetails()->delete();
+    //    foreach ($request->input('development_activities', []) as $activity) {
+    //         $project->developmentDetails()->create([
+    //             'title' => $activity['title'],
+    //             'budget' => $activity['budget'] ?? null,
+    //             'payment_status' => $activity['payment_status'] ?? 'Unpaid',
+    //             'payment_date' => $activity['payment_date'] ?? null,
+    //             'subphase_id' => Subphase::where('name', 'development')->value('id'),
+    //         ]);
+    //     }
 
 
-
+    //     return redirect()->route('allprojects')->with('success', 'Project updated successfully.');
+    // }
 
     public function update(Request $request, Project $project)
     {
@@ -274,7 +337,7 @@ class ProjectController extends Controller
             'project_manager_id' => 'required|exists:users,id',
             'type' => 'required|in:HRM,Admin',
             'budget' => 'nullable|numeric',
-            'budget_code' => 'nullable|string|max:50', // Ajout du budget code
+            'budget_code' => 'nullable|string|max:50',
         ]);
 
         $validated['start_date'] = Carbon::parse($validated['start_date'])->format('Y-m-d');
@@ -282,12 +345,11 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
-        // Partenaires
+        // Synchronisation des partenaires
         $project->partners()->sync($request->input('partners', []));
 
-        // Sous-phases
+        // Mise à jour des sous-phases
         $project->subphases()->detach();
-
         $subphaseSyncData = [];
         foreach ($request->input('subphases', []) as $phaseId => $subIds) {
             $count = count($subIds);
@@ -298,9 +360,9 @@ class ProjectController extends Controller
         }
         $project->subphases()->attach($subphaseSyncData);
 
-        // Activités de développement (tu peux optimiser avec diff)
+        // Mise à jour des activités de développement
         $project->developmentDetails()->delete();
-       foreach ($request->input('development_activities', []) as $activity) {
+        foreach ($request->input('development_activities', []) as $activity) {
             $project->developmentDetails()->create([
                 'title' => $activity['title'],
                 'budget' => $activity['budget'] ?? null,
@@ -310,35 +372,58 @@ class ProjectController extends Controller
             ]);
         }
 
+        // ➕ Affectation des assistants (PMA)
+        if ($request->has('assistant_ids')) {
+            $project->assistants()->sync($request->assistant_ids);
+        }
+
+        // ➕ Affectation des membres
+        if ($request->has('member_ids')) {
+            $project->members()->sync($request->member_ids);
+        }
 
         return redirect()->route('allprojects')->with('success', 'Project updated successfully.');
     }
 
+
     public function show(Project $project)
     {
-        // Récupérer le projet avec ses relations
-        $project->load(['unit', 'projectManager', 'partners', 'phases', 'subphases','subphases.phase', 'developmentDetails']);
+        // Récupérer le projet avec toutes les relations nécessaires
+        $project->load([
+            'unit',
+            'projectManager',
+            'partners',
+            'phases',
+            'subphases',
+            'subphases.phase',
+            'developmentDetails',
+            'assistants', // <-- Ajouté
+            'members'     // <-- Ajouté
+        ]);
 
         // Calculer le pourcentage d'achèvement
         $completionPercentage = $project->getCompletionPercentageAttribute();
+
+        // Récupérer les unités et les PM possibles
         $units = \App\Models\Unit::all();
         $projectManagers = \App\Models\User::whereHas('role', function ($query) {
             $query->whereIn('name', ['Admin', 'Project Manager']);
         })->get();
 
-        // dd($project->project_manager_id);
         return view('projectshow', compact('project', 'completionPercentage', 'units', 'projectManagers'));
     }
 
+
     public function edit(Project $project)
     {
+        // dd($project->projectManager);
         // Charger les relations du projet
         $project->load(['unit', 'projectManager', 'partners', 'subphases', 'phases','developmentDetails']);
 
-
         // Données nécessaires pour les listes déroulantes et sélections
         $units = Unit::all();
-
+        $users = User::all();
+        // dd($users);
         // Utilisateurs avec rôle Project Manager ou Admin
         $roleIds = Role::whereIn('name', ['Project Manager', 'Admin'])->pluck('id')->toArray();
 
@@ -363,7 +448,8 @@ class ProjectController extends Controller
             'selectedSubphases',
             'developmentSubphaseId',
             'developmentActivities',
-            'phases'
+            'phases',
+            'users'
         ));
     }
 
@@ -379,7 +465,7 @@ class ProjectController extends Controller
             'priority', 'status', 'budget', 'type',
             'unit_id', 'project_manager_id', 'partners', 'procurement_type'
         ];
-
+        
         if (!in_array($field, $allowedFields)) {
             return redirect()->back()->with('error', 'Invalid field.');
         }
@@ -752,8 +838,6 @@ class ProjectController extends Controller
     //     return back()->with('success', 'Sub‑phase status and progress updated successfully.');
     // }
 
-
-
   
     public function requestDelete(Request $request, $id)
     {
@@ -811,6 +895,20 @@ class ProjectController extends Controller
         if ($status) {
             $query->where('status', $status);
         }
+
+         if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%$search%")
+                    ->orWhereHas('partners', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('projectManager', function ($q3) use ($search) {
+                        $q3->where('firstname', 'like', "%$search%")
+                            ->orWhere('lastname', 'like', "%$search%");
+                    });
+            });
+        }
       
         $highPriorityProjects = Project::with(['phases'])
             ->where('type', 'HRM')
@@ -865,6 +963,21 @@ class ProjectController extends Controller
             ->where('status', '!=', 'Not started')
             ->get();
 
+             
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%$search%")
+                    ->orWhereHas('partners', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('projectManager', function ($q3) use ($search) {
+                        $q3->where('firstname', 'like', "%$search%")
+                            ->orWhere('lastname', 'like', "%$search%");
+                    });
+            });
+        }
+
         // dd($highPriorityProjects);
         $projects = $query->get();
         // Compte les projets par statut
@@ -896,17 +1009,47 @@ class ProjectController extends Controller
 
 
     public function close(Request $request, Project $project)
-{
-    if ($project->status !== 'Completed') {
-        return redirect()->back()->with('error', 'Only completed projects can be closed.');
+    {
+        if ($project->status !== 'Completed') {
+            return redirect()->back()->with('error', 'Only completed projects can be closed.');
+        }
+
+        $project->status = 'Closed';
+        $project->close_comment = $request->input('close_comment');
+        $project->closed_at = now(); // optional
+        $project->save();
+
+        return redirect()->route('allprojects')->with('success', 'Project has been closed.');
     }
 
-    $project->status = 'Closed';
-    $project->close_comment = $request->input('close_comment');
-    $project->closed_at = now(); // optional
-    $project->save();
+    public function assignTeam(Request $request, Project $project)
+    {
+        if ($request->has('assistant_ids')) {
+            $project->assistants()->sync($request->assistant_ids);
+        }
 
-    return redirect()->route('allprojects')->with('success', 'Project has been closed.');
+        if ($request->has('member_ids')) {
+            $project->members()->sync($request->member_ids);
+        }
+
+        return back()->with('success', 'Team assigned successfully.');
+    }
+
+public function updateRelation(Request $request, Project $project)
+{
+    // Update PMA if present
+    if ($request->filled('pma_id')) {
+        $project->assistants()->sync([$request->pma_id]); // ici tu synchronises la relation
+    }
+
+    // Update members if present
+    if ($request->has('member_ids')) {
+        $project->members()->sync($request->member_ids);
+    }
+
+    return back()->with('success', 'Project team updated successfully.');
 }
+
+
 
 };

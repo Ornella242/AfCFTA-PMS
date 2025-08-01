@@ -1,13 +1,57 @@
 @include('partials.navbar')
-<main role="main" class="main-content">
+<main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-12">
-              <div class="row align-items-center mb-4">
+              {{-- <div class="row align-items-center mb-4">
                 <div class="col">
                     <h2 class="h3 mb-0 page-title text-maroon">Administrative Projects</h2>
                 </div>
+              </div> --}}
+              <div class="row align-items-start mb-2">
+                  <div class="col">
+                      <h2 class="h3 mb-0 page-title text-maroon">Administrative Projects</h2>
+                       <div class="col-md-12 d-flex justify-content-end">
+                          <form method="GET" action="{{ route('projects.admin') }}" class="w-100" style="max-width: 400px;">
+                            <div class="input-group shadow-sm">
+                              <input 
+                                type="text" 
+                                name="search" 
+                                class="form-control" 
+                                placeholder="Search by title or project manager..."
+                                value="{{ request('search') }}"
+                              >
+                              @if(request('status'))
+                                <input type="hidden" name="status" value="{{ request('status') }}">
+                              @endif
+                              <div class="input-group-append">
+                                <button class="btn bg-maroon text-white" type="submit">
+                                  <i class="fe fe-search fe-16"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      {{-- Légende stylée --}}
+                      <div class="d-flex flex-wrap align-items-center mt-3" style="gap: 20px;">
+                          @php
+                              $phases = collect([
+                                  ['name' => 'ToR', 'color' => '#17a2b8'],         // bg-info
+                                  ['name' => 'Procurement', 'color' => '#ffc107'], // bg-warning
+                                  ['name' => 'Implementation', 'color' => '#28a745'], // bg-success
+                              ]);
+                          @endphp
+
+                          @foreach($phases as $phase)
+                              <div class="d-flex align-items-center" style="gap: 8px;">
+                                  <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background-color: {{ $phase['color'] }};"></span>
+                                  <span style="font-size: 14px; color: #555;">{{ $phase['name'] }}</span>
+                              </div>
+                          @endforeach
+                      </div>
+                  </div>
               </div>
+
               <div class="row">
                 @foreach($highPriorityProjects as $project)
                   @php
@@ -29,7 +73,7 @@
                   <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 border-0 shadow-sm">
                       <div class="card-body">
-                        <h6 class="text-black font-weight-bold mb-3">{{ $project->title }}</h6>
+                        <h5 class="text-maroon font-weight-bold mb-3">{{ $project->title }}</h5>
                         <div class="progress" style="height: 20px;">
                           @foreach($phaseBars as $bar)
                             <div class="progress-bar progress-bar-striped {{ $bar['color'] }}" 
@@ -94,12 +138,15 @@
                     </li>
                   </ul>
                 </div>
-                <div class="col-md-auto ml-auto text-right">
+                {{-- <div class="col-md-auto ml-auto text-right">
                   <span class="small bg-white border py-1 px-2 rounded mr-2">
                     <span class="text-muted">Status : <strong>{{ $status ?? 'All' }}</strong></span>
                   </span>
-                </div>
+                </div> --}}
 
+              </div>
+               <div class="row mb-4">
+               
               </div>
               <div class="row">
                 <div class="col-md-12">
