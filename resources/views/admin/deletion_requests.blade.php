@@ -10,7 +10,7 @@
             <div class="col-12">
               <div class="row align-items-center mb-4">
                 <div class="col">
-                    <h2 class="h3 mb-0 page-title text-maroon">Pending Project Deletion Requests</h2>
+                    <h2 class="h3 mb-0 page-title text-maroon">Pending project cancellation requests</h2>
                 </div>
                 @if(session('success'))
                   <div class="alert alert-success shadow-sm">

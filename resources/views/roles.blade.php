@@ -163,7 +163,7 @@
     <div class="card shadow-sm border-0 rounded-lg">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h6 class="h5 text-primary mb-0">
+                <h6 class="h5 text-maroon mb-0">
                     <i class="fe fe-users"></i> Role Details
                 </h6>
                 <div class="form-group mb-0">
@@ -173,7 +173,7 @@
 
             <div class="table-responsive">
                 <table class="table table-hover table-striped table-borderless align-middle">
-                    <thead class="bg-light text-primary">
+                    <thead class="bg-light text-green">
                         <tr role="row">
                             <th scope="col">#ID</th>
                             <th scope="col"><i class="fe fe-user text-green"></i> Name</th>
@@ -319,10 +319,10 @@
                               <td>${user.name}</td>
                               <td>${unitIcon}${user.unit}</td>
                               <td>
-                                  <button class="btn btn-sm btn-link text-dark p-0" 
+                                  <button class="btn btn-sm btn-link text-dark p-0 text-decoration-none" 
                                           title="Edit user role"
                                           onclick="openRoleEditModal(${user.id}, '${user.name}')">
-                                      <i class="fe fe-edit-2 text-green"></i>
+                                      <i class="fe fe-edit-2 fe-16 text-green"></i>
                                   </button>
                               </td>
                           `;

@@ -1,5 +1,5 @@
 @include('partials.navbar')
-  <main role="main" class="main-content">
+  <main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-md-12">
@@ -105,100 +105,6 @@
                   </div> <!-- .row -->
                  
                   <hr style="border: none; height: 3px; background: linear-gradient(to right, #feb47b, #1b1311);">
-
-                  <h6 class="mb-3">Admin Reports</h6>
-                  <div class="row my-4 pb-4">
-                    @foreach ($adminReports as $adminreport)
-                      <div class="col-md-4">
-                        @php
-                            $status = $report->project->status;
-                            $borderColor = match ($status) {
-                                'In progress' => '#F4A51F', // jaune
-                                'Completed' => '#70CA89',   // vert
-                                'Closed' => '#299347', 
-                                'Cancelled' => '#dc3545',   // rouge
-                                default => '#C3A466'        // gris par défaut
-                            };
-                        @endphp
-                        <div class="card shadow-sm mb-3" style="border-left: 5px solid {{ $borderColor }};">
-                            <div class="card-body d-flex align-items-start">
-                                <div class="flex-grow-1">
-                                    <div>
-                                        <a href="{{ url('projects/' . $report->project->id . '/report') }}" class="text-black h6 fw-bold text-decoration-none">
-                                            {{ $report->title }}
-                                        </a>
-                                    </div>
-                                    <div class="text-muted small mt-1">
-                                        Web Report<br>
-                                        <span>{{ $report->created_at->format('d M Y') }}</span>
-                                    </div>
-                                </div>
-                                <div class="ms-auto">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light" data-toggle="dropdown">
-                                            <i class="fe fe-more-vertical"></i>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="{{ url('projects/' . $report->project->id . '/report') }}"><i class="fe fe-eye mr-2"></i>View</a>
-                                            <a class="dropdown-item text-danger" href="#"><i class="fe fe-trash mr-2"></i>Delete</a>
-                                            <a class="dropdown-item" href="#"><i class="fe fe-share mr-2"></i>Share</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                      </div>
-                    @endforeach
-                  </div> <!-- .row -->
-                  <!-- .row -->
-
-                  <hr style="border: none; height: 3px; background: linear-gradient(to right, #1b1311, #feb47b);">
-
-                  <h6 class="mb-3">HRM Reports</h6>
-                   <div class="row my-4 pb-4">
-                    @foreach ($hrmReports as $hrmreport)
-                       <div class="col-md-4">
-                        @php
-                            $status = $report->project->status;
-                            $borderColor = match ($status) {
-                                'In progress' => '#F4A51F', // jaune
-                                'Completed' => '#70CA89',   // vert
-                                'Closed' => '#299347', 
-                                'Cancelled' => '#dc3545',   // rouge
-                                default => '#C3A466'        // gris par défaut
-                            };
-                        @endphp
-                        <div class="card shadow-sm mb-3" style="border-left: 5px solid {{ $borderColor }};">
-                            <div class="card-body d-flex align-items-start">
-                                <div class="flex-grow-1">
-                                    <div>
-                                        <a href="{{ url('projects/' . $report->project->id . '/report') }}" class="text-black h6 fw-bold text-decoration-none">
-                                            {{ $report->title }}
-                                        </a>
-                                    </div>
-                                    <div class="text-muted small mt-1">
-                                        Web Report<br>
-                                        <span>{{ $report->created_at->format('d M Y') }}</span>
-                                    </div>
-                                </div>
-                                <div class="ms-auto">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light" data-toggle="dropdown">
-                                            <i class="fe fe-more-vertical"></i>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="{{ url('projects/' . $report->project->id . '/report') }}"><i class="fe fe-eye mr-2"></i>View</a>
-                                            <a class="dropdown-item text-danger" href="#"><i class="fe fe-trash mr-2"></i>Delete</a>
-                                            <a class="dropdown-item" href="#"><i class="fe fe-share mr-2"></i>Share</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                      </div>
-                    @endforeach
-                  </div> <!-- .row -->
-
                 </div> <!-- .file-panel -->
               </div> <!-- .file-container -->
             </div> <!-- .col -->

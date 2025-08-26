@@ -4,7 +4,7 @@
     <span class="sr-only">Loading...</span>
   </div>
 </div>
-<main role="main" class="main-content">
+<main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-12">

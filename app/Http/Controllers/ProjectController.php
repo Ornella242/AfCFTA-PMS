@@ -99,6 +99,7 @@ class ProjectController extends Controller
     }
 
 
+    
     public function create()
     {
         // dd('Create Project Page');
@@ -273,57 +274,7 @@ class ProjectController extends Controller
     }
 
 
-    // public function update(Request $request, Project $project)
-    // {
-    //     $validated = $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'start_date' => 'required|date',
-    //         'end_date' => 'required|date|after_or_equal:start_date',
-    //         'priority' => 'required|in:Low,Medium,High',
-    //         'status' => 'required',
-    //         'unit_id' => 'required|exists:units,id',
-    //         'project_manager_id' => 'required|exists:users,id',
-    //         'type' => 'required|in:HRM,Admin',
-    //         'budget' => 'nullable|numeric',
-    //         'budget_code' => 'nullable|string|max:50', // Ajout du budget code
-    //     ]);
-
-    //     $validated['start_date'] = Carbon::parse($validated['start_date'])->format('Y-m-d');
-    //     $validated['end_date'] = Carbon::parse($validated['end_date'])->format('Y-m-d');
-
-    //     $project->update($validated);
-
-    //     // Partenaires
-    //     $project->partners()->sync($request->input('partners', []));
-
-    //     // Sous-phases
-    //     $project->subphases()->detach();
-
-    //     $subphaseSyncData = [];
-    //     foreach ($request->input('subphases', []) as $phaseId => $subIds) {
-    //         $count = count($subIds);
-    //         $equalPercent = round(100 / $count, 2);
-    //         foreach ($subIds as $subId) {
-    //             $subphaseSyncData[$subId] = ['percentage' => $equalPercent];
-    //         }
-    //     }
-    //     $project->subphases()->attach($subphaseSyncData);
-
-    //     // Activités de développement (tu peux optimiser avec diff)
-    //     $project->developmentDetails()->delete();
-    //    foreach ($request->input('development_activities', []) as $activity) {
-    //         $project->developmentDetails()->create([
-    //             'title' => $activity['title'],
-    //             'budget' => $activity['budget'] ?? null,
-    //             'payment_status' => $activity['payment_status'] ?? 'Unpaid',
-    //             'payment_date' => $activity['payment_date'] ?? null,
-    //             'subphase_id' => Subphase::where('name', 'development')->value('id'),
-    //         ]);
-    //     }
-
-
-    //     return redirect()->route('allprojects')->with('success', 'Project updated successfully.');
-    // }
+    
 
     public function update(Request $request, Project $project)
     {
@@ -564,7 +515,7 @@ class ProjectController extends Controller
                     $prevSubName = $previousNotCompleted->label ?? $previousNotCompleted->name;
                     $prevStatus = $previousNotCompleted->pivot->status;
 
-                    return redirect()->back()->with('error', "Cannot complete this subphase because previous subphase \"$prevSubName\" in phase \"$prevPhaseName\" is still \"$prevStatus\".");
+                    return redirect()->back()->with('error', "Cannot complete this subphase because previous subphase \"$prevSubName\" in phase \"$prevPhaseName\" is still \"not completed\".");
                 }
             }
 
@@ -1022,6 +973,19 @@ class ProjectController extends Controller
         return redirect()->route('allprojects')->with('success', 'Project has been closed.');
     }
 
+        public function closeAdmin(Request $request, Project $project)
+    {
+        if ($project->status !== 'Closed') {
+            return redirect()->back()->with('error', 'Only closed projects by project manager can be closed by administrator.');
+        }
+
+        $project->status = 'Closed';
+        $project->close_comment_admin = $request->input('close_comment_admin');
+        $project->save();
+
+        return redirect()->route('allprojects')->with('success', 'Project has been closed.');
+    }
+
     public function assignTeam(Request $request, Project $project)
     {
         if ($request->has('assistant_ids')) {
@@ -1035,20 +999,20 @@ class ProjectController extends Controller
         return back()->with('success', 'Team assigned successfully.');
     }
 
-public function updateRelation(Request $request, Project $project)
-{
-    // Update PMA if present
-    if ($request->filled('pma_id')) {
-        $project->assistants()->sync([$request->pma_id]); // ici tu synchronises la relation
-    }
+    public function updateRelation(Request $request, Project $project)
+    {
+        // Update PMA if present
+        if ($request->filled('pma_id')) {
+            $project->assistants()->sync([$request->pma_id]); // ici tu synchronises la relation
+        }
 
-    // Update members if present
-    if ($request->has('member_ids')) {
-        $project->members()->sync($request->member_ids);
-    }
+        // Update members if present
+        if ($request->has('member_ids')) {
+            $project->members()->sync($request->member_ids);
+        }
 
-    return back()->with('success', 'Project team updated successfully.');
-}
+        return back()->with('success', 'Project team updated successfully.');
+    }
 
 
 

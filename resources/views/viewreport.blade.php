@@ -279,9 +279,9 @@
                                                                                                         @elseif($developmentDetails->isNotEmpty())
                                                                                                             @foreach($developmentDetails as $detail)
                                                                                                                 <div>
-                                                                                                                    Detail: <strong>{{ $detail->title ?? 'N/A' }}</strong> — 
-                                                                                                                    Status: <em>{{ $detail->status }}</em>
-                                                                                                                    Status: <em>{{ $detail->reason }}</em>
+                                                                                                                    Detail: <strong>{{ $detail->title ?? 'N/A' }}</strong> <br>
+                                                                                                                    Status: <em>{{ $detail->status }}</em> <br>
+                                                                                                                    Reason: <em>{{ $detail->reason }}</em>
                                                                                                                 </div>
                                                                                                             @endforeach
 
@@ -406,29 +406,37 @@
                                                     </div> --}}
 
                                                     <div class="final-comment-section" style="width: 100%; margin-top: 30px;">
-                                <h4 style="color: #000; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #C2A756; padding-bottom: 5px;">
-                                    Final Comment
-                                </h4>
+                                                        <h4 style="color: #000; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #C2A756; padding-bottom: 5px;">
+                                                            Final Comment
+                                                        </h4>
 
-                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #444; font-size: 15px;">
-                                    <thead style="background-color: #f7f3e8;">
-                                        <tr>
-                                            <th style="border: 1px solid #444; padding: 10px; text-align: left;">Comment</th>
-                                            <th style="border: 1px solid #444; padding: 10px; text-align: left;">Signature</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="border: 1px solid #444; padding: 12px;">
-                                                {{ $project->close_comment ?? '—' }}
-                                            </td>
-                                            <td style="border: 1px solid #444; padding: 12px; height: 80px;">
-                                                {{-- Placeholder for signature --}}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #444; font-size: 15px;">
+                                                            <thead style="background-color: #f7f3e8;">
+                                                                <tr>
+                                                                    <th style="border: 1px solid #444; padding: 10px; text-align: left;">Comment</th>
+                                                                    <th style="border: 1px solid #444; padding: 10px; text-align: left;">Signature</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td style="border: 1px solid #444; padding: 12px;">
+                                                                        {{ $project->close_comment ?? '—' }}
+                                                                    </td>
+                                                                    <td style="border: 1px solid #444; padding: 12px; height: 80px;">
+                                                                        {{-- Placeholder for signature --}}
+                                                                    </td>
+                                                                </tr>
+                                                                 <tr>
+                                                                    <td style="border: 1px solid #444; padding: 12px;">
+                                                                        {{ $project->close_comment_admin ?? '—' }}
+                                                                    </td>
+                                                                    <td style="border: 1px solid #444; padding: 12px; height: 80px;">
+                                                                        {{-- Placeholder for signature --}}
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                         </div> <!-- /.card-body -->
                         </div> <!-- /.card-body -->
                     </div>

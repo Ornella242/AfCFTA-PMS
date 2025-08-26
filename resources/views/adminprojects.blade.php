@@ -1,3 +1,70 @@
+<style>
+      /* Container du tableau */
+    .table-container {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* En-tête */
+    .table thead {
+        background: linear-gradient(90deg, #800000, #a83232);
+        color: white;
+        text-transform: uppercase;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Lignes du tableau */
+    .table tbody tr {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(255, 215, 0, 0.1);
+        transform: scale(1.01);
+    }
+
+    /* Cellules */
+    .table td {
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    /* Points de statut */
+    .dot {
+        height: 12px;
+        width: 12px;
+        display: inline-block;
+        border-radius: 50%;
+        position: relative;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    /* Icônes d’action */
+    .table .fe {
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .table .fe:hover {
+        transform: scale(1.2);
+        color: #ff9800;
+    }
+
+    /* Boutons icônes */
+    .btn-sm {
+        border-radius: 6px;
+        padding: 4px 6px;
+    }
+
+</style>
 @include('partials.navbar')
 <main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
@@ -32,65 +99,73 @@
                             </div>
                           </form>
                         </div>
-                      {{-- Légende stylée --}}
-                      <div class="d-flex flex-wrap align-items-center mt-3" style="gap: 20px;">
-                          @php
-                              $phases = collect([
-                                  ['name' => 'ToR', 'color' => '#17a2b8'],         // bg-info
-                                  ['name' => 'Procurement', 'color' => '#ffc107'], // bg-warning
-                                  ['name' => 'Implementation', 'color' => '#28a745'], // bg-success
-                              ]);
-                          @endphp
+                        @php
+                          $user = auth()->user();
+                          $isAdmin = $user->role?->name === 'Admin';
+                      @endphp
+                      @if ($isAdmin)
+                        {{-- Légende stylée --}}
+                        <div class="d-flex flex-wrap align-items-center mt-3" style="gap: 20px;">
+                            @php
+                                $phases = collect([
+                                    ['name' => 'ToR', 'color' => '#17a2b8'],         // bg-info
+                                    ['name' => 'Procurement', 'color' => '#ffc107'], // bg-warning
+                                    ['name' => 'Implementation', 'color' => '#28a745'], // bg-success
+                                ]);
+                            @endphp
 
-                          @foreach($phases as $phase)
-                              <div class="d-flex align-items-center" style="gap: 8px;">
-                                  <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background-color: {{ $phase['color'] }};"></span>
-                                  <span style="font-size: 14px; color: #555;">{{ $phase['name'] }}</span>
-                              </div>
-                          @endforeach
-                      </div>
+                            @foreach($phases as $phase)
+                                <div class="d-flex align-items-center" style="gap: 8px;">
+                                    <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background-color: {{ $phase['color'] }};"></span>
+                                    <span style="font-size: 14px; color: #555;">{{ $phase['name'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                      @endif
                   </div>
               </div>
 
-              <div class="row">
-                @foreach($highPriorityProjects as $project)
-                  @php
-                      $phases = collect([
-                          ['name' => 'tor', 'color' => 'bg-info'],
-                          ['name' => 'procurement', 'color' => 'bg-warning'],
-                          ['name' => 'implementation', 'color' => 'bg-success'],
-                      ]);
+              @if ($isAdmin)
+                <div class="row">
+                  @foreach($highPriorityProjects as $project)
+                    @php
+                        $phases = collect([
+                            ['name' => 'tor', 'color' => 'bg-info'],
+                            ['name' => 'procurement', 'color' => 'bg-warning'],
+                            ['name' => 'implementation', 'color' => 'bg-success'],
+                        ]);
 
-                      $phaseBars = $phases->map(function ($phase) use ($project) {
-                          $p = $project->phases->firstWhere('name', $phase['name']);
-                          return $p ? [
-                              'percentage' => $p->pivot->percentage,
-                              'color' => $phase['color']
-                          ] : null;
-                      })->filter();
-                  @endphp
+                        $phaseBars = $phases->map(function ($phase) use ($project) {
+                            $p = $project->phases->firstWhere('name', $phase['name']);
+                            return $p ? [
+                                'percentage' => $p->pivot->percentage,
+                                'color' => $phase['color']
+                            ] : null;
+                        })->filter();
+                    @endphp
 
-                  <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                      <div class="card-body">
-                        <h5 class="text-maroon font-weight-bold mb-3">{{ $project->title }}</h5>
-                        <div class="progress" style="height: 20px;">
-                          @foreach($phaseBars as $bar)
-                            <div class="progress-bar progress-bar-striped {{ $bar['color'] }}" 
-                                role="progressbar"
-                                style="width: {{ $bar['percentage'] }}%"
-                                aria-valuenow="{{ $bar['percentage'] }}" 
-                                aria-valuemin="0" 
-                                aria-valuemax="100">
-                              {{ $bar['percentage'] }}%
-                            </div>
-                          @endforeach
+                    <div class="col-md-6 col-lg-4 mb-4">
+                      <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                          <h5 class="text-maroon font-weight-bold mb-3">{{ $project->title }}</h5>
+                          <div class="progress" style="height: 20px;">
+                            @foreach($phaseBars as $bar)
+                              <div class="progress-bar progress-bar-striped {{ $bar['color'] }}" 
+                                  role="progressbar"
+                                  style="width: {{ $bar['percentage'] }}%"
+                                  aria-valuenow="{{ $bar['percentage'] }}" 
+                                  aria-valuemin="0" 
+                                  aria-valuemax="100">
+                                {{ $bar['percentage'] }}%
+                              </div>
+                            @endforeach
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                @endforeach
-              </div>
+                  @endforeach
+                </div>
+              @endif
               <div class="row items-align-center my-4  d-none d-lg-flex">
                <div class="col-md">
                   <ul class="nav nav-pills justify-content-start">
@@ -255,9 +330,22 @@
 
                         <td class="text-center">
                           <div class="d-flex justify-content-center gap-2 align-items-center">
-                            @if ($project->status !=='Closed')
-                              <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none"><i class="fe fe-edit-2"></i></a>
-                            @endif
+                          @php
+                              $user = auth()->user();
+                              $isManager = $user->id === $project->project_manager_id;
+                              $isAdmin = $user->role?->name === 'Admin';
+                              $isMember = $project->members->contains('id', $user->id);
+                              $isPMAssistant = $project->assistants->contains('id', $user->id);
+                          @endphp
+                          @if (
+                              $project->status !== 'Closed' && 
+                              $project->status !== 'Completed' && 
+                              ($isManager || $isAdmin || $isMember || $isPMAssistant)
+                          )
+                              <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none">
+                                  <i class="fe fe-edit-2"></i>
+                              </a>
+                          @endif
 
                             <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
                               @if($project->status === 'Cancelled')
@@ -295,71 +383,57 @@
                                     </form>
                                   </div>
                                 </div>
-
-                             
-                                @elseif($project->status !== 'Closed')
-                                {{-- Bouton de suppression --}}
-                                <button class="btn btn-sm text-danger" data-toggle="modal" data-target="#deleteProjectModal{{ $project->id }}">
-                                  <i class="fe fe-trash-2"></i>
-                                </button>
                               @endif
 
-                            <!-- Delete Modal -->
-                            <div class="modal fade" id="deleteProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
-                              <div class="modal-dialog" role="document">
-                                <form action="{{ route('projects.requestDelete', $project->id) }}" method="POST">
-                                  @csrf
-                                  <div class="modal-content">
-                                    <div class="modal-header bg-danger text-white">
-                                      <h5 class="modal-title text-white" id="deleteProjectModalLabel">Delete Project Request</h5>
-                                      <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                      </button>
-                                    </div>
-                                    <div class="modal-body">
-                                      <p class="text-black h5">Why do you want to delete this project?</p>
-                                      <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
-                                    </div>
-                                    <div class="modal-footer">
-                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                      <button type="submit" class="btn btn-danger">Request Deletion</button>
-                                    </div>
-                                  </div>
-                                </form>
-                              </div>
-                            </div>
+                              @php
+                                  $user = auth()->user();
+                                  $isManager = $user->id === $project->project_manager_id;
+                                  $isAdmin = $user->role?->name === 'Admin';
+                              @endphp
 
-                            @if($project->status === 'Completed')
-                              <!-- Close button triggers modal -->
-                              <button class="btn btn-sm text-danger" data-toggle="modal" data-target="#closeProjectModal{{ $project->id }}" title="Close Project">
-                                  <i class="fe fe-lock"></i>
+                              @if (
+                                  $project->status !== 'Closed' &&
+                                  $project->status !== 'Cancelled' &&
+                                  $project->status !== 'Completed' &&
+                                  ($isManager || $isAdmin)
+                              )
+                                  <button 
+                                      class="btn btn-sm text-danger" 
+                                      data-toggle="modal" 
+                                      data-target="#deleteProjectModal" 
+                                      data-id="{{ $project->id }}" 
+                                      data-title="{{ $project->title }}">
+                                      <i class="fe fe-trash-2"></i>
+                                  </button>
+                              @endif
+
+                            @if($project->status === 'Completed' && auth()->user()->role->name === 'Project Manager')
+                              <button 
+                                class="btn btn-sm text-danger" 
+                                data-toggle="modal" 
+                                data-target="#closeProjectModal" 
+                                data-id="{{ $project->id }}" 
+                                data-title="{{ $project->title }}">
+                                <i class="fe fe-lock"></i>
                               </button>
-                              <!-- Modal -->
-                              <div class="modal fade" id="closeProjectModal{{ $project->id }}" tabindex="-1" aria-labelledby="closeProjectModalLabel{{ $project->id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                  <form method="POST" action="{{ route('projects.close', $project->id) }}">
-                                    @csrf
-                                    @method('PATCH')
-                                    <div class="modal-content">
-                                      <div class="modal-header">
-                                        <h5 class="modal-title" id="closeProjectModalLabel{{ $project->id }}">Close Project</h5>
-                                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-                                      </div>
-                                      <div class="modal-body">
-                                        <div class="mb-3">
-                                          <label for="close_comment_{{ $project->id }}" class="form-label">Add a comment</label>
-                                          <textarea name="close_comment" class="form-control" id="close_comment_{{ $project->id }}" rows="3" placeholder="Enter a final comment before closing the project..."></textarea>
-                                        </div>
-                                      </div>
-                                      <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-danger">Close Project</button>
-                                      </div>
-                                    </div>
-                                  </form>
-                                </div>
-                              </div>
                             @endif
+
+                             @if(
+                                $project->status === 'Closed' && 
+                                auth()->user()->role->name === 'Admin' && 
+                                empty($project->close_comment_admin)
+                            )
+                                <button 
+                                    type="button"
+                                    class="btn btn-sm text-danger" 
+                                    data-toggle="modal" 
+                                    data-target="#adminLockModal" 
+                                    data-id="{{ $project->id }}" 
+                                    data-title="{{ $project->title }}">
+                                    <i class="fe fe-lock"></i>
+                                </button>
+                            @endif
+
                           </div>
                         </td>
                       </tr>
@@ -424,4 +498,104 @@
           </div> <!-- .row -->
         </div> <!-- .container-fluid -->
      @include('partials.footer')  
+       <!-- Delete Project Modal (Générique) -->
+    <div class="modal fade" id="deleteProjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <form method="POST" id="deleteProjectForm">
+          @csrf
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title text-white" id="deleteProjectModalLabel">Delete Project Request</h5>
+              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p class="text-black h5">
+                Why do you want to delete the project <strong id="projectTitlePlaceholder"></strong>?
+              </p>
+              <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger">Request Deletion</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal fade" id="closeProjectModal" tabindex="-1" aria-labelledby="closeProjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST" id="closeProjectForm">
+          @csrf
+          @method('PATCH')
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title text-white" id="closeProjectModalLabel">Close Project</h5>
+              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p class="text-black h5">Add a final comment before closing <strong id="closeProjectTitle"></strong>.</p>
+              <textarea name="close_comment" class="form-control" rows="3" placeholder="Enter a final comment..." required></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger">Close Project</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Close Project Admin Modal (Générique) -->
+    <div class="modal fade" id="adminLockModal" tabindex="-1" aria-labelledby="adminLockModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST" id="adminLockForm">
+          @csrf
+          @method('PATCH')
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title text-white" id="closeProjectModalLabel">Close Project</h5>
+              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p class="text-black h5">Add a final comment before closing <strong id="closeAdminProjectTitle"></strong>.</p>
+              <textarea name="close_comment_admin" class="form-control" rows="3" placeholder="Enter a final comment..." required></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger">Close Project</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
 </main>
+
+<script>
+  $('#deleteProjectModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var projectId = button.data('id');
+    var projectTitle = button.data('title');
+    var actionUrl = '{{ url('/projects') }}/' + projectId + '/request-delete'; // ajuste la route si besoin
+
+    $('#deleteProjectForm').attr('action', actionUrl);
+    $('#projectTitlePlaceholder').text(projectTitle);
+  });
+</script>
+<script>
+  $('#closeProjectModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var projectId = button.data('id');
+    var projectTitle = button.data('title');
+    var actionUrl = '{{ url('/projects') }}/' + projectId + '/close';
+
+    $('#closeProjectForm').attr('action', actionUrl);
+    $('#closeProjectTitle').text(projectTitle);
+  });
+</script>

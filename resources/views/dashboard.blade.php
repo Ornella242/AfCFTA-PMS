@@ -113,96 +113,101 @@
                   </div>
                 @endforeach
               </div>
+              @php
+                  $user = auth()->user();
+                  $isAdmin = $user->role?->name === 'Admin';
+              @endphp
+              @if ($isAdmin)
+                <div class="row">
+                  <div class="my-5 col-12">
+                    <h3 class="mb-4 text-maroon font-weight-bold">
+                      <i class="fe fe-bar-chart-2 mr-2"></i>Project Distribution by Manager
+                    </h3>
+                    <div class="card shadow-sm border-0 p-4">
+                      <div id="managerProjectsChart"></div>
+                    </div>
+                    <div class="mt-5">
+                        <h4 class="mb-3 text-black font-weight-bold">
+                          <i class="fe fe-users mr-2"></i> Project Manager Overview
+                        </h4>
 
-              <div class="row">
-                <div class="my-5 col-12">
-                  <h3 class="mb-4 text-maroon font-weight-bold">
-                    <i class="fe fe-bar-chart-2 mr-2"></i>Project Distribution by Manager
-                  </h3>
-                  <div class="card shadow-sm border-0 p-4">
-                    <div id="managerProjectsChart"></div>
-                  </div>
-                   <div class="mt-5">
-                      <h4 class="mb-3 text-black font-weight-bold">
-                        <i class="fe fe-users mr-2"></i> Project Manager Overview
-                      </h4>
-
-                      <div class="table-responsive">
-                        <table class="table table-hover align-middle shadow-sm rounded">
-                          <thead class="bg-maroon text-white">
-                            <tr>
-                              <th>Name</th>
-                              <th class="text-center">Projects</th>
-                              <th>Progress</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            @foreach ($projectManagers as $manager)
-                              @php
-                                $totalProgress = $manager->managedProjects->sum('percentage');
-                                $projectCount = $manager->managedProjects->count();
-                                $averageProgress = $projectCount > 0 ? round($totalProgress / $projectCount, 1) : 0;
-
-                                $barClass = 'bg-success';
-                                if ($averageProgress < 40) $barClass = 'bg-danger';
-                                elseif ($averageProgress < 70) $barClass = 'bg-warning';
-                              @endphp
-
-                              <tr class="clickable-row" data-toggle="modal" data-target="#managerModal{{ $manager->id }}">
-                                <td class="font-weight-bold">{{ $manager->firstname }} {{ $manager->lastname }}</td>
-                                <td class="text-center">{{ $projectCount }}</td>
-                                <td style="min-width: 250px;">
-                                  <div class="progress" style="height: 22px; border-radius: 10px;">
-                                    <div class="progress-bar {{ $barClass }}" style="width: {{ $averageProgress }}%; border-radius: 10px;">
-                                      {{ $averageProgress }}%
-                                    </div>
-                                  </div>
-                                </td>
+                        <div class="table-responsive">
+                          <table class="table table-hover align-middle shadow-sm rounded">
+                            <thead class="bg-maroon text-white">
+                              <tr>
+                                <th>Name</th>
+                                <th class="text-center">Projects</th>
+                                <th>Progress</th>
                               </tr>
-                            @endforeach
-                          </tbody>
-                        </table>
-                        @foreach ($projectManagers as $manager)
-                          <div class="modal fade" id="managerModal{{ $manager->id }}" tabindex="-1" role="dialog" aria-labelledby="managerModalLabel{{ $manager->id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header bg-gold text-white">
-                                  <h5 class="modal-title text-white" id="managerModalLabel{{ $manager->id }}">
-                                    Projects of {{ $manager->firstname }} {{ $manager->lastname }}
-                                  </h5>
-                                  <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
-                                </div>
-                                <div class="modal-body">
-                                  @foreach ($manager->managedProjects as $project)
-                                    @php
-                                      $barClass = 'bg-success';
-                                      if ($project->percentage < 40) $barClass = 'bg-danger';
-                                      elseif ($project->percentage < 70) $barClass = 'bg-warning';
-                                    @endphp
+                            </thead>
+                            <tbody>
+                              @foreach ($projectManagers as $manager)
+                                @php
+                                  $totalProgress = $manager->managedProjects->sum('percentage');
+                                  $projectCount = $manager->managedProjects->count();
+                                  $averageProgress = $projectCount > 0 ? round($totalProgress / $projectCount, 1) : 0;
 
-                                    <div class="mb-3">
-                                      <div class="d-flex justify-content-between">
-                                        <strong>{{ $project->title }}</strong>
-                                        <small class="text-muted">{{ $project->percentage }}%</small>
+                                  $barClass = 'bg-success';
+                                  if ($averageProgress < 40) $barClass = 'bg-danger';
+                                  elseif ($averageProgress < 70) $barClass = 'bg-warning';
+                                @endphp
+
+                                <tr class="clickable-row" data-toggle="modal" data-target="#managerModal{{ $manager->id }}">
+                                  <td class="font-weight-bold">{{ $manager->firstname }} {{ $manager->lastname }}</td>
+                                  <td class="text-center">{{ $projectCount }}</td>
+                                  <td style="min-width: 250px;">
+                                    <div class="progress" style="height: 22px; border-radius: 10px;">
+                                      <div class="progress-bar {{ $barClass }}" style="width: {{ $averageProgress }}%; border-radius: 10px;">
+                                        {{ $averageProgress }}%
                                       </div>
-                                      <div class="progress" style="height: 12px; border-radius: 6px;">
-                                        <div class="progress-bar {{ $barClass }}" role="progressbar"
-                                            style="width: {{ $project->percentage }}%;"
-                                            aria-valuenow="{{ $project->percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                  </td>
+                                </tr>
+                              @endforeach
+                            </tbody>
+                          </table>
+                          @foreach ($projectManagers as $manager)
+                            <div class="modal fade" id="managerModal{{ $manager->id }}" tabindex="-1" role="dialog" aria-labelledby="managerModalLabel{{ $manager->id }}" aria-hidden="true">
+                              <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header bg-gold text-white">
+                                    <h5 class="modal-title text-white" id="managerModalLabel{{ $manager->id }}">
+                                      Projects of {{ $manager->firstname }} {{ $manager->lastname }}
+                                    </h5>
+                                    <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                                  </div>
+                                  <div class="modal-body">
+                                    @foreach ($manager->managedProjects as $project)
+                                      @php
+                                        $barClass = 'bg-success';
+                                        if ($project->percentage < 40) $barClass = 'bg-danger';
+                                        elseif ($project->percentage < 70) $barClass = 'bg-warning';
+                                      @endphp
+
+                                      <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                          <strong>{{ $project->title }}</strong>
+                                          <small class="text-muted">{{ $project->percentage }}%</small>
+                                        </div>
+                                        <div class="progress" style="height: 12px; border-radius: 6px;">
+                                          <div class="progress-bar {{ $barClass }}" role="progressbar"
+                                              style="width: {{ $project->percentage }}%;"
+                                              aria-valuenow="{{ $project->percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  @endforeach
+                                    @endforeach
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        @endforeach
+                          @endforeach
 
+                        </div>
                       </div>
-                    </div>
+                  </div>
                 </div>
-              </div>
+              @endif
 
               <div class="row">
                 <!-- Recent projects -->

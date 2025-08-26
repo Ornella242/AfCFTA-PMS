@@ -1,34 +1,3 @@
-{{-- <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Account Created</title>
-</head>
-<body style="font-family: Arial, sans-serif; background-color: #f5f8fa; padding: 30px;">
-    <div style="background-color: white; max-width: 600px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-        <div style="text-align: right;">
-            <img src="{{ asset('images/logo.png') }}" alt="AfCFTA Logo" style="width: 60px;">
-        </div>
-        <h2 style="color: #333;">Dear {{ $user->firstname }} {{ $user->lastname }}</h2>
-        <p>The following report has been shared with you: </p>
-
-        <p><strong>{{ $report->title }}</strong></p>
-        <p><strong>Project: {{ $report->project->title }}</strong></p>
-        <p><strong>Date: {{ $report->created_at->format('d M Y') }}</strong></p>
-
-        <p>
-            You can view the report here:<br>
-            <a href="{{ url('projects/' . $report->project->id . '/report') }}">
-                View Report
-            </a>
-        </p>
-
-        <br>
-        <p>Best regards,<br>
-    </div>
-</body>
-</html> --}}
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>

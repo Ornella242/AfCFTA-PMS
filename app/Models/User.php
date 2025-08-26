@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\CustomResetPassword;
 
 class User extends Authenticatable
 {
@@ -84,4 +85,18 @@ class User extends Authenticatable
         return $this->role && $this->role->name === $role;
     }
 
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPassword($token));
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to'); 
+    }
+
+    public function taskActivities()
+    {
+        return $this->hasMany(TaskActivity::class);
+    }
 }

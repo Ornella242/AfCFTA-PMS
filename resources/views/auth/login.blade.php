@@ -87,9 +87,13 @@
                       <div class="form-group mb-3">
                           <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" required>
                       </div>
-                      <div class="form-group text-right mb-3">
-                          <a href="#" class="text-muted small">Forgot password?</a>
-                      </div>
+                        {{-- <div class="form-group text-right mb-3">
+                            <a href="{{ route('password.change') }}" class="text-muted small">Forgot password?</a>
+                        </div> --}}
+                        <div class="form-group text-right mb-3">
+                            <a href="{{ route('password.request') }}" class="text-muted small">Forgot password?</a>
+                        </div>
+
                       <div class="form-group">
                           <button type="submit" class="btn bg-green text-white btn-block btn-lg">LOGIN</button>
                       </div>

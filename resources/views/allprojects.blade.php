@@ -13,20 +13,81 @@ function statusColorClass($status) {
     };
 }
 @endphp
+<style>
+      /* Container du tableau */
+    .table-container {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* En-tête */
+    .table thead {
+        background: linear-gradient(90deg, #800000, #a83232);
+        color: white;
+        text-transform: uppercase;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Lignes du tableau */
+    .table tbody tr {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(255, 215, 0, 0.1);
+        transform: scale(1.01);
+    }
+
+    /* Cellules */
+    .table td {
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    /* Points de statut */
+    .dot {
+        height: 12px;
+        width: 12px;
+        display: inline-block;
+        border-radius: 50%;
+        position: relative;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    /* Icônes d’action */
+    .table .fe {
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .table .fe:hover {
+        transform: scale(1.2);
+        color: #ff9800;
+    }
+
+    /* Boutons icônes */
+    .btn-sm {
+        border-radius: 6px;
+        padding: 4px 6px;
+    }
+
+</style>
 @include('partials.navbar')
-{{-- <div id="loading-spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
-  <div class="spinner-grow mr-3 text-success" role="status" style="width: 5rem; height: 5rem;">
-    <span class="sr-only">Loading...</span>
-  </div>
-</div> --}}
 <main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-12">
-              @if($deletionRequests->count())
+              @if(auth()->user()->role && auth()->user()->role->name === 'Admin' && $deletionRequests->count())
                 <div class="alert alert-warning">
-                  <h5>Project Deletion Requests</h5>
-
+                  <h5>Project Cancellation Requests</h5>
                   @foreach($deletionRequests as $request)
                     <div class="card mb-2">
                       <div class="card-body d-flex justify-content-between align-items-center">
@@ -171,6 +232,7 @@ function statusColorClass($status) {
 
               <div class="row">
                 <div class="col-md-12">
+                  
                   <!-- table -->
                   <table class="table table-borderless table-striped table-hover">
                     <thead class="text-white bg-maroon">
@@ -218,151 +280,217 @@ function statusColorClass($status) {
                               {{ $project->projectManager->firstname ?? '' }} {{ $project->projectManager->lastname ?? '' }}
                           </td>
                         
-                          {{-- <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2 align-items-center">
-                              <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none"><i class="fe fe-edit-2"></i></a>
-                              <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
-                              <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
-                                  @csrf
-                                  @method('DELETE')
-                                  <button class="btn btn-sm text-danger" title="Delete">
-                                      <i class="fe fe-trash-2"></i>
-                                  </button>
-                              </form>
-                           
-
-                            </div>
-                          </td> --}}
+                         
                           <td class="text-center">
                           <div class="d-flex justify-content-center gap-2 align-items-center">
-                            @if ($project->status !=='Closed')
-                              <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none"><i class="fe fe-edit-2"></i></a>
-                            @endif
-
-                            <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
-                              @if($project->status === 'Cancelled')
-                                {{-- Bouton de réactivation --}}
-                                <!-- Reactivate Trigger Button -->
-                                <button class="btn btn-sm text-success" title="Reactivate Project" data-toggle="modal" data-target="#reactivateProjectModal{{ $project->id }}">
-                                  <i class="fe fe-refresh-ccw"></i>
-                                </button>
-
-                                <!-- Reactivate Modal -->
-                                <div class="modal fade" id="reactivateProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="reactivateProjectModalLabel{{ $project->id }}" aria-hidden="true">
-                                  <div class="modal-dialog" role="document">
-                                    <form action="{{ route('projects.reactivate', $project->id) }}" method="POST">
-                                      @csrf
-                                      @method('PATCH')
-                                      <div class="modal-content">
-                                        <div class="modal-header bg-success text-white">
-                                          <h5 class="modal-title" id="reactivateProjectModalLabel{{ $project->id }}">
-                                            Reactivate Project
-                                          </h5>
-                                          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                          </button>
-                                        </div>
-
-                                        <div class="modal-body">
-                                          <p>Are you sure you want to <strong>reactivate</strong> the project <strong>{{ $project->title }}</strong>?</p>
-                                        </div>
-
-                                        <div class="modal-footer">
-                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                          <button type="submit" class="btn btn-success">Reactivate</button>
-                                        </div>
-                                      </div>
-                                    </form>
-                                  </div>
-                                </div>
-
-                             
-                                @elseif($project->status !== 'Closed')
-                                {{-- Bouton de suppression --}}
-                                <button class="btn btn-sm text-danger" data-toggle="modal" data-target="#deleteProjectModal{{ $project->id }}">
-                                  <i class="fe fe-trash-2"></i>
-                                </button>
-                                @endif
-                                <!-- Delete Modal -->
-                              <div class="modal fade" id="deleteProjectModal{{ $project->id }}" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                  <form action="{{ route('projects.requestDelete', $project->id) }}" method="POST">
-                                    @csrf
-                                    <div class="modal-content">
-                                      <div class="modal-header bg-danger text-white">
-                                        <h5 class="modal-title text-white" id="deleteProjectModalLabel">Delete Project Request</h5>
-                                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                          <span aria-hidden="true">&times;</span>
-                                        </button>
-                                      </div>
-                                      <div class="modal-body">
-                                        <p class="text-black h5">Why do you want to delete this project?</p>
-                                        <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
-                                      </div>
-                                      <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-danger">Request Deletion</button>
-                                      </div>
-                                    </div>
-                                  </form>
-                                </div>
-                              </div>
-
                           
 
-                            @if($project->status === 'Completed')
-                              <!-- Close button triggers modal -->
-                              <button class="btn btn-sm text-danger" data-toggle="modal" data-target="#closeProjectModal{{ $project->id }}" title="Close Project">
-                                  <i class="fe fe-lock"></i>
+                          @php
+                              $user = auth()->user();
+                              $isManager = $user->id === $project->project_manager_id;
+                              $isAdmin = $user->role?->name === 'Admin';
+                              $isMember = $project->members->contains('id', $user->id);
+                              $isPMAssistant = $project->assistants->contains('id', $user->id);
+                          @endphp
+                          @if (
+                              $project->status !== 'Closed' && 
+                              $project->status !== 'Completed' && 
+                              ($isManager || $isAdmin || $isMember || $isPMAssistant)
+                          )
+                              <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none">
+                                  <i class="fe fe-edit-2"></i>
+                              </a>
+                          @endif
+
+
+                            <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
+                              @if($project->status === 'Cancelled' && $isAdmin)
+                                {{-- Bouton de réactivation --}}
+                                <!-- Reactivate Trigger Button -->
+                               <button 
+                                  class="btn btn-sm text-success" 
+                                  title="Reactivate Project" 
+                                  data-toggle="modal" 
+                                  data-target="#reactivateProjectModal" 
+                                  data-id="{{ $project->id }}" 
+                                  data-title="{{ $project->title }}">
+                                  <i class="fe fe-refresh-ccw"></i>
+                                </button>
+                                @endif
+                              @php
+                                  $user = auth()->user();
+                                  $isManager = $user->id === $project->project_manager_id;
+                                  $isAdmin = $user->role?->name === 'Admin';
+                              @endphp
+
+                              @if (
+                                  $project->status !== 'Closed' &&
+                                  $project->status !== 'Cancelled' &&
+                                  $project->status !== 'Completed' &&
+                                  ($isManager || $isAdmin)
+                              )
+                                  <button 
+                                      class="btn btn-sm text-danger" 
+                                      data-toggle="modal" 
+                                      data-target="#deleteProjectModal" 
+                                      data-id="{{ $project->id }}" 
+                                      data-title="{{ $project->title }}">
+                                      <i class="fe fe-trash-2"></i>
+                                  </button>
+                              @endif
+
+                              
+                           @if($project->status === 'Completed' && auth()->user()->role->name === 'Project Manager')
+                              <button 
+                                type="button"
+                                class="btn btn-sm text-danger" 
+                                data-toggle="modal" 
+                                data-target="#closeProjectModal" 
+                                data-id="{{ $project->id }}" 
+                                data-title="{{ $project->title }}">
+                                <i class="fe fe-lock"></i>
                               </button>
-                              <!-- Modal -->
-                              <div class="modal fade" id="closeProjectModal{{ $project->id }}" tabindex="-1" aria-labelledby="closeProjectModalLabel{{ $project->id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                  <form method="POST" action="{{ route('projects.close', $project->id) }}">
-                                    @csrf
-                                    @method('PATCH')
-                                    <div class="modal-content">
-                                      <div class="modal-header">
-                                        <h5 class="modal-title" id="closeProjectModalLabel{{ $project->id }}">Close Project</h5>
-                                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-                                      </div>
-                                      <div class="modal-body">
-                                        <div class="mb-3">
-                                          <label for="close_comment_{{ $project->id }}" class="form-label">Add a comment</label>
-                                          <textarea name="close_comment" class="form-control" id="close_comment_{{ $project->id }}" rows="3" placeholder="Enter a final comment before closing the project..."></textarea>
-                                        </div>
-                                      </div>
-                                      <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-danger">Close Project</button>
-                                      </div>
-                                    </div>
-                                  </form>
-                                </div>
-                              </div>
                             @endif
+
+                            
+                            @if(
+                                $project->status === 'Closed' && 
+                                auth()->user()->role->name === 'Admin' && 
+                                empty($project->close_comment_admin)
+                            )
+                                <button 
+                                    type="button"
+                                    class="btn btn-sm text-danger" 
+                                    data-toggle="modal" 
+                                    data-target="#adminLockModal" 
+                                    data-id="{{ $project->id }}" 
+                                    data-title="{{ $project->title }}">
+                                    <i class="fe fe-lock"></i>
+                                </button>
+                            @endif
+
                           </div>
                         </td>
                         </tr>
                       @empty
                         <tr><td colspan="8" class="text-center text-muted">No projects found.</td></tr>
                       @endforelse
-                      
                     </tbody>
-
                   </table>
-                 
                 </div> <!-- .col -->
-                
               </div> <!-- .row -->
-              
-            </div> <!-- .col-12 -->
-            
+            </div> <!-- .col-12 -->        
           </div> <!-- .row -->
-          
         </div> <!-- .container-fluid -->
         
      @include('partials.footer')   
+     <!-- Delete Project Modal (Générique) -->
+    <div class="modal fade" id="deleteProjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <form method="POST" id="deleteProjectForm">
+          @csrf
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title text-white" id="deleteProjectModalLabel">Delete Project Request</h5>
+              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p class="text-black h5">
+                Why do you want to delete the project <strong id="projectTitlePlaceholder"></strong>?
+              </p>
+              <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger">Request Deletion</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Close Project Modal (Générique) -->
+    <div class="modal fade" id="closeProjectModal" tabindex="-1" aria-labelledby="closeProjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST" id="closeProjectForm">
+          @csrf
+          @method('PATCH')
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title text-white" id="closeProjectModalLabel">Close Project</h5>
+              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p class="text-black h5">Add a final comment before closing <strong id="closeProjectTitle"></strong>.</p>
+              <textarea name="close_comment" class="form-control" rows="3" placeholder="Enter a final comment..." required></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger">Close Project</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+     <!-- Close Project Admin Modal (Générique) -->
+    <div class="modal fade" id="adminLockModal" tabindex="-1" aria-labelledby="adminLockModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST" id="adminLockForm">
+          @csrf
+          @method('PATCH')
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title text-white" id="closeProjectModalLabel">Close Project</h5>
+              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span>&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p class="text-black h5">Add a final comment before closing <strong id="closeAdminProjectTitle"></strong>.</p>
+              <textarea name="close_comment_admin" class="form-control" rows="3" placeholder="Enter a final comment..." required></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger">Close Project</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Reactivate Project Modal (Générique) -->
+    <div class="modal fade" id="reactivateProjectModal" tabindex="-1" role="dialog" aria-labelledby="reactivateProjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <form method="POST" id="reactivateProjectForm">
+          @csrf
+          @method('PATCH')
+          <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+              <h5 class="modal-title" id="reactivateProjectModalLabel">Reactivate Project</h5>
+              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <p>Are you sure you want to <strong>reactivate</strong> the project <strong id="reactivateProjectTitle"></strong>?</p>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success">Reactivate</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
 </main>
 
 <script>
@@ -463,12 +591,50 @@ function statusColorClass($status) {
 </script>
 
 <script>
-  $('#deleteModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget); // Bouton qui déclenche le modal
-    var projectId = button.data('id');   // ID du projet depuis data-id
-    var action = '{{ url('/projects') }}/' + projectId;
+  $('#deleteProjectModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var projectId = button.data('id');
+    var projectTitle = button.data('title');
+    var actionUrl = '{{ url('/projects') }}/' + projectId + '/request-delete'; // ajuste la route si besoin
 
-    // Mettre à jour l'action du formulaire dans le modal
-    $('#deleteProjectForm').attr('action', action);
+    $('#deleteProjectForm').attr('action', actionUrl);
+    $('#projectTitlePlaceholder').text(projectTitle);
   });
 </script>
+
+<script>
+  $('#closeProjectModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var projectId = button.data('id');
+    var projectTitle = button.data('title');
+    var actionUrl = '{{ url('/projects') }}/' + projectId + '/close';
+
+    $('#closeProjectForm').attr('action', actionUrl);
+    $('#closeProjectTitle').text(projectTitle);
+  });
+</script>
+
+<script>
+  $('#adminLockModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var projectId = button.data('id');
+    var projectAdminTitle = button.data('title');
+    var actionUrl = '{{ url('/projects') }}/' + projectId + '/closeAdmin';
+
+    $('#adminLockForm').attr('action', actionUrl);
+    $('#closeAdminProjectTitle').text(projectAdminTitle);
+  });
+</script>
+
+<script>
+  $('#reactivateProjectModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var projectId = button.data('id');
+    var projectTitle = button.data('title');
+    var actionUrl = '{{ url('/projects') }}/' + projectId + '/reactivate';
+
+    $('#reactivateProjectForm').attr('action', actionUrl);
+    $('#reactivateProjectTitle').text(projectTitle);
+  });
+</script>
+

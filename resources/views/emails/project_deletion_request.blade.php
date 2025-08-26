@@ -57,7 +57,7 @@
 <body>
 <div class="card">
   <div class="card-header">
-    Project Deletion Request
+    Project Cancellation Request
   </div>
   <div class="card-body">
     <div class="info">
@@ -78,15 +78,15 @@
     </a>
   </div>
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 30px;">
-  <tr>
-    <td style="font-family: Arial, sans-serif; font-size: 14px; color: #444;">
-      This is an automated message from the AfCFTA Project Management System.
-    </td>
-    <td align="right">
-      <img src="{{ asset('images/logo.png') }}" alt="AfCFTA Logo" style="height: 40px;">
-    </td>
-  </tr>
-</table>
+      <tr>
+        <td style="font-family: Arial, sans-serif; font-size: 14px; color: #444;">
+          This is an automated message from the AfCFTA Project Management System.
+        </td>
+        <td align="right">
+          <img src="{{ asset('images/logo.png') }}" alt="AfCFTA Logo" style="height: 40px;">
+        </td>
+      </tr>
+    </table>
 
 
 </div>

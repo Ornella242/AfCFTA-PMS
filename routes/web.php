@@ -12,6 +12,12 @@ use  App\Http\Controllers\DevelopmentDetailController;
 use App\Http\Controllers\ProjectDeletionRequestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ResetPasswordController;   
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\TaskArchivationRequestController;
+use App\Http\Controllers\TaskArchiveRequestController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -108,9 +114,52 @@ Route::patch('/projects/{project}/reactivate', [ProjectController::class, 'react
 Route::get('/projects/{project}/report', [ReportController::class, 'viewReport'])->name('projects.viewReport');
 Route::patch('/development-details/{id}/update-payment', [DevelopmentDetailController::class, 'updatePayment'])->name('developmentDetails.updatePayment');
 Route::patch('/projects/{project}/close', [ProjectController::class, 'close'])->name('projects.close');
+Route::patch('/projects/{project}/closeAdmin', [ProjectController::class, 'closeAdmin'])->name('projects.close.admin');
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 Route::post('/reports/store', [ReportController::class, 'store'])->name('reports.store');
 Route::get('/reports/{report}/download', [ReportController::class, 'download'])->name('reports.download');
 Route::post('/projects/{project}/assign-team', [ProjectController::class, 'assignTeam'])->name('projects.assignTeam');
 Route::patch('/projects/{project}/update-relation', [ProjectController::class, 'updateRelation'])->name('projects.updateRelation');
 Route::post('/reports/{report}/share', [ReportController::class, 'share'])->name('reports.share');
+
+
+
+
+// Formulaire "Mot de passe oublié"
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])
+    ->name('password.request');
+
+// Envoi du lien par email
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->name('password.email');
+
+// Formulaire "Nouveau mot de passe"
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
+    ->name('password.reset');
+
+// Traitement du nouveau mot de passe
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
+    ->name('password.update');
+
+
+
+Route::get('/alltasks', [TaskController::class, 'index'])->name('tasks.index');
+Route::get('/hrmtasks', [TaskController::class, 'indexhrm'])->name('tasks.indexhrm');
+Route::get('/admintasks', [TaskController::class, 'indexadmin'])->name('tasks.indexadmin');
+
+
+Route::post('/alltasks', [TaskController::class, 'store'])->name('tasks.store');
+Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+Route::get('/tasks/{task}', [TaskController::class, 'show']);
+Route::post('/tasks/{task}/comments', [TaskController::class, 'storeComment'])->name('tasks.comments.store');
+
+Route::get('/tasks/summary', [TaskController::class, 'summary'])->name('tasks.summary');
+Route::resource('tasks', TaskController::class);
+
+Route::post('/tasks/{task}/archive', [TaskController::class, 'archive'])->name('tasks.archive');
+
+Route::post('/task-archive-requests/{id}/approve', [TaskArchiveRequestController::class, 'approve'])
+    ->name('taskArchiveRequests.approve');
+
+Route::delete('/task-archive-requests/{id}/decline', [TaskArchiveRequestController::class, 'decline'])
+    ->name('taskArchiveRequests.decline');

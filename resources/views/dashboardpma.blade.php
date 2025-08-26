@@ -81,7 +81,6 @@
                                 <thead class="bg-green text-white">
                                     <tr>
                                         <th>Project Title</th>
-                                        <th>Current Phase</th>
                                         <th>Status</th>
                                         <th>Project manager</th>
                                         <th style="width: 150px;">Actions</th>
@@ -104,13 +103,15 @@
                                               ->where('status', 'In progress')
                                               ->sortByDesc('id') // ou 'created_at'
                                               ->first();
+                                           
+
                                             $color = $phaseColors[$currentPhase] ?? 'badge bg-light text-dark';
                                         @endphp
                                         <tr>
                                             <td class="text-start">
                                                 <i class="fas fa-folder-open text-muted me-2"></i> {{ $project->title }}
                                             </td>
-                                            <td><span class="{{ $color }}">{{ $currentPhase }}</span></td>
+                                           
                                             <td>
                                                 <span class="p-2 badge rounded-pill 
                                                     @if($project->status === 'Completed') bg-green 
@@ -126,7 +127,14 @@
                                                {{ $project->projectManager->firstname .' '. $project->projectManager->lastname?? 'N/A' }} 
                                             </td>
                                             <td>
-                                                
+                                                 @if ($project->status !== 'Closed' && $project->status !== 'Completed')
+                                                      <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none">
+                                                          <i class="fe fe-edit-2"></i>
+                                                      </a>
+                                                  @endif
+
+
+                                                    <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach

@@ -4210,7 +4210,7 @@ a.close.disabled {
   /* .modal-backdrop.show {
     opacity: 0.5; } */
  .modal-backdrop.show {
-    opacity: 0; }
+    opacity: 0.5; }
 
 .modal-header {
   display: flex;
@@ -7167,6 +7167,29 @@ a.text-dark:hover, a.text-dark:focus {
     color: inherit;
     border-color: #e9ecef; } }
 
+    #tasksCalendar .fc {
+    border-radius: 0.5rem;
+}
+
+#tasksCalendar .fc-event {
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+#tasksCalendar .fc-scrollgrid {
+    overflow-x: auto;      
+    white-space: nowrap;    
+}
+
+#tasksCalendar .fc-col-header-cell,
+#tasksCalendar .fc-daygrid-day {
+    display: inline-block;  
+    vertical-align: top;
+    min-width: 150px;      
+}
+ 
 /* Start Background colors */
 .bg-maroon {
   background: #9E2140; }
@@ -7193,6 +7216,8 @@ a.text-dark:hover, a.text-dark:focus {
   background: #EBEAE5; }
 .bg-grey {
   background: #EBEAE5; }
+
+  
 
   .sidebar-left .nav-link {
     border-left: 3px solid transparent;

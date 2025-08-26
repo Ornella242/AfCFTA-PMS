@@ -30,7 +30,7 @@ class ProjectDeletionRequestMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Project Deletion Request Mail',
+            subject: 'Project Cancellation Request Mail',
         );
     }
 
