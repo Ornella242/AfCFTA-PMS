@@ -40,7 +40,7 @@
 
 .main-img {
   background: linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.25)),
-    url('/images/bghrm.jpg') center / cover no-repeat;
+    url('/images/bgadmin.jpg') center / cover no-repeat;
   min-height: 40vh;      /* assure une hauteur visible */
   position: relative; 
 }

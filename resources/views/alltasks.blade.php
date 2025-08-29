@@ -93,13 +93,7 @@
                                                     <i class="fe fe-check"></i> Approve
                                                 </button>
                                             </form>
-                                            {{-- <form action="{{ route('taskArchiveRequests.decline', $request->id) }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="fe fe-x"></i> Decline
-                                                </button>
-                                            </form> --}}
+                                           
                                             <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#declineModal{{ $request->id }}">
                                                 <i class="fe fe-x"></i> Decline
                                             </button>
@@ -161,20 +155,14 @@
         <div class="col-12 mb-3">     
             <div class="card shadow p-2 rounded-lg">
                 <ul class="nav nav-tabs custom-nav" id="taskTabs" role="tablist">
-                    @if (auth()->user()->role && auth()->user()->role->name === 'Admin') 
+                    @if (auth()->user()->role && auth()->user()->role->name !== 'Member')    
                         <li class="nav-item">
                             <a class="nav-link active" id="summary-tab" data-toggle="tab" href="#summary-tab-content" role="tab" aria-controls="summary-tab-content" aria-selected="true">
                                 <i class="fe fe-aperture"></i> Summary
                             </a>
                         </li>
                     @endif
-                     @if (auth()->user()->role && auth()->user()->role->name === 'Project Manager') 
-                        <li class="nav-item">
-                            <a class="nav-link" id="summary-man-tab" data-toggle="tab" href="#summary-man-tab-content" role="tab" aria-controls="summary-man-tab-content" aria-selected="true">
-                                <i class="fe fe-aperture"></i> Summary
-                            </a>
-                        </li>
-                    @endif
+                   
                     <li class="nav-item">
                         <a class="nav-link" id="board-tab" data-toggle="tab" href="#board-tab-content" role="tab" aria-controls="board-tab-content" aria-selected="false">
                             <i class="fe fe-columns"></i> Board
@@ -195,124 +183,78 @@
             </div>
         </div>
 
-      
-
         <div class="col-12 tab-content mt-3" id="taskTabsContent">
-             @if (auth()->user()->role && auth()->user()->role->name === 'Admin') 
                 <!-- SUMMARY -->
+              @if (auth()->user()->role && auth()->user()->role->name !== 'Member')
                 <div class="tab-pane fade-in show active" id="summary-tab-content" role="tabpanel" aria-labelledby="summary-tab">
-                    <div class="row">    
+                    <div class="row"> 
+                            <div class="col-md-6">
+                                <div class="card shadow mb-3">
+                                    <div class="card-header bg-gold text-white">All tasks assigned by status</div>
+                                    <div class="card-body">
+                                        <canvas id="statusPieChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         <div class="col-md-6">
                             <div class="card shadow mb-3">
-                                <div class="card-header bg-gold text-white">Distribution by status</div>
+                                <div class="card-header bg-maroon text-white">My tasks by status</div>
                                 <div class="card-body">
-                                    <canvas id="statusPieChart"></canvas>
+                                    <canvas id="myTasksChart"></canvas>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Activité -->
-                        <div class="col-md-6">
-                            <div class="card shadow mb-3">
-                                <div class="card-header bg-maroon text-white">Recent Activity</div>
-                                    <div class="card-body">
-                                            <ul class="list-group list-group-flush">
-                                                @foreach($activities as $log)
-                                                    <li class="list-group-item">
-                                                        <div class="d-flex justify-content-between">
-                                                            <div>
-                                                                <strong>{{ $log->user->firstname }}</strong> 
-                                                                changed <strong>{{ $log->task->title }}</strong><br>
-                                                                <span class="badge bg-grey">{{ $log->from_status }}</span>
-                                                                →
-                                                                <span class="badge bg-green text-white">{{ $log->to_status }}</span>
+                            
+                            <div class="col-md-6">
+                                <div class="card shadow mb-3">
+                                    <div class="card-header bg-maroon text-white">Recent Activity</div>
+                                        <div class="card-body">
+                                                <ul class="list-group list-group-flush">
+                                                    @foreach($activities as $log)
+                                                        <li class="list-group-item">
+                                                            <div class="d-flex justify-content-between">
+                                                                <div>
+                                                                    <strong>{{ $log->user->firstname }}</strong> 
+                                                                    changed <strong>{{ $log->task->title }}</strong><br>
+                                                                    <span class="badge bg-grey">{{ $log->from_status }}</span>
+                                                                    →
+                                                                    <span class="badge bg-green text-white">{{ $log->to_status }}</span>
+                                                                </div>
+                                                                <small class="text-muted">
+                                                                    {{ $log->created_at->diffForHumans() }}
+                                                                </small>
                                                             </div>
-                                                            <small class="text-muted">
-                                                                {{ $log->created_at->diffForHumans() }}
-                                                            </small>
-                                                        </div>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                        </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="card shadow mb-3">
+                                    <div class="card-header bg-green text-white">Tasks assigned per person</div>
+                                    <div class="card-body">
+                                        <canvas id="tasksByUserChart"></canvas>
                                     </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-12">
-                            <div class="card shadow mb-3">
-                                <div class="card-header bg-green text-white">Tasks assigned per person</div>
-                                <div class="card-body">
-                                    <canvas id="tasksByUserChart"></canvas>
                                 </div>
                             </div>
-                        </div>
-
-                    
                     </div>
                 </div>
-            @endif
-            <!-- SUMMARY PM -->
-            
-            {{-- <div class="tab-pane fade-in show active" id="summary-man-tab-content" role="tabpanel" aria-labelledby="summary-man-tab">
-                <div class="row">    
-                    <div class="col-md-6">
-                        <div class="card shadow mb-3">
-                            <div class="card-header bg-gold text-white">Distribution by status</div>
-                            <div class="card-body">
-                                <canvas id="statusPieChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                     <!-- Activité -->
-                    <div class="col-md-6">
-                        <div class="card shadow mb-3">
-                            <div class="card-header bg-maroon text-white">Recent Activity</div>
-                                <div class="card-body">
-                                        <ul class="list-group list-group-flush">
-                                            @foreach($activities as $log)
-                                                <li class="list-group-item">
-                                                    <div class="d-flex justify-content-between">
-                                                        <div>
-                                                            <strong>{{ $log->user->firstname }}</strong> 
-                                                            changed <strong>{{ $log->task->title }}</strong><br>
-                                                            <span class="badge bg-grey">{{ $log->from_status }}</span>
-                                                            →
-                                                            <span class="badge bg-green text-white">{{ $log->to_status }}</span>
-                                                        </div>
-                                                        <small class="text-muted">
-                                                            {{ $log->created_at->diffForHumans() }}
-                                                        </small>
-                                                    </div>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-12">
-                        <div class="card shadow mb-3">
-                            <div class="card-header bg-green text-white">Tasks assigned per person</div>
-                            <div class="card-body">
-                                <canvas id="tasksByUserChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                   
-                </div>
-            </div> --}}
-
+           @endif
             <!-- BOARD -->
             <div class="tab-pane fade-in" id="board-tab-content" role="tabpanel" aria-labelledby="board-tab">
                 <div class="row">
                     <!-- TO DO -->
                     <div class="col-md-4">
                         <div class="card">
-                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <div class="card-header bg-gold d-flex justify-content-between align-items-center text-white">
                                 <strong>To Do</strong>
-                                <button type="button" class="btn btn-sm bg-yellow text-white" data-toggle="modal" data-target="#createTaskModal">Create</button>
+                                <button type="button" class="btn btn-sm bg-maroon text-white" data-toggle="modal" data-target="#createTaskModal">Create</button>
                             </div>
                             <div class="card-body min-vh-50" id="todo" data-status="pending">
                                 @foreach($tasks->where('status', 'pending') as $task)
@@ -361,7 +303,7 @@
                     <!-- IN PROGRESS -->
                     <div class="col-md-4">
                         <div class="card">
-                            <div class="card-header bg-light"><strong>In Progress</strong></div>
+                            <div class="card-header bg-yellow text-white"><strong>In Progress</strong></div>
                                 <div class="card-body min-vh-50" id="inprogress" data-status="processing">
                                     @foreach($tasks->where('status', 'processing') as $task)
                                         <div class="card mb-2 task-item" 
@@ -411,7 +353,7 @@
                     <!-- DONE -->
                     <div class="col-md-4">
                         <div class="card">
-                            <div class="card-header bg-light"><strong>Done</strong></div>
+                            <div class="card-header bg-green text-white"><strong>Done</strong></div>
                             <div class="card-body min-vh-50" id="done" data-status="completed">
                                 @foreach($tasks->where('status', 'completed') as $task)
                                     <div class="card mb-2 task-item" 
@@ -545,10 +487,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-     
-        
+        </div>    
     </div>
 
   <!-- Modal Create Task -->
@@ -699,12 +638,12 @@
                     <!-- Comment Section --> 
                     <hr> 
                    <h6 class="font-weight-bold">Comments</h6>
-                        <form method="POST" id="taskCommentForm">
+                        <form method="POST" action="{{ route('tasks.comments.store', $task->id) }}">
                             @csrf
                             <div class="form-group">
-                                <textarea name="comment" class="form-control" rows="3" placeholder="Write your comment..."></textarea>
+                                <textarea name="comment" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
                             </div>
-                            <button type="submit" class="btn bg-gold text-white">
+                            <button type="submit" class="btn bg-gold text-white mt-2">
                                 <i class="fe fe-send text-white mr-1"></i> Post Comment
                             </button>
                         </form>
@@ -1123,75 +1062,119 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 <script>
-    // On injecte les données Laravel → JS
-    const tasksByUserLabels = {!! json_encode($tasksByUser->keys()) !!};
-    const tasksByUserData = {!! json_encode($tasksByUser->values()) !!};
+    let tasksByUserChart = null;
+    let statusPieChart = null;
+    let myTasksChart = null;
 
-    const statusLabels = {!! json_encode($statusCounts->keys()) !!};
-    const statusData = {!! json_encode($statusCounts->values()) !!};
-
-    const activityLabels = {!! json_encode($activity->keys()) !!};
-    const activityData = {!! json_encode($activity->values()) !!};
-    
-    const backgroundColors = tasksByUserData.map(value => {
-     if (value >= 10) {
-        return 'rgba(255, 99, 132, 0.8)';
-        } else if (value < 5) {
-            return 'rgba(255, 206, 86, 0.8)'; 
-        } else {
-            return 'rgba(75, 192, 192, 0.8)';   
-        }
-    });
-
-    // 1. Tâches par personne
-    new Chart(document.getElementById('tasksByUserChart'), {
-        type: 'bar',
-        data: {
-            labels: tasksByUserLabels,
-            datasets: [{
-                label: 'Number of tasks',
-                data: tasksByUserData,
-                backgroundColor: backgroundColors, 
-                borderRadius: 6, 
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false }
+    // --- Tasks By User ---
+    const tasksByUserCanvas = document.getElementById('tasksByUserChart');
+    if (tasksByUserCanvas) {
+        tasksByUserChart = new Chart(tasksByUserCanvas, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Number of tasks',
+                    data: [],
+                    backgroundColor: [],
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } }
             }
-        }
-    });
+        });
+    }
 
-    // 2. Répartition par statut
-    new Chart(document.getElementById('statusPieChart'), {
-        type: 'pie',
-        data: {
-            labels: statusLabels,
-            datasets: [{
-                data: statusData,
-                backgroundColor: ['#9E2140', '#F4A51F', '#299347', '#dc3545']
-            }]
-        }
-    });
+    // --- Status Pie (Admin only) ---
+    const statusPieCanvas = document.getElementById('statusPieChart');
+    if (statusPieCanvas) {
+        statusPieChart = new Chart(statusPieCanvas, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: ['#9E2140', '#F4A51F', '#299347', '#dc3545']
+                }]
+            }
+        });
+    }
+    // --- My Tasks ---
+    const myTasksCanvas = document.getElementById('myTasksChart');
+    if (myTasksCanvas) {
+        myTasksChart = new Chart(myTasksCanvas, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: ['#299347',, '#F4A51F', '#9E2140', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
 
-    // 3. Activité (timeline)
-    new Chart(document.getElementById('activityChart'), {
-        type: 'line',
-        data: {
-            labels: activityLabels,
-            datasets: [{
-                label: 'Nombre d’actions',
-                data: activityData,
-                borderColor: '#007bff',
-                fill: false,
-                tension: 0.3
-            }]
+    // Fonction de mise à jour des graphes
+    async function refreshCharts() {
+        try {
+            const response = await fetch('/charts/data');
+            const data = await response.json();
+
+            // --- Tasks By User ---
+            if (tasksByUserChart) {
+                const tasksByUserLabels = Object.keys(data.tasksByUser);
+                const tasksByUserData = Object.values(data.tasksByUser);
+
+                const backgroundColors = tasksByUserData.map(value => {
+                    if (value >= 10) {
+                        return 'rgba(255, 99, 132, 0.8)';
+                    } else if (value < 5) {
+                        return 'rgba(255, 206, 86, 0.8)';
+                    } else {
+                        return 'rgba(75, 192, 192, 0.8)';
+                    }
+                });
+
+                tasksByUserChart.data.labels = tasksByUserLabels;
+                tasksByUserChart.data.datasets[0].data = tasksByUserData;
+                tasksByUserChart.data.datasets[0].backgroundColor = backgroundColors;
+                tasksByUserChart.update();
+            }
+
+            // --- Status Pie ---
+            if (statusPieChart) {
+                statusPieChart.data.labels = Object.keys(data.statusCounts);
+                statusPieChart.data.datasets[0].data = Object.values(data.statusCounts);
+                statusPieChart.update();
+            }
+
+            // --- My Tasks ---
+            if (myTasksChart) {
+                myTasksChart.data.labels = Object.keys(data.myTasks);
+                myTasksChart.data.datasets[0].data = Object.values(data.myTasks);
+                myTasksChart.update();
+            }
+
+        } catch (error) {
+            console.error("Erreur lors du refresh des graphiques:", error);
         }
-    });
+    }
+
+    // Refresh immédiat au chargement
+    refreshCharts();
+
+    // Refresh toutes les 30 secondes
+    setInterval(refreshCharts, 30000);
 </script>
-
 
 
 <script>

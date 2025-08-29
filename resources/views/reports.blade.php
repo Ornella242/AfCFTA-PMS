@@ -91,7 +91,6 @@
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
                                             <a class="dropdown-item" href="{{ url('projects/' . $report->project->id . '/report') }}"><i class="fe fe-eye mr-2"></i>View</a>
-                                            <a class="dropdown-item text-danger" href="#"><i class="fe fe-trash mr-2"></i>Delete</a>
                                             <a class="dropdown-item" data-toggle="modal" data-target="#shareReportModal{{ $report->id }}">
                                                 <i class="fe fe-share mr-2"></i>Share
                                             </a>
@@ -109,6 +108,10 @@
               </div> <!-- .file-container -->
             </div> <!-- .col -->
           </div> <!-- .row -->
+        </div> <!-- .container-fluid -->
+        @include('partials.footer')
+
+        @foreach ($monthlyReports as $report)
           <div class="modal fade" id="shareReportModal{{ $report->id }}" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
               <form method="POST" action="{{ route('reports.share', $report->id) }}">
@@ -128,7 +131,7 @@
                             {{ $user->firstname }} {{ $user->lastname }}
                           </label>
                         </div>
-                       
+                      
                       @endforeach
                     </div>
                   </div>
@@ -140,8 +143,7 @@
               </form>
             </div>
           </div>
-        </div> <!-- .container-fluid -->
-        @include('partials.footer')
+        @endforeach
         <script>
           function goToReport() {
             const projectId = document.getElementById('project_id').value;

@@ -18,69 +18,28 @@ use App\Notifications\TaskDeleteRequestNotification;
 
 class TaskController extends Controller
 {
-    
-    // public function index()
-    // {
-    //     $tasks = Task::with('assignedUser')
-    //                 ->where('is_archived', false)
-    //                 ->get();
-    //     $users = User::orderBy('firstname')->get();
-
-    //     $tasksPending = Task::where('status', 'pending')->get();
-    //     $tasksProcessing = Task::where('status', 'processing')->get();
-    //     $tasksCompleted = Task::where('status', 'completed')->get();
-    //     $archiveRequests = TaskArchivationRequest::with('task', 'requester')
-    //                         ->where('approved', false)
-    //                         ->get();
-    //     //  Tâches par personne
-    //     $tasksByUser = User::whereHas('tasks')
-    //         ->withCount('tasks')
-    //         ->orderBy('tasks_count', 'desc')
-    //         ->pluck('tasks_count', 'firstname');
-
-    //     //  Répartition par statut
-    //     $statusCounts = Task::select('status', DB::raw('COUNT(*) as total'))
-    //         ->groupBy('status')
-    //         ->pluck('total', 'status');
-
-    //     //  Activité récente (graph/stat)
-    //     $activity = Task::selectRaw('DATE(updated_at) as date, COUNT(*) as total')
-    //         ->groupBy('date')
-    //         ->orderBy('date', 'asc')
-    //         ->pluck('total', 'date');
-
-    //     // Liste des activités (pour ton foreach)
-    //     $activities = TaskActivity::with(['user', 'task'])
-    //         ->latest()
-    //         ->take(20) // limite pour éviter surcharge
-    //         ->get();
-
-    //     // dd($activities);
-    //     return view('alltasks', compact(
-    //         'tasks',
-    //         'users',
-    //         'tasksPending',
-    //         'tasksProcessing',
-    //         'tasksCompleted',
-    //         'tasksByUser',
-    //         'statusCounts',
-    //         'activity',
-    //         'activities',
-    //         'archiveRequests'
-    //     ));
-    // }
 
     public function index(Request $request)
     {
         $user = Auth::user();
         // Tâches créées par l'utilisateur et non archivées
-        $tasks = Task::with('assignedUser')
-                    ->where('is_archived', false)
-                    ->where(function ($q) use ($user) {
-                        $q->where('created_by', $user->id)
-                        ->orWhere('assigned_to', $user->id);
-                    })
-                    ->get();
+       if ($user->role->name === 'Admin') {
+        // dd('admin here');
+            $tasks = Task::with('assignedUser')
+                        ->where('is_archived', false)
+                        ->where('archived', false)
+                        ->get();         
+        } else {
+            // dd('user here');
+            $tasks = Task::with('assignedUser')
+                        ->where('is_archived', false)
+                        ->where('archived', false)
+                        ->where(function ($q) use ($user) {
+                            $q->where('created_by', $user->id)
+                            ->orWhere('assigned_to', $user->id);
+                        })
+                        ->get();
+        }
 
         $units = Unit::orderBy('name')->get(); 
         $types = ['HRM', 'Admin'];
@@ -123,6 +82,11 @@ class TaskController extends Controller
             ->where('created_by', $user->id)
             ->groupBy('status')
             ->pluck('total', 'status');
+        
+         $myTasks = Task::where('assigned_to', Auth::id())
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
         // Activité récente pour ses tâches
         $activities = TaskActivity::with(['user', 'task'])
@@ -152,7 +116,8 @@ class TaskController extends Controller
             'activities',
             'archiveRequests',
             'units',
-            'types'
+            'types',
+            'myTasks'
         ));
     }
 
@@ -358,56 +323,33 @@ class TaskController extends Controller
     }
 
 
-    // public function store(Request $request)
-    // {
-    //    $validated = $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'description' => 'nullable|string',
-    //         'start_date' => 'nullable|date',
-    //         'end_date' => 'nullable|date|after_or_equal:start_date',
-    //         'priority' => 'required|in:high,medium,low',
-    //         'status' => 'required|in:pending,processing,completed',
-    //         'assigned_to' => 'required|exists:users,id',
-    //         'type' => 'required|in:HRM,Admin',       // nouveau champ
-    //         'unit_id' => 'required|exists:units,id', // nouveau champ
-    //     ]);
-
-    //     // dd($validated);
-
-    //     // On ajoute le créateur à l’array validé
-    //     $validated['created_by'] = Auth::id();
-
-    //     Task::create($validated);
-
-    //     return redirect()->back()->with('success', 'Task created successfully!');
-    // }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'start_date' => 'nullable|date',
-        'end_date' => 'nullable|date|after_or_equal:start_date',
-        'priority' => 'required|in:high,medium,low',
-        'status' => 'required|in:pending,processing,completed',
-        'assigned_to' => 'required|exists:users,id',
-        'type' => 'required|in:HRM,Admin',
-        'unit_id' => 'required|exists:units,id',
-    ]);
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'priority' => 'required|in:high,medium,low',
+            'status' => 'required|in:pending,processing,completed',
+            'assigned_to' => 'required|exists:users,id',
+            'type' => 'required|in:HRM,Admin',
+            'unit_id' => 'required|exists:units,id',
+        ]);
 
-    $validated['created_by'] = Auth::id();
+        $validated['created_by'] = Auth::id();
 
-    $task = Task::create($validated);
+        $task = Task::create($validated);
 
-    // ✅ Envoi du mail à la personne assignée
-    $assignedUser = \App\Models\User::find($task->assigned_to);
-    if ($assignedUser && $assignedUser->email) {
-        Mail::to($assignedUser->email)->send(new TaskAssignedMail($task));
+        // ✅ Envoi du mail à la personne assignée
+        $assignedUser = \App\Models\User::find($task->assigned_to);
+        if ($assignedUser && $assignedUser->email) {
+            Mail::to($assignedUser->email)->send(new TaskAssignedMail($task));
+        }
+
+        return redirect()->back()->with('success', 'Task created successfully and notification sent!');
     }
-
-    return redirect()->back()->with('success', 'Task created successfully and notification sent!');
-}
    
 
     public function updateStatus(Task $task, Request $request)
@@ -496,16 +438,19 @@ class TaskController extends Controller
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        // 3. Activité (si tu as une table type "task_activities")
-        //    event_type: 'status_changed', 'comment_added', etc.
-        //    Si tu n'as pas cette table, remplace par collect()
+        // 3. Activité récente (graph/stat)
         $activity = \App\Models\Task::selectRaw('DATE(created_at) as date, COUNT(*) as total')
             ->whereIn('event_type', ['status_changed', 'comment_added'])
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->pluck('total', 'date');
-
-        return view('alltasks', compact('tasksByUser', 'statusCounts', 'activity'));
+         // 4. Tâches assignées à l’utilisateur connecté
+        $myTasks = Task::where('assigned_to', Auth::id())
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        
+        return view('alltasks', compact('tasksByUser', 'statusCounts', 'activity', 'myTasks'));
     }
 
 
@@ -522,8 +467,10 @@ class TaskController extends Controller
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);
 
+        if ($request->status === 'completed' && $task->status !== 'completed') {
+            $task->completed_at = now();
+        }
         $task->update($request->all());
-
         return redirect()->back()->with('success', 'Task updated successfully!');
     }
 
@@ -560,5 +507,85 @@ class TaskController extends Controller
     }
 
 
+
+    // public function chartData()
+    // {
+    //     // 1. Tâches par personne
+    //     $tasksByUserQuery = Task::join('users', 'tasks.assigned_to', '=', 'users.id')
+    //         ->selectRaw('users.id, users.firstname as username, COUNT(*) as total')
+    //         ->groupBy('users.id', 'users.firstname');
+
+    //     if (Auth::user()->role->name === 'Project Manager') {
+    //         $tasksByUserQuery->where('tasks.created_by', Auth::id());
+    //     }
+
+    //     $tasksByUser = $tasksByUserQuery->pluck('total', 'username');
+
+    //     // 2. Répartition par statut (Admin vs Project Manager)
+    //     $statusQuery = Task::query();
+
+    //     if (Auth::user()->role->name === 'Project Manager') {
+    //         // Un PM ne voit que les tâches qu’il a assignées
+    //         $statusQuery->where('created_by', Auth::id());
+    //     }
+
+    //     $statusCounts = $statusQuery
+    //         ->selectRaw('status, count(*) as total')
+    //         ->groupBy('status')
+    //         ->pluck('total', 'status');
+
+    //     // 3. Mes propres tâches
+    //     $myTasks = Task::where('assigned_to', Auth::id())
+    //         ->selectRaw('status, count(*) as total')
+    //         ->groupBy('status')
+    //         ->pluck('total', 'status');
+
+    //     return response()->json([
+    //         'tasksByUser'   => $tasksByUser,
+    //         'statusCounts'  => $statusCounts,
+    //         'myTasks'       => $myTasks,
+    //     ]);
+    // }
+
+    public function chartData()
+    {
+        // 1. Tâches par personne
+        $tasksByUserQuery = Task::join('users', 'tasks.assigned_to', '=', 'users.id')
+            ->selectRaw('users.id, users.firstname as username, COUNT(*) as total')
+            ->where('tasks.is_archived', false)   // exclure les archivées
+            ->groupBy('users.id', 'users.firstname');
+
+        if (Auth::user()->role->name === 'Project Manager') {
+            $tasksByUserQuery->where('tasks.created_by', Auth::id());
+        }
+
+        $tasksByUser = $tasksByUserQuery->pluck('total', 'username');
+
+        // 2. Répartition par statut (Admin vs Project Manager)
+        $statusQuery = Task::where('is_archived', false);
+
+        if (Auth::user()->role->name === 'Project Manager') {
+            // Un PM ne voit que les tâches qu’il a assignées
+            $statusQuery->where('created_by', Auth::id());
+        }
+
+        $statusCounts = $statusQuery
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        // 3. Mes propres tâches
+        $myTasks = Task::where('assigned_to', Auth::id())
+            ->where('is_archived', false)
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        return response()->json([
+            'tasksByUser'   => $tasksByUser,
+            'statusCounts'  => $statusCounts,
+            'myTasks'       => $myTasks,
+        ]);
+    }
 
 }

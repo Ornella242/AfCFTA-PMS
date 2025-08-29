@@ -33,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
         View::share('totalProjects', \App\Models\Project::count());
         View::share('totalProjectsHRM', \App\Models\Project::where('type', 'HRM')->count());
         View::share('totalProjectsAdmin', \App\Models\Project::where('type', 'Admin')->count());
+        View::share('totalReports', \App\Models\Report::count());
+        View::share('totalTasks', \App\Models\Task::count());
+        View::share('totalTasksHRM', \App\Models\Task::where('type', 'HRM')->count());
+        View::share('totalTasksAdmin', \App\Models\Task::where('type', 'Admin')->count());
         // dd('boot is working');
 
     }

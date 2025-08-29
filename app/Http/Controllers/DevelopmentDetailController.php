@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\DevelopmentDetail;
 use App\Models\Project;
 use App\Models\Subphase;
+use App\Mail\PhaseCompletedMail;
+use Illuminate\Support\Facades\Mail;
 
 class DevelopmentDetailController extends Controller
 {
@@ -143,6 +145,7 @@ class DevelopmentDetailController extends Controller
         return redirect()->back()->with('success', 'Development activity status and progress updated.');
     }
 
+   
   
    public function store(Request $request)
     {

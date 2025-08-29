@@ -141,8 +141,6 @@ Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showRese
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
     ->name('password.update');
 
-
-
 Route::get('/alltasks', [TaskController::class, 'index'])->name('tasks.index');
 Route::get('/hrmtasks', [TaskController::class, 'indexhrm'])->name('tasks.indexhrm');
 Route::get('/admintasks', [TaskController::class, 'indexadmin'])->name('tasks.indexadmin');
@@ -163,3 +161,6 @@ Route::post('/task-archive-requests/{id}/approve', [TaskArchiveRequestController
 
 Route::delete('/task-archive-requests/{id}/decline', [TaskArchiveRequestController::class, 'decline'])
     ->name('taskArchiveRequests.decline');
+
+Route::get('/charts/data', [TaskController::class, 'chartData'])->name('charts.data');
+
