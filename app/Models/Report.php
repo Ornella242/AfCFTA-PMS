@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\Hashidable;
 
 class Report extends Model
 {
+    use Hashidable;
     /**
      * The "type" of the auto-incrementing ID.
      *

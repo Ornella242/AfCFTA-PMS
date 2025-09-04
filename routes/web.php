@@ -84,6 +84,8 @@ Route::get('/allprojects', [ProjectController::class, 'index'])->name('allprojec
 Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
 Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
 Route::post('/projects/{project}/documents', [ProjectController::class, 'uploadDocuments'])->name('projects.documents.store');
+// Route::get('/projects/documents/{document}/download', [ProjectController::class, 'downloadDocument'])
+//     ->name('projects.documents.download');
 
 
 Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');

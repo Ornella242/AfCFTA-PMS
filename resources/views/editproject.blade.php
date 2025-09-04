@@ -250,7 +250,7 @@
               <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'budget_code']) }}">
                 @csrf @method('PATCH')
                 <div class="d-flex align-items-center">
-                  <input type="text" class="form-control form-control-sm" name="budget_code" value="{{ $project->budget_code }}">
+                  <input type="text" class="form-control form-control-sm" name="value" value="{{ $project->budget_code }}">
                   <button class="btn btn-sm btn-outline-success ml-2">Save</button>
                 </div>
               </form>

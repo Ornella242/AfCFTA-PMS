@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Traits\Hashidable;
 
 class ProjectDeletionRequest extends Model
 {
+    use Hashidable;
       protected $fillable = [
         'project_id',
         'reason',

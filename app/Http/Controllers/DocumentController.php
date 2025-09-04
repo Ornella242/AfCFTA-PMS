@@ -23,4 +23,6 @@ class DocumentController extends Controller
 
         return back()->with('success', 'Document deleted successfully.');
     }
+
+    
 }

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Unit;    
+use App\Models\Unit;   
+use App\Traits\Hashidable;
 
 class Project extends Model
 {
+    use Hashidable;
     use HasFactory;
 
     protected $fillable = [
@@ -23,7 +25,7 @@ class Project extends Model
         'budget',
         'procurement_type',
         'created_by',
-        'budget_code', // New field for budget code
+        'budget_code',
     ];
 
     // 🔗 Relations

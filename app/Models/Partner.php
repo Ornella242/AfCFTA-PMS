@@ -3,9 +3,11 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\Hashidable;
 
 class Partner extends Model
 {
+    use Hashidable;
     use HasFactory;
     protected $fillable = ['name'];
 

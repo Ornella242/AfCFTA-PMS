@@ -23,7 +23,7 @@ use App\Models\Task;
 use App\Mail\PhaseCompletedMail;
 use App\Models\ProjectDocument;
 use Illuminate\Support\Facades\Storage;
-
+use App\Models\Document;
 
 
 class ProjectController extends Controller
@@ -415,6 +415,7 @@ class ProjectController extends Controller
 
     public function updateField(Request $request, $id)
     {
+       
         $project = Project::findOrFail($id);
         $field = $request->input('field');
         $value = $request->input('value');
@@ -422,10 +423,11 @@ class ProjectController extends Controller
         // Liste des champs autorisés
         $allowedFields = [
             'title', 'description', 'start_date', 'end_date',
-            'priority', 'status', 'budget', 'type',
+            'priority', 'status', 'budget', 'type','budget_code',
             'unit_id', 'project_manager_id', 'partners', 'procurement_type'
         ];
-        
+        //  dd($field, $value);
+         // Validation basique
         if (!in_array($field, $allowedFields)) {
             return redirect()->back()->with('error', 'Invalid field.');
         }
@@ -470,7 +472,6 @@ class ProjectController extends Controller
             $project->save();
         }
 
-        // Libellés humains pour l'alerte
         $fieldNames = [
             'title' => 'Title',
             'description' => 'Description',
@@ -651,34 +652,6 @@ class ProjectController extends Controller
     }
 
   
-    // public function requestDelete(Request $request, $id)
-    // {
-    //     $request->validate(['reason' => 'required|string']);
-    //     $project = Project::findOrFail($id);
-
-    //     // Store reason (create a model if needed)
-    //     \App\Models\ProjectDeletionRequest::create([
-    //         'project_id' => $project->id,
-    //         'requested_by' => Auth::id(),
-    //         'reason' => $request->reason,
-    //     ]);
-
-    //     // Notify admins via email
-    //     $admins =  \App\Models\User::whereHas('role', function ($query) {
-    //                     $query->where('name', 'Admin');
-    //                 })->get();
-    
-    //     $user = Auth::user();
-    //     foreach ($admins as $admin) {
-    //         Mail::to($admin->email)->send(new \App\Mail\ProjectDeletionRequestMail(
-    //             $project,
-    //             $request->reason,
-    //             Auth::user()
-    //         ));   
-    //     }
-
-    //     return back()->with('success', 'Deletion request sent to administrators.');
-    // }
 
     public function requestDelete(Request $request, $id)
 {
@@ -923,24 +896,31 @@ class ProjectController extends Controller
     }
 
 
-   public function uploadDocuments(Request $request, Project $project)
-{
-    $request->validate([
-        'documents.*' => 'required|file|mimes:pdf,doc,docx,xlsx,xls,png,jpg,jpeg|max:2048'
-    ]);
-
-    foreach ($request->file('documents') as $file) {
-        $path = $file->store('projects/documents', 'public');
-
-        ProjectDocument::create([
-            'project_id' => $project->id,
-            'filename'   => $file->getClientOriginalName(),
-            'path'       => $path,
+    public function uploadDocuments(Request $request, Project $project)
+    {
+        $request->validate([
+            'documents.*' => 'required|file|mimes:pdf,doc,docx,xlsx,xls,png,jpg,jpeg|max:2048'
         ]);
+
+        foreach ($request->file('documents') as $file) {
+            $path = $file->store('projects/documents', 'public');
+
+            ProjectDocument::create([
+                'project_id' => $project->id,
+                'filename'   => $file->getClientOriginalName(),
+                'path'       => $path,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Documents uploaded successfully.');
     }
 
-    return redirect()->back()->with('success', 'Documents uploaded successfully.');
-}
-
+    // public function downloadDocument(ProjectDocument $document)
+    // {
+    //         return response()->download(
+    //             storage_path('app/public/' . $document->path),
+    //             $document->filename
+    //         );
+    // }
 
 };
