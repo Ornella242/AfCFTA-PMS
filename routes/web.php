@@ -18,6 +18,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\TaskArchivationRequestController;
 use App\Http\Controllers\TaskArchiveRequestController;
+use App\Http\Controllers\DocumentController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -82,6 +83,8 @@ Route::get('/projects/create', [ProjectController::class, 'create'])->name('proj
 Route::get('/allprojects', [ProjectController::class, 'index'])->name('allprojects');
 Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
 Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+Route::post('/projects/{project}/documents', [ProjectController::class, 'uploadDocuments'])->name('projects.documents.store');
+
 
 Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 Route::patch('/projects/{project}/update-field', [ProjectController::class, 'updateField'])->name('projects.updateField');
@@ -107,8 +110,14 @@ Route::post('/projects/{id}/approve-deletion', [ProjectController::class, 'appro
 Route::post('/deletion-requests/{id}/approve', [ProjectDeletionRequestController::class, 'approve'])
     ->name('deletionRequests.approve');
 
-Route::delete('/deletion-requests/{id}/decline', [ProjectDeletionRequestController::class, 'decline'])
+Route::put('/deletion-requests/{id}/decline', [ProjectDeletionRequestController::class, 'decline'])
     ->name('deletionRequests.decline');
+
+    Route::delete('/documents/{id}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+
+
+// Route::delete('/deletion-requests/{id}/decline', [ProjectDeletionRequestController::class, 'decline'])
+//     ->name('deletionRequests.decline');
 
 Route::patch('/projects/{project}/reactivate', [ProjectController::class, 'reactivate'])->name('projects.reactivate');
 Route::get('/projects/{project}/report', [ReportController::class, 'viewReport'])->name('projects.viewReport');
@@ -164,3 +173,11 @@ Route::delete('/task-archive-requests/{id}/decline', [TaskArchiveRequestControll
 
 Route::get('/charts/data', [TaskController::class, 'chartData'])->name('charts.data');
 
+Route::get('/charts/project-managers', [ProjectController::class, 'projectManagersChart']);
+
+
+Route::get('/password/change', [App\Http\Controllers\PasswordController::class, 'edit'])
+    ->name('password.change');
+
+Route::post('/password/change', [App\Http\Controllers\PasswordController::class, 'update'])
+    ->name('password.update');

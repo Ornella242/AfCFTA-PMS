@@ -86,6 +86,16 @@
                 </div>
               </div> --}}
               <div class="row">
+                @if(session('success'))
+                   <div class="alert alert-success alert-dismissible fade show" role="alert">
+                       {{ session('success') }}
+                       <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                           <span aria-hidden="true">&times;</span>
+                       </button>
+                   </div>
+               @endif
+              </div>
+              <div class="row">
                 @php
                   $statuses = [
                     ['label' => 'Not started', 'color' => '#C3A466', 'icon' => 'clock'],
@@ -118,95 +128,100 @@
                   $isAdmin = $user->role?->name === 'Admin';
               @endphp
               @if ($isAdmin)
-                <div class="row">
-                  <div class="my-5 col-12">
-                    <h3 class="mb-4 text-maroon font-weight-bold">
-                      <i class="fe fe-bar-chart-2 mr-2"></i>Project Distribution by Manager
-                    </h3>
-                    <div class="card shadow-sm border-0 p-4">
-                      <div id="managerProjectsChart"></div>
-                    </div>
-                    <div class="mt-5">
+                  <div class="row">
+                    <div class="my-5 col-12">
+                      <h3 class="mb-4 text-maroon font-weight-bold">
+                        <i class="fe fe-bar-chart-2 mr-2"></i>Project Distribution by Manager
+                      </h3>
+                      <div class="card shadow-sm border-0 p-4">
+                        <div id="managerProjectsChart"></div>
+                      </div>
+                      <div class="mt-5">
                         <h4 class="mb-3 text-black font-weight-bold">
                           <i class="fe fe-users mr-2"></i> Project Manager Overview
                         </h4>
 
                         <div class="table-responsive">
-                          <table class="table table-hover align-middle shadow-sm rounded">
-                            <thead class="bg-maroon text-white">
-                              <tr>
-                                <th>Name</th>
-                                <th class="text-center">Projects</th>
-                                <th>Progress</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              @foreach ($projectManagers as $manager)
-                                @php
-                                  $totalProgress = $manager->managedProjects->sum('percentage');
-                                  $projectCount = $manager->managedProjects->count();
-                                  $averageProgress = $projectCount > 0 ? round($totalProgress / $projectCount, 1) : 0;
-
-                                  $barClass = 'bg-success';
-                                  if ($averageProgress < 40) $barClass = 'bg-danger';
-                                  elseif ($averageProgress < 70) $barClass = 'bg-warning';
-                                @endphp
-
-                                <tr class="clickable-row" data-toggle="modal" data-target="#managerModal{{ $manager->id }}">
-                                  <td class="font-weight-bold">{{ $manager->firstname }} {{ $manager->lastname }}</td>
-                                  <td class="text-center">{{ $projectCount }}</td>
-                                  <td style="min-width: 250px;">
-                                    <div class="progress" style="height: 22px; border-radius: 10px;">
-                                      <div class="progress-bar {{ $barClass }}" style="width: {{ $averageProgress }}%; border-radius: 10px;">
-                                        {{ $averageProgress }}%
-                                      </div>
-                                    </div>
-                                  </td>
+                            <table class="table table-hover align-middle shadow-sm rounded overflow-hidden">
+                              <thead class="bg-maroon text-white">
+                                <tr>
+                                  <th class="p-3">Manager</th>
+                                  <th class="text-center p-3">Projects</th>
+                                  <th class="p-3">Average Progress</th>
                                 </tr>
-                              @endforeach
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody>
+                                @foreach ($projectManagers as $manager)
+                                  <tr data-toggle="modal" data-target="#managerModal{{ $manager->id }}" style="cursor: pointer; transition: all .3s;"
+                                      onmouseover="this.style.backgroundColor='#fdf2f2'" onmouseout="this.style.backgroundColor=''">
+                                    <td class="font-weight-bold">
+                                      <img src="{{ asset('images/icons/user.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
+                                      {{ $manager->firstname }} {{ $manager->lastname }}
+                                    </td>
+                                    <td class="text-center">
+                                      <span class="badge badge-pill badge-dark px-3 py-2 shadow-sm text-white">
+                                        {{ $manager->managed_projects_count }}
+                                      </span>
+                                    </td>
+                                    <td style="min-width: 280px;">
+                                      <div class="progress shadow-sm" style="height: 22px; border-radius: 12px; overflow: hidden;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated {{ $manager->bar_class }}"
+                                            style="width: {{ $manager->average_progress }}%; border-radius: 12px;">
+                                          {{ $manager->average_progress }}%
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                @endforeach
+                              </tbody>
+                            </table>
+                          </div>
                           @foreach ($projectManagers as $manager)
-                            <div class="modal fade" id="managerModal{{ $manager->id }}" tabindex="-1" role="dialog" aria-labelledby="managerModalLabel{{ $manager->id }}" aria-hidden="true">
+                            <div class="modal fade" id="managerModal{{ $manager->id }}" tabindex="-1" role="dialog"
+                                aria-labelledby="managerModalLabel{{ $manager->id }}" aria-hidden="true">
                               <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                  <div class="modal-header bg-gold text-white">
+                                <div class="modal-content border-0 shadow-lg rounded-lg">
+                                  <div class="modal-header bg-maroon text-white">
                                     <h5 class="modal-title text-white" id="managerModalLabel{{ $manager->id }}">
-                                      Projects of {{ $manager->firstname }} {{ $manager->lastname }}
+                                      <i class="fe fe-folder mr-2"></i> Projects of {{ $manager->firstname }} {{ $manager->lastname }}
                                     </h5>
                                     <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
                                   </div>
-                                  <div class="modal-body">
-                                    @foreach ($manager->managedProjects as $project)
+                                  <div class="modal-body p-4">
+                                    @forelse ($manager->managedProjects as $project)
                                       @php
                                         $barClass = 'bg-success';
                                         if ($project->percentage < 40) $barClass = 'bg-danger';
                                         elseif ($project->percentage < 70) $barClass = 'bg-warning';
                                       @endphp
 
-                                      <div class="mb-3">
-                                        <div class="d-flex justify-content-between">
-                                          <strong>{{ $project->title }}</strong>
-                                          <small class="text-muted">{{ $project->percentage }}%</small>
+                                      <div class="mb-4 p-3 border rounded shadow-sm bg-light">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                          <strong class="text-maroon">{{ $project->title }}</strong>
+                                          <small class="font-weight-bold {{ $barClass == 'bg-danger' ? 'text-danger' : ($barClass == 'bg-warning' ? 'text-warning' : 'text-success') }}">
+                                            {{ $project->percentage }}%
+                                          </small>
                                         </div>
-                                        <div class="progress" style="height: 12px; border-radius: 6px;">
-                                          <div class="progress-bar {{ $barClass }}" role="progressbar"
+                                        <div class="progress" style="height: 14px; border-radius: 7px;">
+                                          <div class="progress-bar {{ $barClass }} progress-bar-striped progress-bar-animated"
+                                              role="progressbar"
                                               style="width: {{ $project->percentage }}%;"
                                               aria-valuenow="{{ $project->percentage }}" aria-valuemin="0" aria-valuemax="100">
                                           </div>
                                         </div>
                                       </div>
-                                    @endforeach
+                                    @empty
+                                      <div class="alert alert-secondary text-center">No projects assigned</div>
+                                    @endforelse
                                   </div>
                                 </div>
                               </div>
                             </div>
                           @endforeach
-
                         </div>
                       </div>
+                    </div>
                   </div>
-                </div>
               @endif
 
               <div class="row">
@@ -354,16 +369,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </script>
 
-{{-- <script>
-    window.addEventListener("load", function () {
-        const loader = document.getElementById("loader-wrapper");
-        if (loader) {
-            loader.style.display = "none";
-        }
-    });
-</script> --}}
 
-<script>
+{{-- <script>
   document.addEventListener("DOMContentLoaded", function () {
     const managerNames = @json($projectManagers->map(fn($m) => $m->firstname));
     const projectCounts = @json($projectManagers->pluck('managed_projects_count'));
@@ -429,5 +436,63 @@ document.addEventListener("DOMContentLoaded", function () {
 
     new ApexCharts(document.querySelector("#managerProjectsChart"), options).render();
   });
+</script> --}}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const chartEl = document.querySelector("#managerProjectsChart");
+
+    const options = {
+      chart: {
+        type: 'bar',
+        height: 400,
+        toolbar: { show: true }
+      },
+      series: [{ name: 'Projects', data: [] }],
+      xaxis: { categories: [] },
+      plotOptions: {
+        bar: {
+          distributed: true,
+          borderRadius: 8,
+          columnWidth: '45%',
+          endingShape: 'rounded'
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        style: { fontSize: '13px', colors: ['#fff'] }
+      },
+      colors: ["#9E2140", "#299347", "#F4A51F", "#C3A466"],
+      tooltip: {
+        theme: 'light',
+        y: { formatter: val => `${val} project${val > 1 ? 's' : ''}` }
+      },
+      grid: {
+        borderColor: '#e0e0e0',
+        strokeDashArray: 4
+      },
+      legend: { show: false }
+    };
+
+    const chart = new ApexCharts(chartEl, options);
+    chart.render();
+
+    // Fonction pour charger les données
+    function fetchData() {
+      fetch("/charts/project-managers")
+        .then(res => res.json())
+        .then(data => {
+          chart.updateOptions({
+            xaxis: { categories: data.managers },
+            colors: ["#9E2140", "#299347", "#F4A51F", "#C3A466"].slice(0, data.managers.length)
+          });
+          chart.updateSeries([{ data: data.counts }]);
+        });
+    }
+
+    fetchData(); // première fois
+    setInterval(fetchData, 10000); // refresh toutes les 10 secondes
+  });
 </script>
+
 

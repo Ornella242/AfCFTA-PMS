@@ -13,6 +13,7 @@ class ProjectDeletionRequest extends Model
         'reason',
         'requested_by',
         'approved',
+        'decline_reason',
     ];
 
     // Relations (optionnelles mais utiles)

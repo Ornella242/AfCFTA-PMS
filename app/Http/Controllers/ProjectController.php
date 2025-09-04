@@ -21,6 +21,8 @@ use App\Models\ProjectDeletionRequest;
 use App\Models\Report;
 use App\Models\Task;
 use App\Mail\PhaseCompletedMail;
+use App\Models\ProjectDocument;
+use Illuminate\Support\Facades\Storage;
 
 
 
@@ -122,7 +124,7 @@ class ProjectController extends Controller
     
     public function store(Request $request)
     {
-        //   dd('Store Project Data');
+        
         // 1. Validation basique (tu peux l'améliorer selon ton besoin)
         $validated = $request->validate([
         'title' => 'required|string|max:255',
@@ -141,7 +143,7 @@ class ProjectController extends Controller
         'subphases' => 'nullable|array',
         'procurement_type' => 'nullable|in:afcfta,partner',
         'budget_code' => 'nullable|string|max:50', // Ajout du budget code
-         
+        'supporting_documents.*' => 'file|max:5120|mimes:pdf,doc,docx,xlsx,xls,png,jpg,jpeg',
         ]);
         $validated['created_by'] = Auth::id();
         //   dd($validated); 
@@ -173,7 +175,7 @@ class ProjectController extends Controller
         } else {
             $project->partners()->detach(); // Aucun partenaire sélectionné, on vide la relation
         }
-    //    Si le projet a un partenaire spécifique, on l'ajoute
+       //    Si le projet a un partenaire spécifique, on l'ajoute
         if ($request->input('procurement_type') === 'partner' && $request->has('partner_id')) {
             $partnerId = $request->input('partner_id');
             $project->partners()->syncWithoutDetaching([$partnerId]);
@@ -246,10 +248,7 @@ class ProjectController extends Controller
             }
         }
 
-        // c) Enregistrer les sous-phases liées au projet
-        // if (!empty($subphaseSyncData)) {
-        //     $project->subphases()->sync($subphaseSyncData);
-        // }
+      
 
         if (!empty($subphaseSyncData)) {
             foreach ($subphaseSyncData as $subId => $data) {
@@ -271,12 +270,21 @@ class ProjectController extends Controller
             }
         }
 
+        if ($request->hasFile('supporting_documents')) {
+            foreach ($request->file('supporting_documents') as $file) {
+                $path = $file->store('projects/documents', 'public'); // stocke dans storage/app/public/projects/documents
+                $project->documents()->create([
+                    'filename'  => $file->getClientOriginalName(),
+                    'path'      => $path,
+                    'mime_type' => $file->getMimeType(),
+                    'size'      => $file->getSize(),
+                ]);
+            }
+        }
 
         return redirect()->route('allprojects')->with('success', 'Project created successfully.');
     }
 
-
-    
 
     public function update(Request $request, Project $project)
     {
@@ -369,7 +377,6 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
-        // dd($project->projectManager);
         // Charger les relations du projet
         $project->load(['unit', 'projectManager', 'partners', 'subphases', 'phases','developmentDetails']);
 
@@ -644,34 +651,68 @@ class ProjectController extends Controller
     }
 
   
-    public function requestDelete(Request $request, $id)
-    {
-        $request->validate(['reason' => 'required|string']);
-        $project = Project::findOrFail($id);
+    // public function requestDelete(Request $request, $id)
+    // {
+    //     $request->validate(['reason' => 'required|string']);
+    //     $project = Project::findOrFail($id);
 
-        // Store reason (create a model if needed)
-        \App\Models\ProjectDeletionRequest::create([
-            'project_id' => $project->id,
-            'requested_by' => Auth::id(),
-            'reason' => $request->reason,
-        ]);
+    //     // Store reason (create a model if needed)
+    //     \App\Models\ProjectDeletionRequest::create([
+    //         'project_id' => $project->id,
+    //         'requested_by' => Auth::id(),
+    //         'reason' => $request->reason,
+    //     ]);
 
-        // Notify admins via email
-        $admins =  \App\Models\User::whereHas('role', function ($query) {
-                        $query->where('name', 'Admin');
-                    })->get();
+    //     // Notify admins via email
+    //     $admins =  \App\Models\User::whereHas('role', function ($query) {
+    //                     $query->where('name', 'Admin');
+    //                 })->get();
     
-        $user = Auth::user();
-        foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new \App\Mail\ProjectDeletionRequestMail(
-                $project,
-                $request->reason,
-                Auth::user()
-            ));   
-        }
+    //     $user = Auth::user();
+    //     foreach ($admins as $admin) {
+    //         Mail::to($admin->email)->send(new \App\Mail\ProjectDeletionRequestMail(
+    //             $project,
+    //             $request->reason,
+    //             Auth::user()
+    //         ));   
+    //     }
 
-        return back()->with('success', 'Deletion request sent to administrators.');
+    //     return back()->with('success', 'Deletion request sent to administrators.');
+    // }
+
+    public function requestDelete(Request $request, $id)
+{
+    $request->validate(['reason' => 'required|string']);
+
+    $project = Project::findOrFail($id);
+
+    // 1. Sauvegarde la demande en DB
+    $deletionRequest = \App\Models\ProjectDeletionRequest::create([
+        'project_id'   => $project->id,
+        'requested_by' => Auth::id(),
+        'reason'       => $request->reason,
+        'status'       => 'pending', 
+    ]);
+
+    // 2. Récupère les admins
+    $admins = \App\Models\User::whereHas('role', function ($query) {
+        $query->where('name', 'Admin');
+    })->get();
+
+    // 3. Envoie les mails aux admins
+    foreach ($admins as $admin) {
+        Mail::to($admin->email)->send(
+            new \App\Mail\ProjectDeletionRequestMail(
+                $project,
+                $deletionRequest->reason,
+                Auth::user()
+            )
+        );
     }
+
+    return back()->with('success', 'Deletion request saved and sent to administrators.');
+}
+
 
 
     public function hrmProjects(Request $request)
@@ -868,6 +909,38 @@ class ProjectController extends Controller
         return back()->with('success', 'Project team updated successfully.');
     }
 
+
+    public function projectManagersChart()
+    {
+        $projectManagers = User::withCount('managedProjects')
+                ->whereHas('role', fn($q) => $q->whereIn('name', ['Project Manager', 'Admin']))
+                ->get(['id', 'firstname', 'lastname']);
+
+        return response()->json([
+            'managers' => $projectManagers->pluck('firstname'),
+            'counts'   => $projectManagers->pluck('managed_projects_count'),
+        ]);
+    }
+
+
+   public function uploadDocuments(Request $request, Project $project)
+{
+    $request->validate([
+        'documents.*' => 'required|file|mimes:pdf,doc,docx,xlsx,xls,png,jpg,jpeg|max:2048'
+    ]);
+
+    foreach ($request->file('documents') as $file) {
+        $path = $file->store('projects/documents', 'public');
+
+        ProjectDocument::create([
+            'project_id' => $project->id,
+            'filename'   => $file->getClientOriginalName(),
+            'path'       => $path,
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'Documents uploaded successfully.');
+}
 
 
 };

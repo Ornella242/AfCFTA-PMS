@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ProjectDeletionRequest;
 use App\Models\Project;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
+use App\Mail\DeletionRequestDeclined;
 
 class ProjectDeletionRequestController extends Controller
 {
@@ -33,11 +36,32 @@ class ProjectDeletionRequestController extends Controller
     }
 
 
-    public function decline($id)
+    // public function decline($id)
+    // {
+    //     $request = ProjectDeletionRequest::findOrFail($id);
+    //     $request->delete(); // Or mark as declined with a status
+    //     return back()->with('info', 'Deletion request declined.');
+    // }
+
+    public function decline(Request $request, $id)
     {
-        $request = ProjectDeletionRequest::findOrFail($id);
-        $request->delete(); // Or mark as declined with a status
-        return back()->with('info', 'Deletion request declined.');
+        $request->validate([
+            'decline_reason' => 'required|string|max:1000',
+        ]);
+
+        $dr = \App\Models\ProjectDeletionRequest::with(['requester','project'])->findOrFail($id);
+
+        $dr->update([
+            'approved' => 0, // boolean
+            'decline_reason' => $request->decline_reason,
+        ]);
+
+        // Envoi de l’email au requester
+        Mail::to($dr->requester->email)
+            ->send(new DeletionRequestDeclined($dr, $request->decline_reason));
+
+        return back()->with('success', 'Deletion request declined and requester notified.');
     }
+
 
 }

@@ -128,140 +128,213 @@
           </div>
 
           {{-- Subphases --}}
-        <hr style="border: none; height: 6px; background: linear-gradient(to right, #1b1311, #feb47b);">
+           <hr style="border: none; height: 6px; background: linear-gradient(to right, #1b1311, #feb47b);">
+            <h5 class="text-uppercase mt-4">Phases & Subphases</h5>
 
-        <h5 class="text-uppercase mt-4">Phases & Subphases</h5>
+            @foreach($project->phases as $phase)
+                @php
+                    $subphases = $project->subphases->where('phase_id', $phase->id);
+                    $phaseColor = match(strtolower($phase->name)) {
+                        'tor' => 'bg-primary',
+                        'procurement' => 'bg-warning',
+                        'implementation' => 'bg-success',
+                        'evaluation' => 'bg-info',
+                        default => 'bg-secondary',
+                    };
 
-        @foreach($project->phases as $phase)
-            @php
-                $subphases = $project->subphases->where('phase_id', $phase->id);
-                $phaseColor = match(strtolower($phase->name)) {
-                    'tor' => 'bg-primary',
-                    'procurement' => 'bg-warning',
-                    'implementation' => 'bg-success',
-                    'evaluation' => 'bg-info',
-                    default => 'bg-secondary',
-                };
+                    $borderColor = match(strtolower($phase->name)) {
+                        'tor' => 'border-primary',
+                        'procurement' => 'border-warning',
+                        'implementation' => 'border-success',
+                        'evaluation' => 'border-info',
+                        default => 'border-secondary',
+                    };
+                @endphp
 
-                $borderColor = match(strtolower($phase->name)) {
-                    'tor' => 'border-primary',
-                    'procurement' => 'border-warning',
-                    'implementation' => 'border-success',
-                    'evaluation' => 'border-info',
-                    default => 'border-secondary',
-                };
-            @endphp
+                <div class="card mb-4 shadow-sm border-2 {{ $borderColor }}">
+                    <div class="card-header text-white d-flex justify-content-between align-items-center {{ $phaseColor }}">
+                        <h6 class="mb-0">
+                            {{ $phase->label ?? ucfirst($phase->name) }}
+                        </h6>
+                        <span class="badge bg-light text-dark p-2 ">
+                            {{ $phase->pivot->percentage ?? 0 }}%
+                        </span>
+                    </div>
 
-            <div class="card mb-4 shadow-sm border-2 {{ $borderColor }}">
-                <div class="card-header text-white d-flex justify-content-between align-items-center {{ $phaseColor }}">
-                    <h6 class="mb-0">
-                        {{ $phase->label ?? ucfirst($phase->name) }}
+                    <div class="card-body bg-white">
+                        @if($subphases->isEmpty())
+                            <p class="text-muted">No subphases for this phase.</p>
+                        @else
+                            <ul class="list-group list-group-flush">
+                                @foreach($subphases as $sub)
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            {{ $sub->label ?? $sub->name }}
+
+                                            @php
+                                                $subStatus = $sub->pivot->status;
+                                                $procurementType = strtolower($sub->pivot->procurement_type ?? '');
+                                                $subColor = match($subStatus) {
+                                                    'Completed' => 'success',
+                                                    'In progress' => 'info',
+                                                    'Not started' => 'secondary',
+                                                    'Cancelled' => 'danger',
+                                                    'Delayed' => 'warning',
+                                                    'Waiting Approval' => 'primary',
+                                                    'Under review' => 'dark',
+                                                    default => 'light',
+                                                };
+                                            @endphp
+
+                                            <span class="badge badge-{{ $subColor }} pt-2 pb-2 badge-pill">
+                                                {{ $sub->pivot->percentage }}%
+                                            </span>
+                                        </div>
+
+                                        {{-- Affichage conditionnel selon procurement_type --}}
+                                        @if(strtolower($phase->name) === 'procurement')
+                                            @if($procurementType === 'partner')
+                                                <div class="mt-2">
+                                                    <label><strong>Partner Procurement Status:</strong></label>
+                                                    <select class="form-control w-50" name="partner_procurement_status_{{ $sub->id }}">
+                                                        <option value="">-- Select Status --</option>
+                                                        <option value="Not started" {{ $subStatus === 'Not started' ? 'selected' : '' }}>Not started</option>
+                                                        <option value="In progress" {{ $subStatus === 'In progress' ? 'selected' : '' }}>In progress</option>
+                                                        <option value="Completed" {{ $subStatus === 'Completed' ? 'selected' : '' }}>Completed</option>
+                                                        <option value="Delayed" {{ $subStatus === 'Delayed' ? 'selected' : '' }}>Delayed</option>
+                                                        <option value="Cancelled" {{ $subStatus === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                                        <option value="Waiting Approval" {{ $subStatus === 'Waiting Approval' ? 'selected' : '' }}>Waiting Approval</option>
+                                                        <option value="Under review" {{ $subStatus === 'Under review' ? 'selected' : '' }}>Under review</option>
+                                                    </select>
+                                                </div>
+                                            @elseif($procurementType === 'afcfta')
+                                                <p class="text-muted mt-2">AfCFTA procurement in progress.</p>
+                                            @endif
+                                        @endif
+
+                                        {{-- Activités de développement --}}
+                                    
+                                        @if($sub->name === 'development' && $project->developmentDetails->count())
+                                        <div class="mt-2 ml-3">
+                                            <strong>Development Activities:</strong>
+                                            <ul class="list-group mt-1">
+                                                @foreach($project->developmentDetails as $activity)
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                        {{-- Titre et notes --}}
+                                                        <div>
+                                                            <strong>{{ $activity->title }}</strong>
+                                                            @if($activity->notes)
+                                                                <div><small class="text-muted">{{ $activity->notes }}</small></div>
+                                                            @endif
+                                                        </div>
+
+                                                        {{-- Infos à droite : budget + statut + date --}}
+                                                        <div class="text-right">
+                                                            <small class="text-muted">
+                                                                @if($activity->budget_activity > 0)
+                                                                    ${{ number_format($activity->budget_activity, 2) }}
+                                                                @else
+                                                                    No budget dedicated
+                                                                @endif
+
+                                                                {{-- Statut de paiement --}}
+                                                                @if($activity->payment_status)
+                                                                    | {{ $activity->payment_status }}
+
+                                                                    {{-- Date si payé --}}
+                                                                    @if($activity->payment_status === 'Paid' && $activity->payment_date)
+                                                                        on {{ \Carbon\Carbon::parse($activity->payment_date)->format('d M Y') }}
+                                                                    @endif
+                                                                @endif
+                                                            </small>
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        @endif
+
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+
+            {{-- Supporting Documents --}}
+            <hr style="border: none; height: 6px; background: linear-gradient(to right, #1b1311, #feb47b);">
+            <h5 class="text-uppercase mt-4">Supporting Documents</h5>
+
+            <div class="card mb-4 shadow-sm border-2 border-dark">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 text-white">
+                        <i class="fe fe-folder mr-2"></i> Documents
                     </h6>
-                    <span class="badge bg-light text-dark p-2 ">
-                        {{ $phase->pivot->percentage ?? 0 }}%
-                    </span>
                 </div>
 
-                <div class="card-body bg-white">
-                    @if($subphases->isEmpty())
-                        <p class="text-muted">No subphases for this phase.</p>
-                    @else
-                        <ul class="list-group list-group-flush">
-                            @foreach($subphases as $sub)
-                                <li class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        {{ $sub->label ?? $sub->name }}
+               <div class="card-body bg-white">
+                    @if($project->documents && $project->documents->count())
+                        <div class="d-flex flex-wrap gap-4">
+                            @foreach($project->documents as $doc)
+                                @php
+                                    $extension = strtolower(pathinfo($doc->filename, PATHINFO_EXTENSION));
+                                    $iconPath = asset('images/icons/documents/file.png'); // défaut
 
-                                        @php
-                                            $subStatus = $sub->pivot->status;
-                                            $procurementType = strtolower($sub->pivot->procurement_type ?? '');
-                                            $subColor = match($subStatus) {
-                                                'Completed' => 'success',
-                                                'In progress' => 'info',
-                                                'Not started' => 'secondary',
-                                                'Cancelled' => 'danger',
-                                                'Delayed' => 'warning',
-                                                'Waiting Approval' => 'primary',
-                                                'Under review' => 'dark',
-                                                default => 'light',
-                                            };
-                                        @endphp
+                                    if (in_array($extension, ['xls', 'xlsx'])) {
+                                        $iconPath = asset('images/icons/documents/excel.png');
+                                    } elseif (in_array($extension, ['doc', 'docx'])) {
+                                        $iconPath = asset('images/icons/documents/word.png');
+                                    } elseif ($extension === 'pdf') {
+                                        $iconPath = asset('images/icons/documents/pdf.png');
+                                    } elseif (in_array($extension, ['jpg', 'jpeg', 'png'])) {
+                                        $iconPath = asset('images/icons/documents/imagei.png');
+                                    }
+                                @endphp
 
-                                        <span class="badge badge-{{ $subColor }} pt-2 pb-2 badge-pill">
-                                            {{ $sub->pivot->percentage }}%
-                                        </span>
+                               <div class="text-center m-2" style="width: 150px;">
+                                    @php
+                                        $extension = strtolower(pathinfo($doc->filename, PATHINFO_EXTENSION));
+                                        $isImage = in_array($extension, ['jpg','jpeg','png','gif']);
+                                    @endphp
+
+                                    @if($isImage)
+                                        {{-- Afficher une miniature de l'image --}}
+                                        <a href="{{ asset('storage/' . $doc->path) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $doc->path) }}" 
+                                                alt="preview" 
+                                                style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
+                                        </a>
+                                    @else
+                                        {{-- Afficher l'icône correspondante --}}
+                                        <a href="{{ asset('storage/' . $doc->path) }}" target="_blank">
+                                            <img src="{{ $iconPath }}" 
+                                                alt="icon" 
+                                                style="width:48px; height:48px; object-fit:contain;">
+                                        </a>
+                                    @endif
+
+                                    {{-- Nom du fichier --}}
+                                    <div class="mt-2 small text-truncate" title="{{ $doc->filename }}">
+                                        {{ $doc->filename }}
                                     </div>
 
-                                    {{-- Affichage conditionnel selon procurement_type --}}
-                                    @if(strtolower($phase->name) === 'procurement')
-                                        @if($procurementType === 'partner')
-                                            <div class="mt-2">
-                                                <label><strong>Partner Procurement Status:</strong></label>
-                                                <select class="form-control w-50" name="partner_procurement_status_{{ $sub->id }}">
-                                                    <option value="">-- Select Status --</option>
-                                                    <option value="Not started" {{ $subStatus === 'Not started' ? 'selected' : '' }}>Not started</option>
-                                                    <option value="In progress" {{ $subStatus === 'In progress' ? 'selected' : '' }}>In progress</option>
-                                                    <option value="Completed" {{ $subStatus === 'Completed' ? 'selected' : '' }}>Completed</option>
-                                                    <option value="Delayed" {{ $subStatus === 'Delayed' ? 'selected' : '' }}>Delayed</option>
-                                                    <option value="Cancelled" {{ $subStatus === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                                    <option value="Waiting Approval" {{ $subStatus === 'Waiting Approval' ? 'selected' : '' }}>Waiting Approval</option>
-                                                    <option value="Under review" {{ $subStatus === 'Under review' ? 'selected' : '' }}>Under review</option>
-                                                </select>
-                                            </div>
-                                        @elseif($procurementType === 'afcfta')
-                                            <p class="text-muted mt-2">AfCFTA procurement in progress.</p>
-                                        @endif
-                                    @endif
+                                    {{-- Bouton download --}}
+                                    <a href="{{ asset('storage/' . $doc->path) }}" 
+                                    target="_blank" 
+                                    class="btn btn-sm btn-outline-secondary mt-2 w-100">
+                                        <i class="fe fe-eye mr-1"></i> View
+                                    </a>
+                                </div>
 
-                                    {{-- Activités de développement --}}
-                                  
-                                    @if($sub->name === 'development' && $project->developmentDetails->count())
-                                      <div class="mt-2 ml-3">
-                                          <strong>Development Activities:</strong>
-                                          <ul class="list-group mt-1">
-                                              @foreach($project->developmentDetails as $activity)
-                                                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                      {{-- Titre et notes --}}
-                                                      <div>
-                                                          <strong>{{ $activity->title }}</strong>
-                                                          @if($activity->notes)
-                                                              <div><small class="text-muted">{{ $activity->notes }}</small></div>
-                                                          @endif
-                                                      </div>
-
-                                                      {{-- Infos à droite : budget + statut + date --}}
-                                                      <div class="text-right">
-                                                          <small class="text-muted">
-                                                              @if($activity->budget_activity > 0)
-                                                                  ${{ number_format($activity->budget_activity, 2) }}
-                                                              @else
-                                                                  No budget dedicated
-                                                              @endif
-
-                                                              {{-- Statut de paiement --}}
-                                                              @if($activity->payment_status)
-                                                                  | {{ $activity->payment_status }}
-
-                                                                  {{-- Date si payé --}}
-                                                                  @if($activity->payment_status === 'Paid' && $activity->payment_date)
-                                                                      on {{ \Carbon\Carbon::parse($activity->payment_date)->format('d M Y') }}
-                                                                  @endif
-                                                              @endif
-                                                          </small>
-                                                      </div>
-                                                  </li>
-                                              @endforeach
-                                          </ul>
-                                      </div>
-                                    @endif
-
-                                </li>
                             @endforeach
-                        </ul>
+                        </div>
+                    @else
+                        <p class="text-muted mb-0">No supporting documents uploaded.</p>
                     @endif
                 </div>
+
             </div>
-        @endforeach
 
         </div>
       </div>

@@ -1,4 +1,5 @@
 @include('partials.navbar')
+
  <div id="loading-spinner" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
   <div class="spinner-grow mr-3 text-success" role="status" style="width: 3rem; height: 3rem;">
     <span class="sr-only">Loading...</span>
@@ -53,42 +54,7 @@
                     </div>
                 </div>
              </div>
-              {{-- <div class="row">
-                @foreach($roles as $role)
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow {{ 
-                         $role->name === 'Admin' ? 'bg-gold' : 
-                        ($role->name === 'Project Manager' ? 'bg-maroon' : 
-                        ($role->name === 'Project Manager Assistant' ? 'bg-yellow' : 'bg-green')) }}"
-                        data-role-id="{{ $role->id }}"
-                        style="cursor: pointer;"
-                        onclick="loadRoleUsers({{ $role->id }})">
-                        
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <span class="h3 text-white mb-0">{{ $role->name }}</span>
-                                    <p class="small text-white mb-0">
-                                        @if($role->name === 'Admin') Full access on the system
-                                        @elseif($role->name === 'Project Manager') Full access on the system
-                                        @else Low access on the system @endif
-                                    </p>
-                                    <span class="badge badge-pill bg-green mt-1 mb-1 text-white">
-                                        {{ $role->users_count }} user{{ $role->users_count > 1 ? 's' : '' }}
-                                    </span>
-                                </div>
-                                <div class="col-auto">
-                                    <span class="fe fe-32 {{ 
-                                        $role->name === 'Admin' ? 'fe-shield' : 
-                                        ($role->name === 'Project Manager' ? 'fe-user' : 'fe-users') }} text-white mb-0">
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-              </div> --}}
+            
                 <div class="row">
                     @foreach($roles as $role)
                         <div class="col-md-4 mb-4">
@@ -133,31 +99,6 @@
                     @endforeach
                 </div>
 
-              {{-- <div class="col-md-12">
-                   <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="h5 mb-0">Role details</h6>
-                        <div class="form-group mb-0">
-                            <input type="text" class="form-control" id="searchUserInput" placeholder="Search by name..." style="width: 250px;">
-                        </div>
-                    </div>
-
-
-                  <table class="table table-borderless table-striped">
-                    <thead>
-                      <tr role="row">
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Unit</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody id="roleUsersTableBody">
-                        <tr><td colspan="4" class="text-muted">Click on a role card to see details.</td></tr>
-                    </tbody>
-
-                  </table>
-                </div>
-              </div> --}}
 
               <div class="col-md-12">
     <div class="card shadow-sm border-0 rounded-lg">

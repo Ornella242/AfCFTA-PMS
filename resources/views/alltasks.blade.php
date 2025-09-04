@@ -155,7 +155,7 @@
         <div class="col-12 mb-3">     
             <div class="card shadow p-2 rounded-lg">
                 <ul class="nav nav-tabs custom-nav" id="taskTabs" role="tablist">
-                    @if (auth()->user()->role && auth()->user()->role->name !== 'Member')    
+                    @if (auth()->user()->role && auth()->user()->role->name !== 'Member' && auth()->user()->role->name !== 'Project Manager Assistant')  
                         <li class="nav-item">
                             <a class="nav-link active" id="summary-tab" data-toggle="tab" href="#summary-tab-content" role="tab" aria-controls="summary-tab-content" aria-selected="true">
                                 <i class="fe fe-aperture"></i> Summary
@@ -185,7 +185,7 @@
 
         <div class="col-12 tab-content mt-3" id="taskTabsContent">
                 <!-- SUMMARY -->
-              @if (auth()->user()->role && auth()->user()->role->name !== 'Member')
+              @if (auth()->user()->role && auth()->user()->role->name !== 'Member' && auth()->user()->role->name !== 'Project Manager Assistant')
                 <div class="tab-pane fade-in show active" id="summary-tab-content" role="tabpanel" aria-labelledby="summary-tab">
                     <div class="row"> 
                             <div class="col-md-6">

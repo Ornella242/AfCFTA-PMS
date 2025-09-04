@@ -94,5 +94,11 @@ class Project extends Model
             ->first();
     }
 
+    public function documents()
+    {
+        return $this->hasMany(ProjectDocument::class);
+    }
+
+
 
 }

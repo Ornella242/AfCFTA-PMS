@@ -78,41 +78,68 @@ function statusColorClass($status) {
         border-radius: 6px;
         padding: 4px 6px;
     }
+    
 
 </style>
 @include('partials.navbar')
 <main role="main" class="main-content fade-in" id="page-transition">
         <div class="container-fluid">
           <div class="row justify-content-center">
-            <div class="col-12">
+           <div class="col-12">
               @if(auth()->user()->role && auth()->user()->role->name === 'Admin' && $deletionRequests->count())
-                <div class="alert alert-warning">
-                  <h5>Project Cancellation Requests</h5>
+                <div class="alert alert-warning border-0 shadow-sm rounded-lg p-4">
+                  
+                  <!-- Header -->
+                  <h4 class="mb-3 text-dark d-flex align-items-center">
+                    <i class="fe fe-alert-triangle text-danger mr-2"></i>
+                    Project Cancellation Requests
+                  </h4>
+
+                  <!-- List of requests -->
                   @foreach($deletionRequests as $request)
-                    <div class="card mb-2">
+                    <div class="card mb-3 border-0 shadow-sm rounded-lg">
                       <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <!-- Infos -->
                         <div>
-                          <p><strong>{{ $request->requester->firstname }} {{ $request->requester->lastname }}</strong> wants to delete <strong>{{ $request->project->title }}</strong></p>
-                          <p><strong>Reason:</strong> {{ $request->reason }}</p>
+                          <h6 class="mb-1">
+                            <strong class="text-primary">
+                              {{ $request->requester->firstname }} {{ $request->requester->lastname }}
+                            </strong>
+                            <span class="text-muted">requests to delete</span>
+                            <strong class="text-dark">{{ $request->project->title }}</strong>
+                          </h6>
+                          <p class="mb-0 text-muted">
+                            <i class="fe fe-info mr-1 text-secondary"></i>
+                            <strong>Reason:</strong> {{ $request->reason }}
+                          </p>
                         </div>
+
+                        <!-- Actions -->
                         <div class="d-flex">
-                          <form action="{{ route('deletionRequests.approve', $request->id) }}" method="POST" class="mr-2">
+                          <!-- Approve -->
+                          <form action="{{ route('deletionRequests.approve', $request->id) }}" 
+                                method="POST" class="mr-2">
                             @csrf
-                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            <button type="submit" class="btn btn-success btn-sm shadow-sm d-flex align-items-center">
+                              <i class="fe fe-check mr-1"></i> Approve
+                            </button>
                           </form>
 
-                          <form action="{{ route('deletionRequests.decline', $request->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Decline</button>
-                          </form>
+                          <!-- Decline button -->
+                          <button type="button" class="btn btn-outline-danger btn-sm shadow-sm d-flex align-items-center" 
+                                  data-toggle="modal" data-target="#declineModal-{{ $request->id }}">
+                            <i class="fe fe-x mr-1"></i> Decline
+                          </button>
                         </div>
                       </div>
                     </div>
                   @endforeach
+
                 </div>
               @endif
             </div>
+
             <div class="col-12">
               <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
                   <!-- Back Button -->
@@ -490,6 +517,56 @@ function statusColorClass($status) {
       </div>
     </div>
 
+  @if(auth()->user()->role && auth()->user()->role->name === 'Admin' && $deletionRequests->count())
+    @foreach($deletionRequests as $request)
+      <!-- Decline Modal -->
+      <div class="modal fade" id="declineModal-{{ $request->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+          <div class="modal-content shadow-lg border-0 rounded-3">
+            <form action="{{ route('deletionRequests.decline', $request->id) }}" method="POST">
+              @csrf
+              @method('PUT')
+
+              <!-- Header -->
+              <div class="modal-header bg-maroon border-0">
+                <h5 class="modal-title text-white font-weight-bold">
+                  <i class="fa fa-times-circle mr-2"></i> Decline Deletion Request
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              <!-- Body -->
+              <div class="modal-body">
+                <p class="text-muted mb-3">
+                  You are about to decline this project deletion request. Please provide a reason below:
+                </p>
+
+                <div class="form-group">
+                  <label for="declineReason-{{ $request->id }}" class="font-weight-semibold">
+                    Reason for Decline <span class="text-danger">*</span>
+                  </label>
+                  <textarea name="decline_reason" id="declineReason-{{ $request->id }}" 
+                    class="form-control border-danger" rows="4" required></textarea>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                  <i class="fa fa-arrow-left mr-1"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-danger shadow-sm">
+                  <i class="fa fa-check-circle mr-1"></i> Confirm Decline
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    @endforeach
+  @endif
 
 </main>
 

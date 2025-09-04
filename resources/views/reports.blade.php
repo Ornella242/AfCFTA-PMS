@@ -9,32 +9,6 @@
                 </div>
                 <div class="col-auto">
                     <button type="button" class="btn mb-2 bg-maroon  text-white" data-toggle="modal" data-target="#varyModal" data-whatever="@mdo"><i class="fe fe-upload mx-1"></i>Generate new </button>
-                    <div class="modal fade" id="varyModal" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="varyModalLabel">New report</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                  <div class="form-row">
-                                      <label for="priority">Project name</label>
-                                       <select class="form-control" id="project_id" name="project_id">
-                                          @foreach ($projects as $project)
-                                            <option value="{{ $project->id }}">{{ $project->title }}</option>
-                                          @endforeach
-                                      </select>
-                                  </div>
-                                  <!-- Footer -->
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary" onclick="goToReport()">Generate</button>                                  </div>
-                                </div>
-                            </div>
-                        </div>
-                        </div>
                     </div>
                 </div>
                  <div class="col-12">
@@ -110,6 +84,34 @@
           </div> <!-- .row -->
         </div> <!-- .container-fluid -->
         @include('partials.footer')
+
+<div class="modal fade" id="varyModal" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="varyModalLabel">New report</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                  </button>
+                              </div>
+                              <div class="modal-body">
+                                    <div class="form-row">
+                                        <label for="priority">Project name</label>
+                                        <select class="form-control" id="project_id" name="project_id">
+                                            @foreach ($projects as $project)
+                                              <option value="{{ $project->id }}">{{ $project->title }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <!-- Footer -->
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                      <button type="button" class="btn btn-primary" onclick="goToReport()">Generate</button>                                  </div>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                    </div>
 
         @foreach ($monthlyReports as $report)
           <div class="modal fade" id="shareReportModal{{ $report->id }}" tabindex="-1" role="dialog">
