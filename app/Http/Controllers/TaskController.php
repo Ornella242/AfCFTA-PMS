@@ -378,9 +378,43 @@ class TaskController extends Controller
     }
 
 
-    public function show(Task $task)
+    // public function show(Task $task)
+    // {
+    //     $task->load(['assignedUser', 'comments.user']);
+    //     return response()->json([
+    //         'id' => $task->id,
+    //         'title' => $task->title,
+    //         'description' => $task->description,
+    //         'start_date' => $task->start_date,
+    //         'end_date' => $task->end_date,
+    //         'priority' => $task->priority,
+    //         'status' => $task->status,
+    //         'assigned_user' => [
+    //             'id' => $task->assignedUser?->id,
+    //             'firstname' => $task->assignedUser?->firstname,
+    //             'lastname' => $task->assignedUser?->lastname,
+    //         ],
+    //         'comments' => $task->comments->map(function($comment) {
+    //             return [
+    //                 'id' => $comment->id,
+    //                 'comment' => $comment->comment,
+    //                 'created_at' => $comment->created_at->format('d M Y H:i'),
+    //                 'user' => [
+    //                     'id' => $comment->user?->id,
+    //                     'firstname' => $comment->user?->firstname,
+    //                     'lastname' => $comment->user?->lastname,
+    //                 ]
+    //             ];
+    //         })
+    //     ]);
+
+    // }
+
+    public function show($encryptedId)
     {
-        $task->load(['assignedUser', 'comments.user']);
+        $id = decrypt($encryptedId);
+        $task = Task::with(['assignedUser', 'comments.user'])->findOrFail($id);
+
         return response()->json([
             'id' => $task->id,
             'title' => $task->title,
@@ -407,12 +441,14 @@ class TaskController extends Controller
                 ];
             })
         ]);
-
     }
 
 
-    public function storeComment(Request $request, Task $task)
+    public function storeComment(Request $request, $encryptedId)
     {
+        $id = decrypt($encryptedId);
+        $task = Task::findOrFail($id);
+
         $request->validate([
             'comment' => 'required|string|max:1000',
         ]);
@@ -474,9 +510,12 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Task updated successfully!');
     }
 
+    
 
-    public function archive(Task $task)
+    public function archive(Task $task, $encryptedId)
     {
+        $id = decrypt($encryptedId);
+        $task = Task::findOrFail($id);
         $user = Auth::user();
 
         if ($task->created_by == $user->id) {
@@ -507,45 +546,6 @@ class TaskController extends Controller
     }
 
 
-
-    // public function chartData()
-    // {
-    //     // 1. Tâches par personne
-    //     $tasksByUserQuery = Task::join('users', 'tasks.assigned_to', '=', 'users.id')
-    //         ->selectRaw('users.id, users.firstname as username, COUNT(*) as total')
-    //         ->groupBy('users.id', 'users.firstname');
-
-    //     if (Auth::user()->role->name === 'Project Manager') {
-    //         $tasksByUserQuery->where('tasks.created_by', Auth::id());
-    //     }
-
-    //     $tasksByUser = $tasksByUserQuery->pluck('total', 'username');
-
-    //     // 2. Répartition par statut (Admin vs Project Manager)
-    //     $statusQuery = Task::query();
-
-    //     if (Auth::user()->role->name === 'Project Manager') {
-    //         // Un PM ne voit que les tâches qu’il a assignées
-    //         $statusQuery->where('created_by', Auth::id());
-    //     }
-
-    //     $statusCounts = $statusQuery
-    //         ->selectRaw('status, count(*) as total')
-    //         ->groupBy('status')
-    //         ->pluck('total', 'status');
-
-    //     // 3. Mes propres tâches
-    //     $myTasks = Task::where('assigned_to', Auth::id())
-    //         ->selectRaw('status, count(*) as total')
-    //         ->groupBy('status')
-    //         ->pluck('total', 'status');
-
-    //     return response()->json([
-    //         'tasksByUser'   => $tasksByUser,
-    //         'statusCounts'  => $statusCounts,
-    //         'myTasks'       => $myTasks,
-    //     ]);
-    // }
 
     public function chartData()
     {

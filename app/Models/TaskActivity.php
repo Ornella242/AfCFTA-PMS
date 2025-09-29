@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Hashidable;
+// use App\Traits\Hashidable;
 
 class TaskActivity extends Model
 {
-    use Hashidable;
+    // use Hashidable;
     protected $fillable = ['task_id', 'user_id', 'from_status', 'to_status'];
 
     public function task()

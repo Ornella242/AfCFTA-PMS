@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Hashidable;
+// use App\Traits\Hashidable;
 
 class Subphase extends Model
 {
-    use Hashidable;
+    // use Hashidable;
     protected $fillable = ['phase_id', 'name', 'label'];
 
     public function phase()

@@ -26,61 +26,7 @@
                         <button type="button" class="btn bg-green  text-white" data-toggle="modal" data-target="#varyModalUser" data-whatever="@mdo">
                             <i class="fe fe-user-plus mx-1"></i>Add new user
                         </button>
-                         <!-- Modal -->
-                         <div class="modal fade" id="varyModalUser" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 class="modal-title" id="varyModalLabel">New user</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                </div>
-                                <div class="modal-body">
-                                <form action="{{ route('users.store') }}" method="POST">
-                                    @csrf
-                                    <!-- Firstname -->
-                                    <div class="form-group">
-                                    <label for="first">Firstname</label>
-                                    <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter firstname" required>
-                                    </div>
-                                    <div class="form-group">
-                                    <label for="last">Lastname</label>
-                                    <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter lastname" required>
-                                    </div>
-                                    <div class="form-group">
-                                    <label for="email">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email " required>
-                                    </div>  
-                                    <!-- Role & Unit -->
-                                    <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="unit">Unit</label>
-                                         <select name="unit_id" id="unit" class="form-control">
-                                            @foreach($units as $unit)
-                                                <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                        <div class="form-group col-md-6">
-                                        <label for="role">Role</label>
-                                        <select id="role" class="form-control" name='role_id'>
-                                                @foreach($roles as $role)
-                                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                                @endforeach
-                                        </select>
-                                    </div>
-                                    </div>
-                                    <!-- Footer -->
-                                    <div class="modal-footer">
-                                        <button type="submit" class="btn bg-green text-white">
-                                            <i class="fe fe-user-plus mx-1"></i>Add
-                                        </button>
-                                    </div>
-                                </form>
-                                </div>
-                            </div>
-                        </div>
+                       
                     </div>
                 </div>
             </div>
@@ -149,7 +95,6 @@
                                     @endphp
 
                                     <td><i class="{{ $icon }} {{ $color }}"></i> {{ $user->role->name ?? '—' }}</td>
-                                    {{-- <td>{{ $user->role->name ?? '—' }}</td> --}}
 
                                      <!-- Action column -->
                                     <td class="text-center">
@@ -176,84 +121,135 @@
                                                     <i class="fe fe-trash-2"></i>
                                                 </button>
                                             </form>
-                                            <!-- Assign -->
-                                            {{-- <a href="{{ route('users.assign', $user->id) }}" class="text-warning text-decoration-none" title="Assign">
-                                                <i class="fe fe-user-plus"></i>
-                                            </a> --}}
+                                           
                                         </div>
                                     </td>
-
-
                                 </tr>
                             @endforeach
                         </tbody>
-
                       </table>
-                      <!-- Edit User Modal -->
-                        <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <form method="POST" action="" id="editUserForm">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title">Edit User</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span>&times;</span>
-                                    </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <input type="hidden" name="user_id" id="edit_user_id">
-
-                                        <div class="form-group">
-                                            <label for="firstname">Firstname</label>
-                                            <input type="text" name="firstname" id="edit_firstname" class="form-control" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="lastname">Lastname</label>
-                                            <input type="text" name="lastname" id="edit_lastname" class="form-control" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" name="email" id="edit_email" class="form-control" required>
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="form-group col-md-6">
-                                                <label for="unit">Unit</label>
-                                                <select name="unit_id" id="edit_unit_id" class="form-control">
-                                                    @foreach($units as $unit)
-                                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label for="role">Role</label>
-                                                <select name="role_id" id="edit_role_id" class="form-control">
-                                                    @foreach($roles as $role)
-                                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                    <button type="submit" class="btn bg-green text-white">
-                                        <i class="fe fe-save"></i> Save
-                                    </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        </div>
-
                     </div>
                   </div>
                 </div> <!-- simple table -->
               </div> <!-- end section -->
             </div> <!-- .col-12 -->
           </div> <!-- .row -->
-        </div> <!-- .container-fluid -->   
+        </div> <!-- .container-fluid -->      
 </main>
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form method="POST" action="" id="editUserForm">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="user_id" id="edit_user_id">
+
+                    <div class="form-group">
+                        <label for="firstname">Firstname</label>
+                        <input type="text" name="firstname" id="edit_firstname" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastname">Lastname</label>
+                        <input type="text" name="lastname" id="edit_lastname" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="edit_email" class="form-control" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="unit">Unit</label>
+                            <select name="unit_id" id="edit_unit_id" class="form-control">
+                                @foreach($units as $unit)
+                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="role">Role</label>
+                            <select name="role_id" id="edit_role_id" class="form-control">
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="submit" class="btn bg-green text-white">
+                    <i class="fe fe-save"></i> Save
+                </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="varyModalUser" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="varyModalLabel">New user</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        <form action="{{ route('users.store') }}" method="POST">
+            @csrf
+            <!-- Firstname -->
+            <div class="form-group">
+            <label for="first">Firstname</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter firstname" required>
+            </div>
+            <div class="form-group">
+            <label for="last">Lastname</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter lastname" required>
+            </div>
+            <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email " required>
+            </div>  
+            <!-- Role & Unit -->
+            <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="unit">Unit</label>
+                    <select name="unit_id" id="unit" class="form-control">
+                    @foreach($units as $unit)
+                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+                <div class="form-group col-md-6">
+                <label for="role">Role</label>
+                <select id="role" class="form-control" name='role_id'>
+                        @foreach($roles as $role)
+                                <option value="{{ $role->id }}">{{ $role->name }}</option>
+                        @endforeach
+                </select>
+            </div>
+            </div>
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="submit" class="btn bg-green text-white">
+                    <i class="fe fe-user-plus mx-1"></i>Add
+                </button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+
+
 <script src="{{ asset('js/apps.js') }}"></script>
 <script src="https://unpkg.com/feather-icons"></script>
 

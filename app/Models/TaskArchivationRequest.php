@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Hashidable;
+// use App\Traits\Hashidable;
 class TaskArchivationRequest extends Model
 {
-    use Hashidable;
+    // use Hashidable;
     protected $table = 'task_archive_requests';
      protected $fillable = [
         'task_id',

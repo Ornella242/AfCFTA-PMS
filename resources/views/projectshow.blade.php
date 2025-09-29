@@ -18,7 +18,7 @@
           <strong class="card-title h3 text-white mt-3">{{ $project->title }}</strong>
           
           <div class="d-flex align-items-center">
-            <a href="{{ route('projects.viewReport', $project->id) }}" class="btn btn-sm btn-light text-black font-bold mr-3 shadow-sm">
+            <a href="{{ route('projects.viewReport', encrypt($project->id)) }}" class="btn btn-sm btn-light text-black font-bold mr-3 shadow-sm">
               <i class="fe fe-file-text text-green mr-1"></i> View Report
             </a>
 

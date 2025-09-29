@@ -16,10 +16,11 @@ use App\Models\User;
 class ReportController extends Controller
 {
    
-    public function viewReport(Project $project)
-    {
-        // dd($project);
-        // Vérifie si un rapport existe déjà aujourd'hui pour ce projet et cet utilisateur
+    public function viewReport($encryptedId)
+  {
+    $id = decrypt($encryptedId);
+    $project = Project::findOrFail($id);
+      
         $existingReport = Report::where('project_id', $project->id)
             ->where('user_id', Auth::id())
             ->whereDate('generated_at', now()->toDateString())

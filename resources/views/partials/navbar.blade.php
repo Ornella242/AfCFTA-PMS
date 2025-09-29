@@ -60,12 +60,7 @@
 
           <!-- Right: Notifications & User -->
           <ul class="nav align-items-center">
-              <li class="nav-item nav-notif">
-                  <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
-                      <span class="fe fe-bell fe-16"></span>
-                      <span class="dot dot-md bg-success"></span>
-                  </a>
-              </li>
+             
               <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle text-muted pr-0 d-flex align-items-center" href="#" id="navbarDropdownMenuLink"
                     role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -95,13 +90,6 @@
           <i class="fe fe-x"><span class="sr-only"></span></i>
         </a>
         <nav class="vertnav navbar navbar-light">
-          <!-- nav bar -->
-          {{-- <div class="w-100 mb-4 d-flex align-items-center">
-                <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-img me-3" style="height: 50px;">
-                    <span class="ms-2 fw-bold text-dark h4 mb-0">AHRMD Projects</span>
-                </a>
-         </div> --}}
 
           <div class="w-100 mb-1 d-flex justify-content-center align-items-center">
               <a class="navbar-brand " href="{{ url('/') }}">
@@ -192,11 +180,11 @@
                    <img src="{{ asset('images/icons/reports.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
                     <span class="ml-3 item-text">Reports</span>
                   </a>
-                  @if(isset($totalReports))
+                  {{-- @if(isset($totalReports))
                     <span class="badge badge-pill bg-green text-white mr-3 pt-2 pb-2">
                       {{ $totalReports }}
                     </span>
-                  @endif 
+                  @endif  --}}
               </li>
             </ul>
         

@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TaskComment;
-use App\Traits\Hashidable;
+// use App\Traits\Hashidable;
 
 class Task extends Model
 {
-    use Hashidable;
+    // use Hashidable;
     protected $casts = [
     'start_date' => 'date',
     'end_date' => 'date',

@@ -602,11 +602,11 @@
                               $extension = strtolower(pathinfo($doc->filename, PATHINFO_EXTENSION));
                               $isImage = in_array($extension, ['jpg','jpeg','png','gif','webp']);
                               $iconPath = match($extension) {
-                                  'pdf' => asset('images/icons/pdf.png'),
-                                  'doc','docx' => asset('images/icons/word.png'),
-                                  'xls','xlsx' => asset('images/icons/excel.png'),
-                                  'ppt','pptx' => asset('images/icons/ppt.png'),
-                                  default => asset('images/icons/filei.png'),
+                                  'pdf' => asset('images/icons/documents/pdf.png'),
+                                  'doc','docx' => asset('images/icons/documents/word.png'),
+                                  'xls','xlsx' => asset('images/icons/documents/excel.png'),
+                                  'ppt','pptx' => asset('images/icons/documents/ppt.png'),
+                                  default => asset('images/icons/documents/filei.png'),
                               };
                           @endphp
 

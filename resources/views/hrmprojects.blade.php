@@ -360,12 +360,12 @@
                               $project->status !== 'Completed' && 
                               ($isManager || $isAdmin || $isMember || $isPMAssistant)
                           )
-                              <a href="{{ route('projects.edit', $project) }}" class="text-primary mx-1 text-decoration-none">
+                              <a href="{{ route('projects.edit', encrypt($project->id)) }}" class="text-primary mx-1 text-decoration-none">
                                   <i class="fe fe-edit-2"></i>
                               </a>
                           @endif
 
-                            <a href="{{ route('projects.show', $project->id) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
+                            <a href="{{ route('projects.show', encrypt($project->id)) }}" class="text-info mx-1 text-decoration-none"><i class="fe fe-eye"></i></a>
                               @if($project->status === 'Cancelled')
                                 {{-- Bouton de réactivation --}}
                                 <!-- Reactivate Trigger Button -->

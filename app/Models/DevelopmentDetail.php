@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Traits\Hashidable;
+// use App\Traits\Hashidable;
 
 class DevelopmentDetail extends Model
 {
-    use Hashidable;
+    // use Hashidable;
     use HasFactory;
     protected $fillable = [
         'project_id',

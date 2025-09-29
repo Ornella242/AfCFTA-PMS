@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\Hashidable;
 class Unit extends Model
 {
-    use Hashidable;
+    // use Hashidable;
     use HasFactory;
 
     protected $fillable = ['name'];

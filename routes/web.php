@@ -42,18 +42,7 @@ Route::get('/', function () {
     return view('auth.register');
 });
 Route::view('/login', 'auth.login');
-// Route::view('/newproject', 'newproject');
-// Route::view('/allprojects', 'allprojects');
-// Route::view('/adminprojects', 'adminprojects');
-// Route::view('/hrmprojects', 'hrmprojects');
-// Route::view('/projectdetail', 'projectdetail');
 
-Route::view('/alltasks', 'alltasks');
-Route::view('/edittask', 'edittask');
-Route::view('/hrmtasks', 'hrmtasks');
-Route::view('/admintasks', 'admintasks');
-Route::view('/reports', 'reports');
-Route::view('/viewreport', 'viewreport');
 
 Route::view('/logs', 'logs');
 // Route::view('/users', 'users');
@@ -81,14 +70,15 @@ Route::post('/projects', [ProjectController::class, 'store'])->name('projects.st
 Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
 
 Route::get('/allprojects', [ProjectController::class, 'index'])->name('allprojects');
-Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+Route::get('/projects/{encryptedId}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+
 Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
 Route::post('/projects/{project}/documents', [ProjectController::class, 'uploadDocuments'])->name('projects.documents.store');
-// Route::get('/projects/documents/{document}/download', [ProjectController::class, 'downloadDocument'])
-//     ->name('projects.documents.download');
 
 
-Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+
+Route::get('/projects/{encryptedId}', [ProjectController::class, 'show'])->name('projects.show');
+
 Route::patch('/projects/{project}/update-field', [ProjectController::class, 'updateField'])->name('projects.updateField');
 
 Route::get('/projects/{project}/edit/{field}', [ProjectController::class, 'editField'])->name('projects.editField');
@@ -122,7 +112,7 @@ Route::put('/deletion-requests/{id}/decline', [ProjectDeletionRequestController:
 //     ->name('deletionRequests.decline');
 
 Route::patch('/projects/{project}/reactivate', [ProjectController::class, 'reactivate'])->name('projects.reactivate');
-Route::get('/projects/{project}/report', [ReportController::class, 'viewReport'])->name('projects.viewReport');
+Route::get('/projects/{id}/report', [ReportController::class, 'viewReport'])->name('projects.viewReport');
 Route::patch('/development-details/{id}/update-payment', [DevelopmentDetailController::class, 'updatePayment'])->name('developmentDetails.updatePayment');
 Route::patch('/projects/{project}/close', [ProjectController::class, 'close'])->name('projects.close');
 Route::patch('/projects/{project}/closeAdmin', [ProjectController::class, 'closeAdmin'])->name('projects.close.admin');
@@ -159,13 +149,17 @@ Route::get('/admintasks', [TaskController::class, 'indexadmin'])->name('tasks.in
 
 Route::post('/alltasks', [TaskController::class, 'store'])->name('tasks.store');
 Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
-Route::get('/tasks/{task}', [TaskController::class, 'show']);
-Route::post('/tasks/{task}/comments', [TaskController::class, 'storeComment'])->name('tasks.comments.store');
+// Route::get('/tasks/{task}', [TaskController::class, 'show']);
+Route::get('/tasks/{id}', [TaskController::class, 'show']);
+
+Route::post('/tasks/{id}/comments', [TaskController::class, 'storeComment'])->name('tasks.comments.store');
 
 Route::get('/tasks/summary', [TaskController::class, 'summary'])->name('tasks.summary');
 Route::resource('tasks', TaskController::class);
 
-Route::post('/tasks/{task}/archive', [TaskController::class, 'archive'])->name('tasks.archive');
+Route::get('/projects/{encryptedId}', [ProjectController::class, 'show'])->name('projects.show');
+
+Route::post('/tasks/archive/{encryptedId}', [TaskController::class, 'archive'])->name('tasks.archive');
 
 Route::post('/task-archive-requests/{id}/approve', [TaskArchiveRequestController::class, 'approve'])
     ->name('taskArchiveRequests.approve');
@@ -176,7 +170,6 @@ Route::delete('/task-archive-requests/{id}/decline', [TaskArchiveRequestControll
 Route::get('/charts/data', [TaskController::class, 'chartData'])->name('charts.data');
 
 Route::get('/charts/project-managers', [ProjectController::class, 'projectManagersChart']);
-
 
 Route::get('/password/change', [App\Http\Controllers\PasswordController::class, 'edit'])
     ->name('password.change');

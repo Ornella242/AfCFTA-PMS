@@ -43,23 +43,7 @@
         clip-path: ellipse(100% 100% at 0% 50%);
         z-index: 0;
     "></div>
-      @if(session('success'))
-              <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  {{ session('success') }}
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                      <span aria-hidden="true">&times;</span>
-                  </button>
-              </div>
-          @endif
-
-          @if(session('error'))
-              <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                  {{ session('error') }}
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                      <span aria-hidden="true">&times;</span>
-                  </button>
-              </div>
-          @endif
+     
       <div class="container d-flex align-items-center justify-content-center vh-100">
           <div class="row w-100" style="max-width: 1000px; border-radius: 15px; overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,0.1);">
 
@@ -76,7 +60,25 @@
                   <div class="d-flex flex-column align-items-center justify-content-center mb-4">
                       <img src="{{ asset('images/logo.png') }}" alt="Logo" class="mb-3" style="max-height: 60px;">
                   </div>
+                  <div class="mb-2">
+                      @if(session('success'))
+                          <div class="alert alert-success alert-dismissible fade show" role="alert">
+                              {{ session('success') }}
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                  <span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                      @endif
 
+                      @if(session('error'))
+                          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                              {{ session('error') }}
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                  <span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                      @endif
+                  </div>
                   <form method="POST" action="{{ route('login') }}">
                       @csrf
                       <h3 class="mb-4 text-center">Login to your account</h3>

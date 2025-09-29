@@ -347,39 +347,45 @@ class ProjectController extends Controller
     }
 
 
-    public function show(Project $project)
-    {
-        // Récupérer le projet avec toutes les relations nécessaires
-        $project->load([
-            'unit',
-            'projectManager',
-            'partners',
-            'phases',
-            'subphases',
-            'subphases.phase',
-            'developmentDetails',
-            'assistants', // <-- Ajouté
-            'members'     // <-- Ajouté
-        ]);
 
-        // Calculer le pourcentage d'achèvement
-        $completionPercentage = $project->getCompletionPercentageAttribute();
+    public function show($encryptedId)
+{
+    $id = decrypt($encryptedId); // Décrypter l'ID
+    $project = Project::with([
+        'unit',
+        'projectManager',
+        'partners',
+        'phases',
+        'subphases',
+        'subphases.phase',
+        'developmentDetails',
+        'assistants',
+        'members'
+    ])->findOrFail($id);
 
-        // Récupérer les unités et les PM possibles
-        $units = \App\Models\Unit::all();
-        $projectManagers = \App\Models\User::whereHas('role', function ($query) {
-            $query->whereIn('name', ['Admin', 'Project Manager']);
-        })->get();
+    $completionPercentage = $project->getCompletionPercentageAttribute();
 
-        return view('projectshow', compact('project', 'completionPercentage', 'units', 'projectManagers'));
-    }
+    $units = \App\Models\Unit::all();
+    $projectManagers = \App\Models\User::whereHas('role', function ($query) {
+        $query->whereIn('name', ['Admin', 'Project Manager']);
+    })->get();
+
+    return view('projectshow', compact('project', 'completionPercentage', 'units', 'projectManagers'));
+}
 
 
-    public function edit(Project $project)
-    {
+    public function edit($encryptedId)
+{
+    $projectId = decrypt($encryptedId);
         // Charger les relations du projet
-        $project->load(['unit', 'projectManager', 'partners', 'subphases', 'phases','developmentDetails']);
-
+     $project = Project::with([
+        'unit',
+        'projectManager',
+        'partners',
+        'subphases',
+        'phases',
+        'developmentDetails'
+    ])->findOrFail($projectId);
         // Données nécessaires pour les listes déroulantes et sélections
         $units = Unit::all();
         $users = User::all();
@@ -827,8 +833,10 @@ class ProjectController extends Controller
 
 
 
-    public function close(Request $request, Project $project)
+    public function close(Request $request, $encryptedId)
     {
+        $id = decrypt($encryptedId); // Décrypter
+        $project = Project::findOrFail($id);
         if ($project->status !== 'Completed') {
             return redirect()->back()->with('error', 'Only completed projects can be closed.');
         }
@@ -841,8 +849,10 @@ class ProjectController extends Controller
         return redirect()->route('allprojects')->with('success', 'Project has been closed.');
     }
 
-        public function closeAdmin(Request $request, Project $project)
+        public function closeAdmin(Request $request, $encryptedId)
     {
+        $id = decrypt($encryptedId); // Décrypter
+        $project = Project::findOrFail($id);
         if ($project->status !== 'Closed') {
             return redirect()->back()->with('error', 'Only closed projects by project manager can be closed by administrator.');
         }

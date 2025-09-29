@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Hashidable;
+// use App\Traits\Hashidable;
 
 class DeletionRequest extends Model
 {
-    use Hashidable;
+    // use Hashidable;
      protected $fillable = [
         'project_id',
         'requester_id',

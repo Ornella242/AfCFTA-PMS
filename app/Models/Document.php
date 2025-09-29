@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Hashidable;
+// use App\Traits\Hashidable;
 use Illuminate\Support\Facades\Crypt;
 
 class Document extends Model
 {
-    use Hashidable;
+    // use Hashidable;
      protected $table = 'project_documents';
     protected $fillable = ['project_id', 'filename', 'path'];
 

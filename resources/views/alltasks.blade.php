@@ -451,7 +451,7 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <button class="btn btn-sm btn-light"data-id="{{ $task->id }}" 
+                                                    <button class="btn btn-sm btn-light"data-id="{{ encrypt($task->id) }}" 
                                                             data-toggle="modal" 
                                                             data-target="#taskDetailsModal"><i class="fe fe-eye"></i></button>
                                                     <button class="btn btn-sm btn-light" data-toggle="modal" data-target="#editTaskModal{{ $task->id }}">
@@ -463,7 +463,7 @@
                                                         class="btn btn-warning" 
                                                         data-toggle="modal" 
                                                         data-target="#archiveTaskModal" 
-                                                        data-id="{{ $task->id }}" 
+                                                        data-id="{{ encrypt($task->id) }}" 
                                                         data-title="{{ $task->title }}">
                                                         <i class="fe fe-archive"></i>
                                                     </button>
@@ -638,7 +638,7 @@
                     <!-- Comment Section --> 
                     <hr> 
                    <h6 class="font-weight-bold">Comments</h6>
-                        <form method="POST" action="{{ route('tasks.comments.store', $task->id) }}">
+                        <form method="POST" action="{{ route('tasks.comments.store', encrypt($task->id)) }}">
                             @csrf
                             <div class="form-group">
                                 <textarea name="comment" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
@@ -665,25 +665,25 @@
     <div class="modal fade" id="archiveTaskModal" tabindex="-1" role="dialog" aria-labelledby="archiveTaskModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form method="POST" id="archiveTaskForm">
-            @csrf
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title text-white" id="archiveTaskModalLabel">Archive Task Request</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title text-white" id="archiveTaskModalLabel">Archive Task Request</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                    <p class="text-black h5">
+                        Why do you want to archive the task <strong id="taskTitlePlaceholder"></strong>?
+                    </p>
+                    <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Request Archivation</button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                <p class="text-black h5">
-                    Why do you want to archive the task <strong id="taskTitlePlaceholder"></strong>?
-                </p>
-                <textarea name="reason" class="form-control" required placeholder="Enter your reason here..."></textarea>
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-warning">Request Archivation</button>
-                </div>
-            </div>
             </form>
         </div>
     </div>
@@ -701,6 +701,7 @@
 
                     <!-- Form -->
                     <form action="{{ route('tasks.update', $task->id) }}" method="POST">
+
                         @csrf
                         @method('PUT')
 
@@ -796,17 +797,18 @@
     document.addEventListener("DOMContentLoaded", function () {
         $('#archiveTaskModal').on('show.bs.modal', function (event) {
             let button = $(event.relatedTarget);
-            let taskId = button.data('id');
+            let encryptedId = button.data('id');
             let taskTitle = button.data('title');
 
             let modal = $(this);
             modal.find('#taskTitlePlaceholder').text(taskTitle);
 
-            // On met l'action du formulaire correctement
-            modal.find('#archiveTaskForm').attr('action', '/tasks/' + taskId + '/archive');
+            // Remplit dynamiquement l'action du formulaire avec l'ID encrypté
+            modal.find('#archiveTaskForm').attr('action', '/tasks/archive/' + encryptedId);
         });
     });
 </script>
+
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
