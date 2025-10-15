@@ -11,6 +11,7 @@ class RoleController extends Controller
 {
     public function roleOverview()
     {
+      
         // Récupère tous les rôles avec le nombre d'utilisateurs liés
         $roles = Role::withCount('users')->get();
         $users = User::all();

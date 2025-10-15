@@ -10,13 +10,18 @@ use Illuminate\Support\Str;
 
 class ResetPasswordController extends Controller
 {
-     public function showResetForm($token)
-    {
-        return view('auth.reset-password', ['token' => $token]);
-    }
+    public function showResetForm(Request $request, $token)
+{
+    return view('auth.reset-password', [
+        'token' => $token,
+        'email' => $request->email, // 🔥 Ajoute cette ligne
+    ]);
+}
+
 
     public function reset(Request $request)
     {
+        // dd('reçu', $request->all());
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',

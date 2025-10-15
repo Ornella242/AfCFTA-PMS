@@ -27,9 +27,7 @@
           </a>
       </div>
       <div class="card shadow mb-4">
-        <div class="card-header bg-maroon text-white d-flex justify-content-between align-items-center">
-          <strong class="card-title h3 text-white mt-3">{{ $project->title }}</strong>
-            @if(session('success'))
+        @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
@@ -45,6 +43,25 @@
                     </button>
                 </div>
             @endif
+        <div class="card-header bg-maroon text-white d-flex justify-content-between align-items-center">
+          {{-- <strong class="card-title h3 text-white mt-3">{{ $project->title }}</strong> --}}
+          {{-- Editable Title --}}
+          {{-- Formulaire pour éditer le titre --}}
+            <form method="POST" action="{{ route('projects.updateField', ['id' => $project->id, 'field' => 'title']) }}" class="w-100">
+                @csrf @method('PATCH')
+                <div class="d-flex align-items-center">
+                        <input 
+                          type="text" 
+                          name="value" 
+                          value="{{ old('title', $project->title) }}" 
+                          class="form-control form-control-lg font-weight-bold mr-2"
+                          style="background: transparent; color: white; border: none; border-bottom: 2px solid white; flex: 1;"
+                          required
+                        >                  
+                      <button class="btn btn-sm btn-outline-success mr-2 ml-2">Save</button>
+                </div>
+              </form>
+          {{-- End Editable Title --}}
           <span class="float-right">
             <span class="badge badge-pill bg-green text-white pb-2 pt-2">{{ $project->type }}</span>
           </span>
@@ -242,7 +259,6 @@
             </form>
           </dd>
 
-            {{-- BUDGET MODAL --}}
 
             {{-- BUDGET CODE --}}
             <dt class="col-sm-2 mb-3 text-black">Budget Code</dt>

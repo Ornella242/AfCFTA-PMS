@@ -27,7 +27,7 @@ class ArchiveCompletedTasks extends Command
     {
          $tasks = Task::where('status', 'completed')
             ->where('archived', false)
-            ->where('completed_at', '<=', now()->subDays(5))
+            ->where('completed_at', '<=', now()->subDays(4))
             ->get();
 
         foreach ($tasks as $task) {

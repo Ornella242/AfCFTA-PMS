@@ -108,6 +108,7 @@
               </li>
             </ul>
           @endif
+
           @if(Auth::user()->role->name == 'Admin' || Auth::user()->role->name == 'Project Manager')
             @if(Auth::user()->role->name == 'Project Manager')
               <ul class="navbar-nav flex-fill w-100">
@@ -180,11 +181,7 @@
                    <img src="{{ asset('images/icons/reports.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
                     <span class="ml-3 item-text">Reports</span>
                   </a>
-                  {{-- @if(isset($totalReports))
-                    <span class="badge badge-pill bg-green text-white mr-3 pt-2 pb-2">
-                      {{ $totalReports }}
-                    </span>
-                  @endif  --}}
+                 
               </li>
             </ul>
         
@@ -266,17 +263,16 @@
            
           @endif       
           
-            @if(Auth::user()->role->name == 'Project Manager Assistant' || Auth::user()->role->name == 'Member')
-            {{-- @if(Auth::user()->role->name == 'Project Manager Assistant' || Auth::user()->role->name == 'Member') --}}
-                <ul class="navbar-nav flex-fill w-100 mb-2">
-                  <li class="nav-item w-100">
-                    <a href="{{ url('/dashboardpma') }}" class="nav-link">
-                   <img src="{{ asset('images/icons/dashboard.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
-                      <span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
-                    </a>
-                  </li>
-                </ul>
-              {{-- @endif --}}
+          @if(Auth::user()->role->name == 'Project Manager Assistant' || Auth::user()->role->name == 'Member')
+              <ul class="navbar-nav flex-fill w-100 mb-2">
+                <li class="nav-item w-100">
+                  <a href="{{ url('/dashboardpma') }}" class="nav-link">
+                  <img src="{{ asset('images/icons/dashboard.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
+                    <span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
+                  </a>
+                </li>
+              </ul>
+            {{-- @endif --}}
             <p class="text-maroon nav-heading mt-4 mb-1" style="font-weight: bold; font-size: 1.1em;">
               <span>Projects Management</span>
             </p>
@@ -284,7 +280,7 @@
             <ul class="navbar-nav flex-fill w-100 mb-2">
               <li class="nav-item w-100 d-flex justify-content-between align-items-center">
                 <a href="{{ url('/allprojects') }}" class="nav-link d-flex align-items-center">
-                   <img src="{{ asset('images/icons/allprojectsgreen.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
+                    <img src="{{ asset('images/icons/allprojectsgreen.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
                   <span class="ml-3 item-text">All Projects</span>
                 </a>
                 @if(isset($totalProjects))
@@ -297,7 +293,7 @@
             <ul class="navbar-nav flex-fill w-100 mb-2">
               <li class="nav-item w-100 d-flex justify-content-between align-items-center">
                 <a href="{{ url('/hrmprojects') }}" class="nav-link d-flex align-items-center">
-                   <img src="{{ asset('images/icons/hrmprojects.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
+                    <img src="{{ asset('images/icons/hrmprojects.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
                   <span class="ml-3 item-text">HRM Projects</span>
                 </a>
                 @if(isset($totalProjectsHRM))
@@ -310,7 +306,7 @@
             <ul class="navbar-nav flex-fill w-100 mb-2">
               <li class="nav-item w-100 d-flex justify-content-between align-items-center">
                 <a href="{{ url('/adminprojects') }}" class="nav-link d-flex align-items-center">
-                   <img src="{{ asset('images/icons/adminprojects.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
+                    <img src="{{ asset('images/icons/adminprojects.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
                   <span class="ml-3 item-text">Admin Projects</span>
                 </a>
                 @if(isset($totalProjectsAdmin))
@@ -320,23 +316,81 @@
                 @endif 
               </li>
             </ul>
-        
             <p class="text-maroon nav-heading mt-4 mb-1" style="font-weight: bold; font-size: 1.1em;">
               <span>Tasks Management</span>
             </p>
-           
+            
+            <ul class="navbar-nav flex-fill w-100 mb-2">
+            <li class="nav-item w-100">
+                <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
+                    <img src="{{ asset('images/icons/alltasks.png') }}" alt="All Tasks" class="icon-img" style="width:20px; height:20px;">
+                    <span class="ml-3 item-text">All Tasks</span>
+                    
+                </a>
+
+                {{-- Badges sous le lien --}}
+                
+                    @if(isset($assignedToUser))
+                        <span class="badge badge-pill bg-green text-white mr-2 mt-1 pt-2 pb-2 px-3">
+                            Assigned to me: {{ $assignedToUser }}
+                        </span>
+                    @endif
+
+                    @if(isset($assignedByUser))
+                        <span class="badge badge-pill bg-yellow text-white mr-2 mt-1 pt-2 pb-2 px-3">
+                            Assigned by me: {{ $assignedByUser }}
+                        </span>
+                    @endif
+            </li>
+
+            </ul>
+          @endif 
+
+          @if (Auth::user()->role->name == 'Admin Assistant')
+                <ul class="navbar-nav
+             <p class="text-maroon nav-heading mt-4 mb-1" style="font-weight: bold; font-size: 1.1em;">
+              <span>Tasks Management</span>
+            </p>
+          
             <ul class="navbar-nav flex-fill w-100 mb-2">
               <li class="nav-item w-100 d-flex justify-content-between align-items-center">
                 <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
                    <img src="{{ asset('images/icons/alltasks.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
                   <span class="ml-3 item-text">All Tasks</span>
                 </a>
-                <span class="badge badge-pill bg-yellow text-white mr-3 pt-1 pb-1">12</span>
+                @if(isset($totalTasks))
+                  <span class="badge badge-pill bg-yellow text-white mr-3 pt-2 pb-2">
+                    {{ $totalTasks }}
+                  </span>
+                @endif 
               </li>
-            </ul>
-           
-          @endif 
+              
+                <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                  <a href="{{ url('/hrmtasks') }}" class="nav-link d-flex align-items-center">
+                    <img src="{{ asset('images/icons/hrmtasks.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
+                    <span class="ml-3 item-text">HRM Tasks</span>
+                  </a>
+                  @if(isset($totalTasksHRM))
+                    <span class="badge badge-pill bg-maroon text-white mr-3 pt-2 pb-2">
+                      {{ $totalTasksHRM }}
+                    </span>
+                  @endif 
+                </li>
 
+                <li class="nav-item w-100 d-flex justify-content-between align-items-center">
+                  <a href="{{ url('/admintasks') }}" class="nav-link d-flex align-items-center">
+                    <img src="{{ asset('images/icons/admintasks.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
+                    <span class="ml-3 item-text">Admin Tasks</span>
+                  </a>
+                    @if(isset($totalTasksAdmin))
+                      <span class="badge badge-pill bg-gold text-white mr-3 pt-2 pb-2">
+                        {{ $totalTasksAdmin }}
+                      </span>
+                    @endif 
+                </li>
+            </ul>
+          @endif
+   
         </nav>
       </aside>
     </div> <!-- .wrapper -->

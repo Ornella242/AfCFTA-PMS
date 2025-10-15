@@ -23,7 +23,7 @@ class TaskController extends Controller
     {
         $user = Auth::user();
         // Tâches créées par l'utilisateur et non archivées
-       if ($user->role->name === 'Admin') {
+       if ($user->role->name === 'Admin' || $user->role->name === 'Admin Assistant') {
         // dd('admin here');
             $tasks = Task::with('assignedUser')
                         ->where('is_archived', false)
@@ -122,16 +122,128 @@ class TaskController extends Controller
     }
 
 
+    // public function indexhrm(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $unitId = $request->get('unit_id'); // récupère le filtre
+        
+
+    //     // 🔹 Base query
+    //     $baseQuery = Task::with('assignedUser')
+    //         ->where('created_by', $user->id)
+    //         ->where('is_archived', false)
+    //         ->where('type', 'HRM');
+
+    //     if ($unitId) {
+    //         $baseQuery->where('unit_id', $unitId);
+    //     }
+
+    //     $tasks = $baseQuery->get();
+
+    //     // 🔹 Tâches par statut
+    //     $tasksPending = (clone $baseQuery)->where('status', 'pending')->get();
+    //     $tasksProcessing = (clone $baseQuery)->where('status', 'processing')->get();
+    //     $tasksCompleted = (clone $baseQuery)->where('status', 'completed')->get();
+
+    //     // 🔹 Demandes d’archivation
+    //     $archiveRequests = TaskArchivationRequest::with('task', 'requester')
+    //         ->where('approved', false)
+    //         ->whereHas('task', function($q) use ($user, $unitId) {
+    //             $q->where('created_by', $user->id)
+    //             ->where('type', 'HRM');
+    //             if ($unitId) {
+    //                 $q->where('unit_id', $unitId);
+    //             }
+    //         })
+    //         ->get();
+
+    //     // 🔹 Tâches par personne
+    //     $tasksByUser = User::whereHas('tasks', function($q) use ($user, $unitId) {
+    //             $q->where('created_by', $user->id)
+    //             ->where('type', 'HRM');
+    //             if ($unitId) {
+    //                 $q->where('unit_id', $unitId);
+    //             }
+    //         })
+    //         ->withCount(['tasks' => function($q) use ($user, $unitId) {
+    //             $q->where('created_by', $user->id)
+    //             ->where('type', 'HRM');
+    //             if ($unitId) {
+    //                 $q->where('unit_id', $unitId);
+    //             }
+    //         }])
+    //         ->orderBy('tasks_count', 'desc')
+    //         ->pluck('tasks_count', 'firstname');
+
+    //     // 🔹 Répartition par statut
+    //     $statusCounts = Task::select('status', DB::raw('COUNT(*) as total'))
+    //         ->where('created_by', $user->id)
+    //         ->where('type', 'HRM')
+    //         ->when($unitId, function($q) use ($unitId) {
+    //             $q->where('unit_id', $unitId);
+    //         })
+    //         ->groupBy('status')
+    //         ->pluck('total', 'status');
+
+    //     // 🔹 Activité
+    //     $activities = TaskActivity::with(['user', 'task'])
+    //         ->whereHas('task', function($q) use ($user, $unitId) {
+    //             $q->where('created_by', $user->id)
+    //             ->where('type', 'HRM');
+    //             if ($unitId) {
+    //                 $q->where('unit_id', $unitId);
+    //             }
+    //         })
+    //         ->latest()
+    //         ->take(20)
+    //         ->get();
+
+    //     $activity = Task::selectRaw('DATE(updated_at) as date, COUNT(*) as total')
+    //         ->where('created_by', $user->id)
+    //         ->where('type', 'HRM')
+    //         ->when($unitId, function($q) use ($unitId) {
+    //             $q->where('unit_id', $unitId);
+    //         })
+    //         ->groupBy('date')
+    //         ->orderBy('date', 'asc')
+    //         ->pluck('total', 'date');
+
+    //     // 🔹 Listes pour le formulaire
+    //     $units = Unit::orderBy('name')->get();
+    //     $types = ['HRM', 'Admin'];
+    //     $users = User::orderBy('firstname')->get();
+
+    //     return view('hrmtasks', compact(
+    //         'tasks',
+    //         'users',
+    //         'tasksPending',
+    //         'tasksProcessing',
+    //         'tasksCompleted',
+    //         'tasksByUser',
+    //         'statusCounts',
+    //         'activity',
+    //         'activities',
+    //         'archiveRequests',
+    //         'units',
+    //         'types'
+    //     ));
+    // }
+
     public function indexhrm(Request $request)
     {
         $user = Auth::user();
-        $unitId = $request->get('unit_id'); // récupère le filtre
+        $unitId = $request->get('unit_id'); // filtre unité
+        $isAdmin = in_array($user->role->name, ['Admin', 'Admin Assistant']); // 🔹 Vérifie le rôle
 
         // 🔹 Base query
         $baseQuery = Task::with('assignedUser')
-            ->where('created_by', $user->id)
             ->where('is_archived', false)
             ->where('type', 'HRM');
+
+        // Si ce n’est PAS un Admin/Admin Assistant → filtrer sur created_by
+        if (!$isAdmin) {
+            $baseQuery->where('created_by', $user->id);
+        }
 
         if ($unitId) {
             $baseQuery->where('unit_id', $unitId);
@@ -147,9 +259,11 @@ class TaskController extends Controller
         // 🔹 Demandes d’archivation
         $archiveRequests = TaskArchivationRequest::with('task', 'requester')
             ->where('approved', false)
-            ->whereHas('task', function($q) use ($user, $unitId) {
-                $q->where('created_by', $user->id)
-                ->where('type', 'HRM');
+            ->whereHas('task', function($q) use ($user, $unitId, $isAdmin) {
+                $q->where('type', 'HRM');
+                if (!$isAdmin) {
+                    $q->where('created_by', $user->id);
+                }
                 if ($unitId) {
                     $q->where('unit_id', $unitId);
                 }
@@ -157,16 +271,20 @@ class TaskController extends Controller
             ->get();
 
         // 🔹 Tâches par personne
-        $tasksByUser = User::whereHas('tasks', function($q) use ($user, $unitId) {
-                $q->where('created_by', $user->id)
-                ->where('type', 'HRM');
+        $tasksByUser = User::whereHas('tasks', function($q) use ($user, $unitId, $isAdmin) {
+                $q->where('type', 'HRM');
+                if (!$isAdmin) {
+                    $q->where('created_by', $user->id);
+                }
                 if ($unitId) {
                     $q->where('unit_id', $unitId);
                 }
             })
-            ->withCount(['tasks' => function($q) use ($user, $unitId) {
-                $q->where('created_by', $user->id)
-                ->where('type', 'HRM');
+            ->withCount(['tasks' => function($q) use ($user, $unitId, $isAdmin) {
+                $q->where('type', 'HRM');
+                if (!$isAdmin) {
+                    $q->where('created_by', $user->id);
+                }
                 if ($unitId) {
                     $q->where('unit_id', $unitId);
                 }
@@ -176,19 +294,19 @@ class TaskController extends Controller
 
         // 🔹 Répartition par statut
         $statusCounts = Task::select('status', DB::raw('COUNT(*) as total'))
-            ->where('created_by', $user->id)
             ->where('type', 'HRM')
-            ->when($unitId, function($q) use ($unitId) {
-                $q->where('unit_id', $unitId);
-            })
+            ->when(!$isAdmin, fn($q) => $q->where('created_by', $user->id))
+            ->when($unitId, fn($q) => $q->where('unit_id', $unitId))
             ->groupBy('status')
             ->pluck('total', 'status');
 
         // 🔹 Activité
         $activities = TaskActivity::with(['user', 'task'])
-            ->whereHas('task', function($q) use ($user, $unitId) {
-                $q->where('created_by', $user->id)
-                ->where('type', 'HRM');
+            ->whereHas('task', function($q) use ($user, $unitId, $isAdmin) {
+                $q->where('type', 'HRM');
+                if (!$isAdmin) {
+                    $q->where('created_by', $user->id);
+                }
                 if ($unitId) {
                     $q->where('unit_id', $unitId);
                 }
@@ -197,17 +315,16 @@ class TaskController extends Controller
             ->take(20)
             ->get();
 
+        // 🔹 Activité par date
         $activity = Task::selectRaw('DATE(updated_at) as date, COUNT(*) as total')
-            ->where('created_by', $user->id)
             ->where('type', 'HRM')
-            ->when($unitId, function($q) use ($unitId) {
-                $q->where('unit_id', $unitId);
-            })
+            ->when(!$isAdmin, fn($q) => $q->where('created_by', $user->id))
+            ->when($unitId, fn($q) => $q->where('unit_id', $unitId))
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->pluck('total', 'date');
 
-        // 🔹 Listes pour le formulaire
+        // 🔹 Données pour le formulaire
         $units = Unit::orderBy('name')->get();
         $types = ['HRM', 'Admin'];
         $users = User::orderBy('firstname')->get();
@@ -229,99 +346,216 @@ class TaskController extends Controller
     }
 
 
-    public function indexadmin(Request $request)
-    {
-        $user = Auth::user();
 
-        // Base query = uniquement Admin et non archivées
-        $query = Task::with('assignedUser')
-            ->where('is_archived', false)
-            ->where('type', 'Admin');
+    // public function indexadmin(Request $request)
+    // {
+    //     $user = Auth::user();
 
-        // --- filtre Unit si sélectionné ---
-        if ($request->filled('unit_id')) {
-            $query->where('unit_id', $request->unit_id);
-        }
+    //     // Base query = uniquement Admin et non archivées
+    //     $query = Task::with('assignedUser')
+    //         ->where('is_archived', false)
+    //         ->where('type', 'Admin');
 
-        $tasks = $query->get();
+    //     // --- filtre Unit si sélectionné ---
+    //     if ($request->filled('unit_id')) {
+    //         $query->where('unit_id', $request->unit_id);
+    //     }
 
-        $units = Unit::orderBy('name')->get(); 
-        $types = ['HRM', 'Admin'];
-        $users = User::orderBy('firstname')->get();
+    //     $tasks = $query->get();
 
-        // Tâches par statut (type Admin + filtre unit si présent)
-        $tasksPending = (clone $query)->where('status', 'pending')->get();
-        $tasksProcessing = (clone $query)->where('status', 'processing')->get();
-        $tasksCompleted = (clone $query)->where('status', 'completed')->get();
+    //     $units = Unit::orderBy('name')->get(); 
+    //     $types = ['HRM', 'Admin'];
+    //     $users = User::orderBy('firstname')->get();
 
-        // Demandes d'archivation
-        $archiveRequests = TaskArchivationRequest::with('task', 'requester')
-            ->where('approved', false)
-            ->whereHas('task', function($q) use ($request) {
-                $q->where('type', 'Admin');
-                if ($request->filled('unit_id')) {
-                    $q->where('unit_id', $request->unit_id);
-                }
-            })
-            ->get();
+    //     // Tâches par statut (type Admin + filtre unit si présent)
+    //     $tasksPending = (clone $query)->where('status', 'pending')->get();
+    //     $tasksProcessing = (clone $query)->where('status', 'processing')->get();
+    //     $tasksCompleted = (clone $query)->where('status', 'completed')->get();
 
-        // Tâches par personne (type Admin + filtre unit si présent)
-        $tasksByUser = User::whereHas('tasks', function($q) use ($request) {
-                $q->where('type', 'Admin');
-                if ($request->filled('unit_id')) {
-                    $q->where('unit_id', $request->unit_id);
-                }
-            })
-            ->withCount(['tasks' => function($q) use ($request) {
-                $q->where('type', 'Admin');
-                if ($request->filled('unit_id')) {
-                    $q->where('unit_id', $request->unit_id);
-                }
-            }])
-            ->orderBy('tasks_count', 'desc')
-            ->pluck('tasks_count', 'firstname');
+    //     // Demandes d'archivation
+    //     $archiveRequests = TaskArchivationRequest::with('task', 'requester')
+    //         ->where('approved', false)
+    //         ->whereHas('task', function($q) use ($request) {
+    //             $q->where('type', 'Admin');
+    //             if ($request->filled('unit_id')) {
+    //                 $q->where('unit_id', $request->unit_id);
+    //             }
+    //         })
+    //         ->get();
 
-        // Répartition par statut (Admin + filtre unit)
-        $statusCounts = (clone $query)
-            ->select('status', DB::raw('COUNT(*) as total'))
-            ->groupBy('status')
-            ->pluck('total', 'status');
+    //     // Tâches par personne (type Admin + filtre unit si présent)
+    //     $tasksByUser = User::whereHas('tasks', function($q) use ($request) {
+    //             $q->where('type', 'Admin');
+    //             if ($request->filled('unit_id')) {
+    //                 $q->where('unit_id', $request->unit_id);
+    //             }
+    //         })
+    //         ->withCount(['tasks' => function($q) use ($request) {
+    //             $q->where('type', 'Admin');
+    //             if ($request->filled('unit_id')) {
+    //                 $q->where('unit_id', $request->unit_id);
+    //             }
+    //         }])
+    //         ->orderBy('tasks_count', 'desc')
+    //         ->pluck('tasks_count', 'firstname');
 
-        // Activité récente (Admin + filtre unit)
-        $activities = TaskActivity::with(['user', 'task'])
-            ->whereHas('task', function($q) use ($request) {
-                $q->where('type', 'Admin');
-                if ($request->filled('unit_id')) {
-                    $q->where('unit_id', $request->unit_id);
-                }
-            })
-            ->latest()
-            ->take(20)
-            ->get();
+    //     // Répartition par statut (Admin + filtre unit)
+    //     $statusCounts = (clone $query)
+    //         ->select('status', DB::raw('COUNT(*) as total'))
+    //         ->groupBy('status')
+    //         ->pluck('total', 'status');
 
-        // Activité pour graph (Admin + filtre unit)
-        $activity = (clone $query)
-            ->selectRaw('DATE(updated_at) as date, COUNT(*) as total')
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->pluck('total', 'date');
+    //     // Activité récente (Admin + filtre unit)
+    //     $activities = TaskActivity::with(['user', 'task'])
+    //         ->whereHas('task', function($q) use ($request) {
+    //             $q->where('type', 'Admin');
+    //             if ($request->filled('unit_id')) {
+    //                 $q->where('unit_id', $request->unit_id);
+    //             }
+    //         })
+    //         ->latest()
+    //         ->take(20)
+    //         ->get();
 
-        return view('admintasks', compact(
-            'tasks',
-            'users',
-            'tasksPending',
-            'tasksProcessing',
-            'tasksCompleted',
-            'tasksByUser',
-            'statusCounts',
-            'activity',
-            'activities',
-            'archiveRequests',
-            'units',
-            'types'
-        ));
+    //     // Activité pour graph (Admin + filtre unit)
+    //     $activity = (clone $query)
+    //         ->selectRaw('DATE(updated_at) as date, COUNT(*) as total')
+    //         ->groupBy('date')
+    //         ->orderBy('date', 'asc')
+    //         ->pluck('total', 'date');
+
+    //     return view('admintasks', compact(
+    //         'tasks',
+    //         'users',
+    //         'tasksPending',
+    //         'tasksProcessing',
+    //         'tasksCompleted',
+    //         'tasksByUser',
+    //         'statusCounts',
+    //         'activity',
+    //         'activities',
+    //         'archiveRequests',
+    //         'units',
+    //         'types'
+    //     ));
+    // }
+
+public function indexadmin(Request $request)
+{
+    $user = Auth::user();
+    $unitId = $request->get('unit_id');
+    $isAdmin = in_array($user->role->name, ['Admin', 'Admin Assistant']); // 🔹 Vérifie le rôle
+
+    // 🔹 Base query
+    $baseQuery = Task::with('assignedUser')
+        ->where('is_archived', false)
+        ->where('type', 'Admin');
+
+    // 🔸 Si pas Admin/Admin Assistant → ne montrer que ses tâches
+    if (!$isAdmin) {
+        $baseQuery->where('created_by', $user->id);
     }
 
+    // 🔸 Filtre unité si sélectionné
+    if ($unitId) {
+        $baseQuery->where('unit_id', $unitId);
+    }
+
+    $tasks = $baseQuery->get();
+
+    // 🔹 Listes pour le formulaire
+    $units = Unit::orderBy('name')->get(); 
+    $types = ['HRM', 'Admin'];
+    $users = User::orderBy('firstname')->get();
+
+    // 🔹 Tâches par statut
+    $tasksPending = (clone $baseQuery)->where('status', 'pending')->get();
+    $tasksProcessing = (clone $baseQuery)->where('status', 'processing')->get();
+    $tasksCompleted = (clone $baseQuery)->where('status', 'completed')->get();
+
+    // 🔹 Demandes d’archivation
+    $archiveRequests = TaskArchivationRequest::with('task', 'requester')
+        ->where('approved', false)
+        ->whereHas('task', function($q) use ($user, $unitId, $isAdmin) {
+            $q->where('type', 'Admin');
+            if (!$isAdmin) {
+                $q->where('created_by', $user->id);
+            }
+            if ($unitId) {
+                $q->where('unit_id', $unitId);
+            }
+        })
+        ->get();
+
+    // 🔹 Tâches par personne
+    $tasksByUser = User::whereHas('tasks', function($q) use ($user, $unitId, $isAdmin) {
+            $q->where('type', 'Admin');
+            if (!$isAdmin) {
+                $q->where('created_by', $user->id);
+            }
+            if ($unitId) {
+                $q->where('unit_id', $unitId);
+            }
+        })
+        ->withCount(['tasks' => function($q) use ($user, $unitId, $isAdmin) {
+            $q->where('type', 'Admin');
+            if (!$isAdmin) {
+                $q->where('created_by', $user->id);
+            }
+            if ($unitId) {
+                $q->where('unit_id', $unitId);
+            }
+        }])
+        ->orderBy('tasks_count', 'desc')
+        ->pluck('tasks_count', 'firstname');
+
+    // 🔹 Répartition par statut
+    $statusCounts = Task::select('status', DB::raw('COUNT(*) as total'))
+        ->where('type', 'Admin')
+        ->when(!$isAdmin, fn($q) => $q->where('created_by', $user->id))
+        ->when($unitId, fn($q) => $q->where('unit_id', $unitId))
+        ->groupBy('status')
+        ->pluck('total', 'status');
+
+    // 🔹 Activité récente
+    $activities = TaskActivity::with(['user', 'task'])
+        ->whereHas('task', function($q) use ($user, $unitId, $isAdmin) {
+            $q->where('type', 'Admin');
+            if (!$isAdmin) {
+                $q->where('created_by', $user->id);
+            }
+            if ($unitId) {
+                $q->where('unit_id', $unitId);
+            }
+        })
+        ->latest()
+        ->take(20)
+        ->get();
+
+    // 🔹 Activité pour le graph
+    $activity = Task::selectRaw('DATE(updated_at) as date, COUNT(*) as total')
+        ->where('type', 'Admin')
+        ->when(!$isAdmin, fn($q) => $q->where('created_by', $user->id))
+        ->when($unitId, fn($q) => $q->where('unit_id', $unitId))
+        ->groupBy('date')
+        ->orderBy('date', 'asc')
+        ->pluck('total', 'date');
+
+    return view('admintasks', compact(
+        'tasks',
+        'users',
+        'tasksPending',
+        'tasksProcessing',
+        'tasksCompleted',
+        'tasksByUser',
+        'statusCounts',
+        'activity',
+        'activities',
+        'archiveRequests',
+        'units',
+        'types'
+    ));
+}
 
 
     public function store(Request $request)
@@ -337,7 +571,6 @@ class TaskController extends Controller
             'type' => 'required|in:HRM,Admin',
             'unit_id' => 'required|exists:units,id',
         ]);
-
         $validated['created_by'] = Auth::id();
 
         $task = Task::create($validated);
@@ -378,37 +611,6 @@ class TaskController extends Controller
     }
 
 
-    // public function show(Task $task)
-    // {
-    //     $task->load(['assignedUser', 'comments.user']);
-    //     return response()->json([
-    //         'id' => $task->id,
-    //         'title' => $task->title,
-    //         'description' => $task->description,
-    //         'start_date' => $task->start_date,
-    //         'end_date' => $task->end_date,
-    //         'priority' => $task->priority,
-    //         'status' => $task->status,
-    //         'assigned_user' => [
-    //             'id' => $task->assignedUser?->id,
-    //             'firstname' => $task->assignedUser?->firstname,
-    //             'lastname' => $task->assignedUser?->lastname,
-    //         ],
-    //         'comments' => $task->comments->map(function($comment) {
-    //             return [
-    //                 'id' => $comment->id,
-    //                 'comment' => $comment->comment,
-    //                 'created_at' => $comment->created_at->format('d M Y H:i'),
-    //                 'user' => [
-    //                     'id' => $comment->user?->id,
-    //                     'firstname' => $comment->user?->firstname,
-    //                     'lastname' => $comment->user?->lastname,
-    //                 ]
-    //             ];
-    //         })
-    //     ]);
-
-    // }
 
     public function show($encryptedId)
     {
@@ -444,21 +646,31 @@ class TaskController extends Controller
     }
 
 
-    public function storeComment(Request $request, $encryptedId)
-    {
-        $id = decrypt($encryptedId);
-        $task = Task::findOrFail($id);
 
+    public function storeComment(Request $request, $id)
+    {
+        try {
+            // Déchiffrer l'ID
+            $taskId = decrypt($id);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Invalid task identifier.');
+        }
+
+        // Récupérer la tâche
+        $task = Task::findOrFail($taskId);
+
+        // Validation
         $request->validate([
             'comment' => 'required|string|max:1000',
         ]);
 
-        $task->comments()->create([
+        // Créer le commentaire
+        $comment = $task->comments()->create([
             'comment' => $request->comment,
             'user_id' => Auth::id(),
         ]);
 
-        return back()->with('success', 'Comment added successfully!');
+        return back()->with('success', 'Comment added successfully.');
     }
 
 

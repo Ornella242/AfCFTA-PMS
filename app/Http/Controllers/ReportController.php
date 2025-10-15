@@ -17,9 +17,9 @@ class ReportController extends Controller
 {
    
     public function viewReport($encryptedId)
-  {
-    $id = decrypt($encryptedId);
-    $project = Project::findOrFail($id);
+    {
+        $id = decrypt($encryptedId);
+        $project = Project::findOrFail($id);
       
         $existingReport = Report::where('project_id', $project->id)
             ->where('user_id', Auth::id())
@@ -50,15 +50,28 @@ class ReportController extends Controller
         return view('viewreport', compact('project', 'report'));
     }
 
+
+    public function viewOnlyReport($encryptedId)
+    {
+        
+        $id = decrypt($encryptedId);
+        $project = Project::findOrFail($id);
+        // Juste afficher le rapport sans rien créer
+        return view('viewreport', compact('project'));
+    }
+
+
     public function index()
     {
         $pmRoleId = \App\Models\Role::where('name', 'Project Manager')->value('id');
-    $users = User::where('role_id', $pmRoleId)->get();
+        $users = User::where('role_id', $pmRoleId)->get();
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
-
+        $userId = Auth::id();
+     
         // Tous les rapports du mois courant
         $monthlyReports = Report::with('project')
+                                ->where('user_id', $userId)
                                 ->whereMonth('created_at', $currentMonth)
                                 ->whereYear('created_at', $currentYear)
                                 ->get();
@@ -80,19 +93,16 @@ class ReportController extends Controller
     public function download(Report $report)
     {
         $project = $report->project;
-
         // Prépare les données à afficher dans le PDF
         $pdf = Pdf::loadView('viewreport_pdf', compact('project', 'report'))
         ->setPaper('a4', 'portrait');
 
         $filename = $report->code . '.pdf';
-    //  return view('viewreport_pdf', compact('project', 'report'));
         return $pdf->download($filename);
     }
 
-  public function share(Request $request, Report $report)
+    public function share(Request $request, Report $report)
     {
-        // dd('hi');
         $request->validate([
             'users' => 'required|array',
         ]);

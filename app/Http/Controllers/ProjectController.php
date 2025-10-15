@@ -374,18 +374,18 @@ class ProjectController extends Controller
 }
 
 
-    public function edit($encryptedId)
-{
-    $projectId = decrypt($encryptedId);
+     public function edit($encryptedId)
+    {
+      $projectId = decrypt($encryptedId);
         // Charger les relations du projet
-     $project = Project::with([
+       $project = Project::with([
         'unit',
         'projectManager',
         'partners',
         'subphases',
         'phases',
         'developmentDetails'
-    ])->findOrFail($projectId);
+       ])->findOrFail($projectId);
         // Données nécessaires pour les listes déroulantes et sélections
         $units = Unit::all();
         $users = User::all();
@@ -407,6 +407,7 @@ class ProjectController extends Controller
         $phases = \App\Models\Phase::with('subphases')->get();
 
         return view('editproject', compact(
+            
             'project',
             'units',
             'projectManagers',
@@ -425,14 +426,14 @@ class ProjectController extends Controller
         $project = Project::findOrFail($id);
         $field = $request->input('field');
         $value = $request->input('value');
-
+        // dd($field, $value);
         // Liste des champs autorisés
         $allowedFields = [
             'title', 'description', 'start_date', 'end_date',
             'priority', 'status', 'budget', 'type','budget_code',
             'unit_id', 'project_manager_id', 'partners', 'procurement_type'
         ];
-        //  dd($field, $value);
+        
          // Validation basique
         if (!in_array($field, $allowedFields)) {
             return redirect()->back()->with('error', 'Invalid field.');

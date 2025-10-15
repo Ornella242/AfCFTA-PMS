@@ -15,8 +15,8 @@ class Task extends Model
     ];
 
     protected $fillable = [
-        'title', 'description', 'start_date', 'end_date',
-        'status', 'assigned_to', 'created_by',
+        'title', 'description', 'start_date', 'end_date','priority',
+        'status', 'assigned_to', 'created_by','is_archived',
         'delete_requested', 'archived', 'type',
         'unit_id',
     ];

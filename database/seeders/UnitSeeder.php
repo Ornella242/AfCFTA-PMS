@@ -19,5 +19,7 @@ class UnitSeeder extends Seeder
         Unit::create(['name' => 'Stores']);
         Unit::create(['name' => 'Procurement & Travel']);
         Unit::create(['name' => 'Facilities & Transport']);
+        Unit::create(['name' => 'Office of the Director']);
+        Unit::create(['name' => 'Office of the HoD']);
     }
 }

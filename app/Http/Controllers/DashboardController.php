@@ -9,74 +9,53 @@ use App\Models\User;
 
 class DashboardController extends Controller
 {
-    // public function index()
-    // {
-    //     $counts = [
-    //         'Not started' => Project::where('status', 'Not started')->count(),
-    //         'In progress' => Project::where('status', 'In progress')->count(),
-    //         'Completed' => Project::where('status', 'Completed')->count(),
-    //         'Cancelled' => Project::where('status', 'Cancelled')->count(),
-    //     ];
-    //     $projectManagers = User::whereHas('managedProjects')
-    //     ->withCount('managedProjects')
-    //     ->with(['managedProjects' => function($query) {
-    //         $query->select('id', 'title', 'percentage', 'project_manager_id');
-    //     }])
-    //     ->get();
-    //     $latestProjects = Project::with(['partners', 'unit'])
-    //     ->latest()
-    //     ->take(5)
-    //     ->get();
-
-    //     return view('dashboard', compact('counts','projectManagers','latestProjects'));
-    // }
-
+    
     public function index()
-{
-    // Compter les projets par statut
-    $counts = [
-        'Not started' => Project::where('status', 'Not started')->count(),
-        'In progress' => Project::where('status', 'In progress')->count(),
-        'Completed'   => Project::where('status', 'Completed')->count(),
-        'Cancelled'   => Project::where('status', 'Cancelled')->count(),
-    ];
+    {
+        // Compter les projets par statut
+        $counts = [
+            'Not started' => Project::where('status', 'Not started')->count(),
+            'In progress' => Project::where('status', 'In progress')->count(),
+            'Completed'   => Project::where('status', 'Completed')->count(),
+            'Cancelled'   => Project::where('status', 'Cancelled')->count(),
+        ];
 
-    // Récupérer TOUS les users avec rôle Project Manager ou Admin
-   $projectManagers = User::whereHas('role', fn($q) => $q->whereIn('name', ['Project Manager', 'Admin']))
-    ->withCount('managedProjects')
-    ->withSum('managedProjects', 'percentage')
-    ->with(['managedProjects' => function ($query) {
-        $query->select('id', 'title', 'percentage', 'project_manager_id');
-    }])
-    ->get()
-    ->map(function ($manager) {
-        $projectCount   = $manager->managed_projects_count;
-        $totalProgress  = $manager->managed_projects_sum_percentage ?? 0;
+        // Récupérer TOUS les users avec rôle Project Manager ou Admin
+    $projectManagers = User::whereHas('role', fn($q) => $q->whereIn('name', ['Project Manager', 'Admin']))
+        ->withCount('managedProjects')
+        ->withSum('managedProjects', 'percentage')
+        ->with(['managedProjects' => function ($query) {
+            $query->select('id', 'title', 'percentage', 'project_manager_id');
+        }])
+        ->get()
+        ->map(function ($manager) {
+            $projectCount   = $manager->managed_projects_count;
+            $totalProgress  = $manager->managed_projects_sum_percentage ?? 0;
 
-        $manager->average_progress = $projectCount > 0
-            ? round($totalProgress / $projectCount, 1)
-            : 0;
+            $manager->average_progress = $projectCount > 0
+                ? round($totalProgress / $projectCount, 1)
+                : 0;
 
-        if ($manager->average_progress < 40) {
-            $manager->bar_class = 'bg-danger';
-        } elseif ($manager->average_progress < 70) {
-            $manager->bar_class = 'bg-warning';
-        } else {
-            $manager->bar_class = 'bg-success';
-        }
+            if ($manager->average_progress < 40) {
+                $manager->bar_class = 'bg-danger';
+            } elseif ($manager->average_progress < 70) {
+                $manager->bar_class = 'bg-warning';
+            } else {
+                $manager->bar_class = 'bg-success';
+            }
 
-        return $manager;
-    });
+            return $manager;
+        });
 
 
-    // Derniers projets
-    $latestProjects = Project::with(['partners', 'unit'])
-        ->latest()
-        ->take(5)
-        ->get();
+        // Derniers projets
+        $latestProjects = Project::with(['partners', 'unit'])
+            ->latest()
+            ->take(5)
+            ->get();
 
-    return view('dashboard', compact('counts','projectManagers','latestProjects'));
-}
+        return view('dashboard', compact('counts','projectManagers','latestProjects'));
+    }
 
 
     public function pma()

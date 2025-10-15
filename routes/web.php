@@ -113,6 +113,9 @@ Route::put('/deletion-requests/{id}/decline', [ProjectDeletionRequestController:
 
 Route::patch('/projects/{project}/reactivate', [ProjectController::class, 'reactivate'])->name('projects.reactivate');
 Route::get('/projects/{id}/report', [ReportController::class, 'viewReport'])->name('projects.viewReport');
+Route::get('/projects/{project}/report/view', [ReportController::class, 'viewOnlyReport'])
+    ->name('projects.viewOnlyReport');
+
 Route::patch('/development-details/{id}/update-payment', [DevelopmentDetailController::class, 'updatePayment'])->name('developmentDetails.updatePayment');
 Route::patch('/projects/{project}/close', [ProjectController::class, 'close'])->name('projects.close');
 Route::patch('/projects/{project}/closeAdmin', [ProjectController::class, 'closeAdmin'])->name('projects.close.admin');
@@ -152,7 +155,11 @@ Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->n
 // Route::get('/tasks/{task}', [TaskController::class, 'show']);
 Route::get('/tasks/{id}', [TaskController::class, 'show']);
 
-Route::post('/tasks/{id}/comments', [TaskController::class, 'storeComment'])->name('tasks.comments.store');
+// Route::post('/tasks/{id}/comments', [TaskController::class, 'storeComment'])->name('tasks.comments.store');
+// Route::post('/tasks/{id}/comments', [TaskController::class, 'storeComment'])->name('tasks.comments.store');
+Route::post('/tasks/{id}/comments', [TaskController::class, 'storeComment'])
+    ->where('id', '.*') // pour accepter le texte chiffré
+    ->name('tasks.comments.store');
 
 Route::get('/tasks/summary', [TaskController::class, 'summary'])->name('tasks.summary');
 Route::resource('tasks', TaskController::class);

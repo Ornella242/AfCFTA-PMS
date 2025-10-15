@@ -145,8 +145,6 @@
                 </div>
             </div>
 
-
-
             {{-- Derniers projets --}}
             {{-- @include('partials.latest-projects', ['latestProjects' => $latestProjects]) --}}
 

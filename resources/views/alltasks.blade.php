@@ -638,24 +638,48 @@
                     <!-- Comment Section --> 
                     <hr> 
                    <h6 class="font-weight-bold">Comments</h6>
-                        <form method="POST" action="{{ route('tasks.comments.store', encrypt($task->id)) }}">
-                            @csrf
-                            <div class="form-group">
-                                <textarea name="comment" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
-                            </div>
-                            <button type="submit" class="btn bg-gold text-white mt-2">
-                                <i class="fe fe-send text-white mr-1"></i> Post Comment
-                            </button>
-                        </form>
+                        @isset($task)
+                            <form method="POST" action="{{ route('tasks.comments.store', encrypt($task->id)) }}">
+                                @csrf
+                                <div class="form-group">
+                                    <textarea name="comment" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn bg-gold text-white mt-2">
+                                    <i class="fe fe-send text-white mr-1"></i> Post Comment
+                                </button>
+                            </form>
+                        @endisset
+
                     <hr>
 
                     <!-- Commentaires (inchangés) -->
-                    <div id="taskCommentsList">
-                        <h5 class="mb-3 text-secondary"><i class="fe fe-users mr-2"></i> Comments</h5>
-                        <ul class="list-group" id="commentsContainer">
-                            <li class="list-group-item text-muted">No comments yet.</li>
-                        </ul>
-                    </div>
+                    @isset($task)
+                        @if($task->comments->count() > 0)
+                            <ul class="list-group list-group-flush mb-3">
+                                @foreach($task->comments as $comment)
+                                    <li class="list-group-item border-0 px-0 py-2">
+                                        <div class="d-flex align-items-start">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3"
+                                                style="width: 40px; height: 40px; font-weight: bold;">
+                                                {{ strtoupper(substr($comment->user->firstname,0,1) . substr($comment->user->lastname,0,1)) }}
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <strong class="text-dark">{{ $comment->user->firstname }} {{ $comment->user->lastname }}</strong>
+                                                    <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                                </div>
+                                                <div class="mt-1 p-2 bg-light rounded shadow-sm">
+                                                    {{ $comment->comment }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="text-muted">No comments yet.</p>
+                        @endif
+                    @endisset
                 </div>
 
             </div>
@@ -704,7 +728,6 @@
 
                         @csrf
                         @method('PUT')
-
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Title</label>
@@ -717,14 +740,22 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-4">
                                     <label>Start date</label>
                                     <input type="date" name="start_date" value="{{ $task->start_date->format('Y-m-d') }}" class="form-control">
                                 </div>
         
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-4">
                                     <label>End date</label>
                                     <input type="date" name="end_date" value="{{ $task->end_date->format('Y-m-d') }}" class="form-control">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Priority</label>
+                                    <select name="priority" class="form-control">
+                                        <option value="low" {{ $task->priority == 'low' ? 'selected' : '' }}>Low</option>
+                                        <option value="medium" {{ $task->priority == 'medium' ? 'selected' : '' }}>Medium</option>
+                                        <option value="high" {{ $task->priority == 'high' ? 'selected' : '' }}>High</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -733,14 +764,14 @@
                                     <label>Status</label>
                                     <select name="status" class="form-control">
                                         <option value="pending" {{ $task->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="in_progress" {{ $task->status == 'in_progress' ? 'selected' : '' }}>In progress</option>
+                                        <option value="processing" {{ $task->status == 'processing' ? 'selected' : '' }}>Processing</option>
                                         <option value="completed" {{ $task->status == 'completed' ? 'selected' : '' }}>Completed</option>
                                     </select>
                                 </div>
 
                                 <div class="form-group col-md-6">
                                     <label>Assigned user</label>
-                                    <select name="assigned_user_id" class="form-control">
+                                    <select name="assigned_to" class="form-control">
                                         <option value="">-- None --</option>
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}" {{ $task->assigned_to == $user->id ? 'selected' : '' }}>
@@ -952,84 +983,6 @@
                 $('#modalTaskEnd').text(task.end_date);
                 $('#modalTaskUser').text(task.assigned_user ? (task.assigned_user.firstname + ' ' + task.assigned_user.lastname) : 'N/A');
 
-                // ⚡ Gestion des commentaires
-                $('#commentsContainer').empty();
-                if (task.comments && task.comments.length > 0) {
-                    task.comments.forEach(function(comment) {
-                        let initials = (comment.user.firstname[0] ?? '') + (comment.user.lastname[0] ?? '');
-                        $('#commentsContainer').append(`
-                            <li class="list-group-item border-0 px-0 py-2">
-                                <div class="d-flex align-items-start">
-                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3"
-                                        style="width: 40px; height: 40px; font-weight: bold;">
-                                        ${initials.toUpperCase()}
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <strong class="text-dark">${comment.user.firstname} ${comment.user.lastname}</strong>
-                                            <small class="text-muted">${comment.created_at}</small>
-                                        </div>
-                                        <div class="mt-1 p-2 bg-light rounded shadow-sm">
-                                            ${comment.comment}
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        `);
-                    });
-                } else {
-                    $('#commentsContainer').append('<li class="list-group-item text-muted">No comments yet.</li>');
-                }
-
-                // Stocker l'id de la tâche pour le post
-                $('#commentTaskId').val(task.id);
-
-                // ⚡ Ajout listener sur le bouton Post Comment
-                $('#postCommentBtn').off('click').on('click', function() {
-                    let comment = $('#commentText').val();
-
-                    if (!comment.trim()) {
-                        alert("Please write a comment first.");
-                        return;
-                    }
-
-                    fetch(`/tasks/${task.id}/comments`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        body: JSON.stringify({ comment: comment })
-                    })
-                    .then(response => response.json())
-                    .then(newComment => {
-                        // Vider textarea
-                        $('#commentText').val('');
-
-                        // Ajouter directement le nouveau commentaire
-                        let initials = (newComment.user.firstname[0] ?? '') + (newComment.user.lastname[0] ?? '');
-                        $('#commentsContainer').append(`
-                            <li class="list-group-item border-0 px-0 py-2">
-                                <div class="d-flex align-items-start">
-                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3"
-                                        style="width: 40px; height: 40px; font-weight: bold;">
-                                        ${initials.toUpperCase()}
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <strong class="text-dark">${newComment.user.firstname} ${newComment.user.lastname}</strong>
-                                            <small class="text-muted">just now</small>
-                                        </div>
-                                        <div class="mt-1 p-2 bg-light rounded shadow-sm">
-                                            ${newComment.comment}
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        `);
-                    })
-                    .catch(error => console.error('Erreur ajout commentaire:', error));
-                });
 
             })
             .catch(error => console.error('Erreur chargement tâche:', error));
@@ -1115,7 +1068,7 @@
                 labels: [],
                 datasets: [{
                     data: [],
-                    backgroundColor: ['#299347',, '#F4A51F', '#9E2140', '#dc3545']
+                    backgroundColor: ['#9E2140', '#F4A51F', '#299347', '#dc3545']
                 }]
             },
             options: {
