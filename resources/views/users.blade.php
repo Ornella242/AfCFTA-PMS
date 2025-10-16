@@ -21,13 +21,7 @@
                         <h2 class="mb-0 page-title text-maroon">List of Users</h2>
                     </div>
 
-                    <!-- Add User Button -->
-                    <div>
-                        <button type="button" class="btn bg-green  text-white" data-toggle="modal" data-target="#varyModalUser" data-whatever="@mdo">
-                            <i class="fe fe-user-plus mx-1"></i>Add new user
-                        </button>
-                       
-                    </div>
+                   
                 </div>
             </div>
             <div class="row align-items-center mt-2">

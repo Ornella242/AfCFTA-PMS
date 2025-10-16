@@ -47,7 +47,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
         //  dd($user);
-        if ($user->role->name === 'Admin') {
+        if ($user->role->name === 'Admin' || $user->role->name === 'Project Manager') {
             $request->validate([
                 'firstname' => 'required|string|max:255',
                 'lastname' => 'required|string|max:255',
@@ -55,7 +55,7 @@ class UserController extends Controller
                 'unit_id' => 'required|exists:units,id',
                 'role_id' => 'required|exists:roles,id',
             ]);
-    //  dd($request->all());
+       
             // Générer un mot de passe sécurisé
             $specialChars = ['!', '@', '#', '$', '%', '^', '&', '*'];
             $uppercase = strtoupper(Str::random(1));

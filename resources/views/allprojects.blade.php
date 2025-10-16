@@ -155,11 +155,14 @@ function statusColorClass($status) {
                   </div>
 
                   <!-- Add Project Button -->
-                  <div>
-                      <button type="button" class="btn mb-2 bg-maroon text-white" data-toggle="modal" data-target="#projectModal">
-                          <i class="fe fe-plus mx-1"></i> <a href="{{ route('projects.create') }}" class="text-white text-decoration-none">Add new</a>
-                      </button>
-                  </div>
+                  @if (auth()->user()->role->name === 'Project Manager' || auth()->user()->role->name === 'Admin')
+                    
+                    <div>
+                        <button type="button" class="btn mb-2 bg-maroon text-white" data-toggle="modal" data-target="#projectModal">
+                            <i class="fe fe-plus mx-1"></i> <a href="{{ route('projects.create') }}" class="text-white text-decoration-none">Add new</a>
+                        </button>
+                    </div>
+                  @endif
               </div>
               <div class="row align-items-center mb-4">
                         <div class="col-12">

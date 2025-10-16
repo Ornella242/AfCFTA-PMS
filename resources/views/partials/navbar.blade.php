@@ -193,7 +193,7 @@
               <li class="nav-item w-100 d-flex justify-content-between align-items-center">
                 <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
                    <img src="{{ asset('images/icons/alltasks.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
-                  <span class="ml-3 item-text">All Tasks</span>
+                  <span class="ml-3 item-text">My tasks</span>
                 </a>
                 @if(isset($totalTasks))
                   <span class="badge badge-pill bg-yellow text-white mr-3 pt-2 pb-2">
@@ -324,13 +324,12 @@
             <li class="nav-item w-100">
                 <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
                     <img src="{{ asset('images/icons/alltasks.png') }}" alt="All Tasks" class="icon-img" style="width:20px; height:20px;">
-                    <span class="ml-3 item-text">All Tasks</span>
+                    <span class="ml-3 item-text">My Tasks</span>
                     
                 </a>
 
                 {{-- Badges sous le lien --}}
-                
-                    @if(isset($assignedToUser))
+                    {{-- @if(isset($assignedToUser))
                         <span class="badge badge-pill bg-green text-white mr-2 mt-1 pt-2 pb-2 px-3">
                             Assigned to me: {{ $assignedToUser }}
                         </span>
@@ -340,7 +339,7 @@
                         <span class="badge badge-pill bg-yellow text-white mr-2 mt-1 pt-2 pb-2 px-3">
                             Assigned by me: {{ $assignedByUser }}
                         </span>
-                    @endif
+                    @endif --}}
             </li>
 
             </ul>
@@ -356,7 +355,7 @@
               <li class="nav-item w-100 d-flex justify-content-between align-items-center">
                 <a href="{{ url('/alltasks') }}" class="nav-link d-flex align-items-center">
                    <img src="{{ asset('images/icons/alltasks.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
-                  <span class="ml-3 item-text">All Tasks</span>
+                  <span class="ml-3 item-text">My Tasks</span>
                 </a>
                 @if(isset($totalTasks))
                   <span class="badge badge-pill bg-yellow text-white mr-3 pt-2 pb-2">

@@ -7,9 +7,6 @@
                 <div class="col">
                   <h2 class="page-title">Reports</h2>
                 </div>
-                <div class="col-auto">
-                    <button type="button" class="btn mb-2 bg-maroon  text-white" data-toggle="modal" data-target="#varyModal" data-whatever="@mdo"><i class="fe fe-upload mx-1"></i>Generate new </button>
-                    </div>
                 </div>
                  <div class="col-12">
                       @if(session('success'))
@@ -64,7 +61,8 @@
                                             <i class="fe fe-more-vertical"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="{{ url('projects/' . $report->project->id . '/report') }}"><i class="fe fe-eye mr-2"></i>View</a>
+                                          
+                                            <a class="dropdown-item" href="{{  route('projects.viewOnlyReport', encrypt($report->project->id))  }}"><i class="fe fe-eye mr-2"></i>View</a>
                                             <a class="dropdown-item" data-toggle="modal" data-target="#shareReportModal{{ $report->id }}">
                                                 <i class="fe fe-share mr-2"></i>Share
                                             </a>

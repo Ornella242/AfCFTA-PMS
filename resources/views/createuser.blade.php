@@ -161,7 +161,7 @@
                       @endforeach
                   </select>
                 </div>
-                <div class="form-group col-md-4">
+                {{-- <div class="form-group col-md-4">
                   <label for="role" style="font-weight: bold">
                     <img src="{{ asset('images/icons/role.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
                      Role</label>
@@ -170,7 +170,30 @@
                             <option value="{{ $role->id }}">{{ $role->name }}</option>
                       @endforeach
                   </select>
+                </div> --}}
+                <div class="form-group col-md-4">
+                    <label for="role" style="font-weight: bold">
+                        <img src="{{ asset('images/icons/role.png') }}" alt="Dashboard" class="icon-img" style="width:20px; height:20px;">
+                        Role
+                    </label>
+
+                    <select id="role" class="form-control shadow-sm" name="role_id">
+                        @if(Auth::user()->role->name === 'Admin')
+                            {{-- Si l'utilisateur connecté est Admin, afficher tous les rôles --}}
+                            @foreach($roles as $role)
+                                <option value="{{ $role->id }}">{{ $role->name }}</option>
+                            @endforeach
+                        @else
+                            {{-- Sinon, afficher seulement "Project Manager Assistant" et "Member" --}}
+                            @foreach($roles as $role)
+                                @if(in_array($role->name, ['Project Manager Assistant', 'Member']))
+                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                @endif
+                            @endforeach
+                        @endif
+                    </select>
                 </div>
+
               </div>
 
               <div class="d-flex justify-content-end mt-3">
